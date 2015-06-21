@@ -1,2 +1,2 @@
 # Jandy
-jandy is a dynamic analysis project for opensource developer using on github and travis-ci
+Jandy is a dynamic analysis project for opensource developer using on github and travis-ci

@@ -47,6 +47,7 @@
     </div>
   </div>
 <script>
+
   $(function () {
     $("[role='bootstrap-switch']").bootstrapSwitch().on('switchChange.bootstrapSwitch', function (event, state) {
       var $this = $(this);

@@ -6,12 +6,13 @@
     <title>Jandy</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="${root}/css/style.css"/>
-    <link rel="stylesheet" href="${root}/webjars/bootstrap/3.3.5/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="${root}/webjars/bootstrap/3.3.5/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="${root}/webjars/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.min.css"/>
   </head>
   <body data-spy="scroll">
     <script src="${root}/webjars/jquery/2.1.4/jquery.min.js"></script>
     <#nested/>
+    <script src="${root}/webjars/json2/20140204/json2.min.js"></script>
     <script src="${root}/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="${root}/webjars/bootstrap-switch/3.3.2/js/bootstrap-switch.min.js"></script>
     <script src="${root}/js/bootstrap-waitingfor.js"></script>
@@ -40,12 +41,17 @@
               <li class="dropdown">
                 <a href="${root}/profile" class="navbar-brand" style="background-image: url('${user.avatarUrl}'); background-size: cover; width: 50px;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
                 <ul class="dropdown-menu">
-                  <li><a href="#">Profile</a></li>
-                  <li><a href="${root}/j_spring_security_logout">Sign out</a></li>
+                  <li><a href="${root}/profile">Profile</a></li>
+                  <li><a href="${root}/signout">Sign out</a></li>
                 </ul>
               </li>
             <#else>
-              <li><button onclick="javascript:window.location.href='${root}/login'" class="navbar-btn btn btn-default">Sign in with GitHub</button></li>
+              <li>
+                <form action="${root}/signin/github" method="POST">
+                  <button type="submit" class="navbar-btn btn btn-default">Sign in with GitHub</button>
+                  <input type="hidden" name="scope" value="${github_scopes}" />
+                </form>
+              </li>
             </#if>
           </ul>
         </div><!-- /.navbar-collapse -->

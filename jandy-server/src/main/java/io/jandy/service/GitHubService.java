@@ -6,7 +6,9 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.*;
 import org.eclipse.egit.github.core.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.client.OAuth2RestOperations;
+import org.springframework.social.connect.Connection;
+import org.springframework.social.connect.ConnectionRepository;
+import org.springframework.social.github.api.GitHub;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,13 +20,14 @@ import java.io.IOException;
 @Service
 public class GitHubService {
   @Autowired
-  private OAuth2RestOperations ops;
+  private ConnectionRepository connectionRepository;
 
   private GitHubClient getGitHubClient() throws NotSignedInException {
-    if (ops == null)
+    Connection<? extends GitHub> connection = connectionRepository.findPrimaryConnection(GitHub.class);
+    if (connection == null)
       throw new NotSignedInException();
     GitHubClient ghClient = new GitHubClient();
-    ghClient.setOAuth2Token(ops.getAccessToken().getValue());
+    ghClient.setOAuth2Token(connection.createData().getAccessToken());
     return ghClient;
   }
 

@@ -56,8 +56,12 @@
         var fullName = $this.parents('.row[data-full-name]').data('full-name');
         waitingDialog.show('Importing...');
         $.ajax({
-          url: "${root}/profile/project/" + fullName,
-          type: "PUT"
+          url: "${root}/profile/project",
+          type: "PUT",
+          contentType: "application/json",
+          data: JSON.stringify({
+                fullName: fullName
+              })
         }).fail(function () {
           $this.bootstrapSwitch('state', false, true);
         }).always(function () {

@@ -12,16 +12,15 @@ import io.jandy.exception.UserNotFoundException;
 import io.jandy.service.GitHubService;
 import io.jandy.service.UserService;
 import io.jandy.web.view.model.VmRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
@@ -46,12 +45,12 @@ public class ProfileController {
   @Autowired
   private ProjectRepository projectRepository;
 
-  @RequestMapping
+  @RequestMapping(method = RequestMethod.GET)
   public ModelAndView index() throws IOException, UserNotFoundException, NotSignedInException {
     return index(gitHubService.getUser().getLogin());
   }
 
-  @RequestMapping("/{login}")
+  @RequestMapping(value = "/{login}", method = RequestMethod.GET)
   public ModelAndView index(@PathVariable String login) throws IOException, UserNotFoundException, NotSignedInException {
 
     logger.trace("calling page 'index' ");
@@ -79,9 +78,11 @@ public class ProfileController {
         ;
   }
 
-  @RequestMapping(value = "/project/{account}/{name}", method = RequestMethod.PUT)
+  @RequestMapping(value = "/project", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
-  public void importProject(@PathVariable String account, @PathVariable String name) throws IOException, NotSignedInException, UserNotFoundException {
+  public void importProject(@RequestBody Map<String, ?> req) throws IOException, NotSignedInException, UserNotFoundException {
+    String []strs = StringUtils.split((String)req.get("fullName"), '/');
+    String account = strs[0].trim(), name = strs[1].trim();
 
     Project project = projectRepository.findByAccountAndName(account, name);
     if (project == null) {

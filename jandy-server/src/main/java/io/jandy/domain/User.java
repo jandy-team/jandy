@@ -15,18 +15,15 @@ public class User {
   private long id;
 
   @Column(unique = true)
-  private int gitHubId;
+  private long gitHubId;
 
-  @Transient
   private String avatarUrl;
+  private String login;
+  private int publicRepos;
 
   @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "user")
   private List<Project> projects = new ArrayList<>();
 
-  @Transient
-  private String login;
-  @Transient
-  private int publicRepos;
 
   public long getId() {
     return id;
@@ -44,11 +41,11 @@ public class User {
     this.projects = projects;
   }
 
-  public int getGitHubId() {
+  public long getGitHubId() {
     return gitHubId;
   }
 
-  public void setGitHubId(int gitHubId) {
+  public void setGitHubId(long gitHubId) {
     this.gitHubId = gitHubId;
   }
 

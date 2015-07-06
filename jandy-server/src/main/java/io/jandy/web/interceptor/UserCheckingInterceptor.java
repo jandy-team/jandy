@@ -35,7 +35,8 @@ public class UserCheckingInterceptor implements HandlerInterceptor {
   public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView mav) throws Exception {
     String userId = userCookieGenerator.readCookieValue(request);
     try {
-      if (!StringUtils.isEmpty(userId) && !mav.getModelMap().containsAttribute("user")) {
+      if (!StringUtils.isEmpty(userId)
+          && (mav != null && !mav.getModelMap().containsAttribute("user"))) {
         mav.addObject("user", userService.getUser(Long.parseLong(userId)));
       }
     } catch(NotSignedInException e) {

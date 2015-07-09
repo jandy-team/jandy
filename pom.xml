@@ -10,8 +10,8 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>jandy-runner</module>
     <module>jandy-server</module>
   </modules>
-
 
 </project>

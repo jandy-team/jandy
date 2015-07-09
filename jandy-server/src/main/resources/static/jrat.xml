@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jrat>
+  <settings>
+    <property name="httpServerEnabled" value="true"/>
+  </settings>
+
+  <profile name="my code">
+
+    <criteria>
+      <include/>
+      <exclude package="com.sun.*"/>
+    </criteria>
+
+    <handlers>
+
+      <handler factory="org.shiftone.jrat.provider.tree.TreeMethodHandlerFactory">
+        <property name="outputFile" value="results.jrat"/>
+      </handler>
+
+    </handlers>
+
+  </profile>
+</jrat> 

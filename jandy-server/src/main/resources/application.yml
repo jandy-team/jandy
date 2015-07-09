@@ -10,4 +10,5 @@ spring:
     requestContextAttribute: rc
 server.port: 3000
 
-logging.level.io.jandy: TRACE
+logging.level:
+  io.jandy: TRACE

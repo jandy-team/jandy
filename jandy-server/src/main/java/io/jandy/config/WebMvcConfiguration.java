@@ -31,12 +31,12 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addWebRequestInterceptor(springEnvironmentsAttributeInterceptor);
     registry.addInterceptor(userInterceptor)
-        .excludePathPatterns("/");
+        .excludePathPatterns("/error", "/", "/travis/**");
     registry.addInterceptor(userCheckingInterceptor);
   }
 
   public void addViewControllers(ViewControllerRegistry registry) {
-    registry.addViewController("/signin").setViewName("forward:/");
+    registry.addViewController("/signin").setViewName("redirect:/");
     registry.addViewController("/signout");
   }
 }

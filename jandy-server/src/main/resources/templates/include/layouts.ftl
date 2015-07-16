@@ -6,7 +6,7 @@
     <title>Jandy</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="${root}/css/style.css"/>
-    <link rel="stylesheet" href="${root}/webjars/bootstrap/3.3.5/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="${root}/css/bootstrap.css"/>
     <link rel="stylesheet" href="${root}/webjars/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.min.css"/>
   </head>
   <body data-spy="scroll">
@@ -42,7 +42,12 @@
           <ul class="navbar-nav nav navbar-right">
             <#if user??>
               <li class="dropdown">
-                <a href="${root}/profile" class="navbar-brand" style="background-image: url('${user.avatarUrl}'); background-size: cover; width: 50px;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+                <a href="${root}/profile" style="padding-top: 0;" class="navbar-brand" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <span style="display: inline-block; margin-top: 15px;">${user.login}</span>
+                  <#--<div style="display:inline-block; background-image: url('${user.avatarUrl}'); background-size: cover; width: 30px; height: 30px; padding-top: -10px; border-radius: 5px;">&nbsp;</div>-->
+                  <img src="${user.avatarUrl}" style="display: inline-block; background-size: cover; border-radius: 5px;" width="40px" height="40px">
+                  <span class="caret"></span>
+                </a>
                 <ul class="dropdown-menu">
                   <li><a href="${root}/profile">Profile</a></li>
                   <li><a href="${root}/signout">Sign out</a></li>

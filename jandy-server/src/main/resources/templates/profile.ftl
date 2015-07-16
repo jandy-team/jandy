@@ -1,44 +1,50 @@
 <#include "include/layouts.ftl">
 <@layoutFully>
-  <div class="container-fluid">
+  <div id="profile" class="container-fluid">
     <div class="row">
-      <div class="col-md-3" role="navigation">
-        <div class="panel panel-success">
-          <div class="panel-heading">
-            <h3 class="panel-title">Organizations</h3>
+      <aside id="left-menu" class="col-md-2 affix" role="navigation">
+        <div class="panel panel-default">
+          <div class="panel-heading" style="background-color: #fff">
+            <h3 class="panel-title" style="color: rgb(139, 139, 139); font-size: 20px;">Organizations</h3>
           </div>
-          <ul class="list-group">
-            <li class="list-group-item">
-              <span class="badge">${user.publicRepos}</span>
-              <a href="#repos-${user.login}">${user.login}</a>
-            </li>
+          <ul id="org-list" class="list-group">
+            <a href="#repos-${user.login}" class="list-group-item" style="border-left: 5px solid ${colors[user.login?lower_case]};">
+              <div class="row">
+                <span class="col-md-10">${user.login}</span>
+                <span class="col-md-2" style="text-align: center; border-left: 1px #dddddd solid;">${user.publicRepos}</span>
+              </div>
+            </a>
             <#foreach org in organizations>
-              <li class="list-group-item">
-                <span class="badge">${org['publicRepos']}</span>
-                <a href="#repos-${org['login']?lower_case}">${org['login']}</a>
-              </li>
+              <a href="#repos-${org['login']?lower_case}" class="list-group-item" style="border-left: 5px solid ${colors[org['login']?lower_case]};">
+                <div class="row">
+                  <span class="col-md-10">${org['login']}</span>
+                  <span class="col-md-2" style="text-align: center; border-left: 1px #dddddd solid;">${org['publicRepos']}</span>
+                </div>
+              </a>
             </#foreach>
           </ul>
         </div>
-      </div>
-      <section class="col-md-9" role="main">
+      </aside>
+      <section class="col-md-10 col-md-offset-2" role="main">
         <#foreach ownerName in repositories?keys>
           <div class="row">
-            <div id="repos-${ownerName}" class="panel panel-default">
-              <div class="panel-heading">
-                <h2 class="panel-title">${ownerName}</h2>
+            <div id="repos-${ownerName?lower_case}" class="panel panel-default" style="border-top: 5px ${colors[ownerName?lower_case]} solid;">
+              <div class="panel-heading" style="background-color: #fff; border-bottom: none;">
+                <h2 class="panel-title" style="font-size: 30px; padding-left: 15px;">${ownerName}</h2>
               </div>
               <div class="panel-body">
-                <div class="container-fluid">
+                <article class="container-fluid">
                   <#list repositories[ownerName] as repo>
                     <div class="row" style="vertical-align: middle; height: 30px;" data-full-name="${repo.owner.login}/${repo.name}" data-github-id="${repo.id?c}">
                       <div class="col-md-1">
-                        <input type="checkbox" role="bootstrap-switch" data-size="mini" <#if repo.imported>checked</#if>>
+                        <input type="checkbox" role="bootstrap-switch" data-size="small" data-on-color="success" <#if repo.imported>checked</#if>>
                       </div>
-                      <div class="col-md-11" title="${repo.description}">${repo.name}</div>
+                      <div class="col-md-11">
+                        <span data-toggle="tooltip" data-placement="right" title="${repo.description}" style="font-size: 16px;">${repo.name}</span>
+                      </div>
                     </div>
                   </#list>
-                </div>
+                </article>
               </div>
             </div>
           </div>
@@ -81,7 +87,7 @@
         })
       }
     });
-    $("[title]").tooltip()
+    $("[data-toggle='tooltip']").tooltip()
   })
 </script>
 </@layoutFully>

@@ -55,6 +55,7 @@ public class TravisRestControllerTest extends AbstractWebAppTestCase {
                 .param("repoName", "jandy")
                 .param("buildId", "1")
                 .param("branchName", "master")
+                .param("buildNum", "1")
         ).andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
         .andDo(MockMvcResultHandlers.print());
   }

@@ -1,8 +1,10 @@
 package io.jandy.config;
 
+import io.jandy.config.social.JpaUsersConnectionRepository;
 import io.jandy.config.social.SecurityContext;
 import io.jandy.config.social.SimpleConnectionSignUp;
 import io.jandy.config.social.SimpleSignInAdapter;
+import io.jandy.domain.UserConnectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,11 +17,7 @@ import org.springframework.social.config.annotation.ConnectionFactoryConfigurer;
 import org.springframework.social.config.annotation.EnableSocial;
 import org.springframework.social.config.annotation.SocialConfigurer;
 import org.springframework.social.connect.*;
-import org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository;
 import org.springframework.social.connect.web.ProviderSignInController;
-import org.springframework.social.connect.web.ProviderSignInInterceptor;
-import org.springframework.social.connect.web.ProviderSignInUtils;
-import org.springframework.social.connect.web.SignInAdapter;
 import org.springframework.social.github.api.GitHub;
 import org.springframework.social.github.connect.GitHubConnectionFactory;
 
@@ -38,6 +36,8 @@ public class SocialConfiguration implements SocialConfigurer {
   private SimpleConnectionSignUp simpleConnectionSignUp;
   @Autowired
   private SimpleSignInAdapter simpleSignInAdapter;
+  @Autowired
+  private UserConnectionRepository userConnectionRepository;
 
   @Override
   public void addConnectionFactories(ConnectionFactoryConfigurer cfConfig, Environment env) {
@@ -49,7 +49,7 @@ public class SocialConfiguration implements SocialConfigurer {
    */
   @Override
   public UsersConnectionRepository getUsersConnectionRepository(ConnectionFactoryLocator connectionFactoryLocator) {
-    JdbcUsersConnectionRepository repository = new JdbcUsersConnectionRepository(dataSource, connectionFactoryLocator, Encryptors.noOpText());
+    JpaUsersConnectionRepository repository = new JpaUsersConnectionRepository(userConnectionRepository, connectionFactoryLocator, Encryptors.noOpText());
     repository.setConnectionSignUp(this.simpleConnectionSignUp);
     return repository;
   }

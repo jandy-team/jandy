@@ -20,21 +20,21 @@ public class BuildService {
   @Autowired
   private ProjectRepository projectRepository;
 
-  public Build getBuild(String ownerName, String repoName, String branchName,
-                        long travisBuildId, String language) throws ProjectNotRegisteredException {
+  public Build getBuildForTravis(long travisBuildId) throws ProjectNotRegisteredException {
     Build build = buildRepository.findByTravisBuildId(travisBuildId);
-    return build == null ? createBuild(ownerName, repoName, branchName, travisBuildId, language) : build;
+    return build;
   }
 
   @Transactional
-  private Build createBuild(String ownerName, String repoName, String branchName,
-                            long travisBuildId, String language) throws ProjectNotRegisteredException {
+  public Build createBuild(String ownerName, String repoName, String branchName,
+                           long travisBuildId, String language, Long buildNum) throws ProjectNotRegisteredException {
     Branch branch = getBranch(ownerName, repoName, branchName);
 
     Build build = new Build();
     build.setBranch(branch);
     build.setTravisBuildId(travisBuildId);
     build.setLanguage(language);
+    build.setNumber(buildNum);
 
     return buildRepository.save(build);
   }

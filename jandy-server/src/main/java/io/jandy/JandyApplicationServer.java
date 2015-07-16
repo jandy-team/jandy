@@ -8,10 +8,13 @@ import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.system.ApplicationPidFileWriter;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Controller;
@@ -45,6 +48,9 @@ public class JandyApplicationServer {
   }
 
   public static void main(String[] args) {
-    SpringApplication.run(JandyApplicationServer.class, args);
+    new SpringApplicationBuilder()
+        .listeners(new ApplicationPidFileWriter())
+        .sources(JandyApplicationServer.class)
+        .run(args);
   }
 }

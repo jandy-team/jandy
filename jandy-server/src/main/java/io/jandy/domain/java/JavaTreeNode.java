@@ -26,6 +26,13 @@ public class JavaTreeNode {
   private int concurrentThreads = 0;
   private int maxConcurrentThreads = 0;
 
+  @Transient
+  private double offset;
+  @Transient
+  private double width;
+  @Transient
+  private int depth;
+
   @ManyToOne
   private JavaMethod javaMethod;
 
@@ -154,5 +161,29 @@ public class JavaTreeNode {
 
   public void setChildren(List<JavaTreeNode> children) {
     this.children = children;
+  }
+
+  public double getOffset() {
+    return offset;
+  }
+
+  public void setOffset(double offset) {
+    this.offset = offset;
+  }
+
+  public double getWidth() {
+    return width;
+  }
+
+  public void setWidth(double width) {
+    this.width = width;
+  }
+
+  public int getDepth() {
+    return depth;
+  }
+
+  public void setDepth(int depth) {
+    this.depth = depth;
   }
 }

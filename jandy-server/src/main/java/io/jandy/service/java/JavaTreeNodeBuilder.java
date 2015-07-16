@@ -1,4 +1,4 @@
-package io.jandy.service;
+package io.jandy.service.java;
 
 import io.jandy.core.jrat.TraceMetrics;
 import io.jandy.domain.Build;
@@ -22,7 +22,7 @@ import javax.transaction.Transactional;
  * @since 2015-07-08
  */
 @Service
-public class JavaProfilingDumpBuilder {
+public class JavaTreeNodeBuilder {
   private static final Logger logger = LoggerFactory.getLogger(JavaProfilingDump.class);
 
   @Autowired
@@ -34,20 +34,8 @@ public class JavaProfilingDumpBuilder {
   @Autowired
   private JavaClassRepository javaClassRepository;
 
-  @Autowired
-  private JavaProfilingDumpRepository javaProfilingDumpRepository;
-
   @Transactional
-  public JavaProfilingDump build(Build build, TraceMetrics traceMetrics) {
-    JavaProfilingDump dump = new JavaProfilingDump();
-    dump.setRoot(buildTreeNode(traceMetrics.getRoot(), null));
-    dump.setBuild(build);
-
-    return javaProfilingDumpRepository.save(dump);
-  }
-
-  @Transactional
-  private JavaTreeNode buildTreeNode(TreeNode treeNode, JavaTreeNode parent) {
+  public JavaTreeNode buildTreeNode(TreeNode treeNode, JavaTreeNode parent) {
     JavaTreeNode javaTreeNode = new JavaTreeNode();
 
     Accumulator accumulator = treeNode.getAccumulator();

@@ -8,7 +8,7 @@
 
     <criteria>
       <include/>
-      <exclude package="com.sun.*"/>
+      <exclude className="com.sun.*"/>
     </criteria>
 
     <handlers>

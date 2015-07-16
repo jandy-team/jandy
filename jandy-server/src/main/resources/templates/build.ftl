@@ -1,31 +1,36 @@
 <#include "include/layouts.ftl">
 <@layoutFully>
-<div class="container">
+<section class="container">
   <#if build??>
     <#if build.language == 'java'>
-      <#macro traverseTreeNodes treeNode depth>
-        <#nested treeNode depth>
+      <#macro traverseTreeNodes treeNode>
+        <#nested treeNode>
         <#foreach childNode in treeNode.children>
-          <@traverseTreeNodes childNode depth+2; resultTreeNode, resultDepth>
-            <#nested resultTreeNode resultDepth>
+          <@traverseTreeNodes childNode; resultTreeNode>
+            <#nested resultTreeNode>
           </@traverseTreeNodes>
         </#foreach>
       </#macro>
-      <@traverseTreeNodes build.javaProfilingDump.root 0; treeNode, depth>
+      <#assign offset = 0, siblingDepth = 0>
+      <@traverseTreeNodes build.javaProfilingDump.root; treeNode>
         <div class="row">
-          <h3>
-            <#list 0..depth as d>
-              &nbsp;
-            </#list>
+          <div class="col-md-6" style="overflow: hidden;">
             <#if treeNode.javaMethod??>
-              ${treeNode.javaMethod.javaClass.packageName}.${treeNode.javaMethod.javaClass.className}.${treeNode.javaMethod.methodName!}
+              <span title="${treeNode.javaMethod.javaClass.packageName}.${treeNode.javaMethod.javaClass.className}.${treeNode.javaMethod.methodName!}">
+                <#list 0..treeNode.depth as d>|&nbsp;&nbsp;</#list>${treeNode.javaMethod.javaClass.packageName}.${treeNode.javaMethod.javaClass.className}.${treeNode.javaMethod.methodName!}
+              </span>
             <#else>
               Root
             </#if>
-          </h3>
+          </div>
+          <div class="col-md-6" style="vertical-align: middle;">
+            <div style="position:relative; left: ${treeNode.offset*100.0}%; width: ${treeNode.width*100.0}%; background-color: hotpink;">
+              ${treeNode.totalDuration}ms
+            </div>
+          </div>
         </div>
       </@traverseTreeNodes>
     </#if>
   </#if>
-</div>
+</section>
 </@layoutFully>

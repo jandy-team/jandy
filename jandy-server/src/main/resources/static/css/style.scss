@@ -1,3 +1,14 @@
 body {
   position: relative;
 }
+
+#profile {
+  ul#org-list {
+    .list-group-item {
+
+      a, span {
+        font-size: 19px;
+      }
+    }
+  }
+}

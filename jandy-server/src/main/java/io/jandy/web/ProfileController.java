@@ -1,5 +1,6 @@
 package io.jandy.web;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -11,7 +12,10 @@ import io.jandy.exception.NotSignedInException;
 import io.jandy.exception.UserNotFoundException;
 import io.jandy.service.GitHubService;
 import io.jandy.service.UserService;
+import io.jandy.util.ColorUtils;
 import io.jandy.web.view.model.VmRepository;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.DynaBeanPropertyMapDecorator;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.service.RepositoryService;
@@ -25,9 +29,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author JCooky
@@ -46,14 +48,14 @@ public class ProfileController {
   private ProjectRepository projectRepository;
 
   @RequestMapping(method = RequestMethod.GET)
-  public ModelAndView index() throws IOException, UserNotFoundException, NotSignedInException {
+  public ModelAndView index() throws IOException, UserNotFoundException, NotSignedInException, InvocationTargetException, IllegalAccessException {
     return index(gitHubService.getUser().getLogin());
   }
 
   @RequestMapping(value = "/{login}", method = RequestMethod.GET)
-  public ModelAndView index(@PathVariable String login) throws IOException, UserNotFoundException, NotSignedInException {
+  public ModelAndView index(@PathVariable String login) throws IOException, UserNotFoundException, NotSignedInException, InvocationTargetException, IllegalAccessException {
 
-    logger.trace("calling page 'index' ");
+    logger.debug("calling page 'index' ");
 
     List<Map<String, Object>> organizations = Lists.newArrayList(Iterables.transform(gitHubService.getOrganizationService().getOrganizations(login), org -> {
           return ImmutableMap.<String, Object>builder()
@@ -64,15 +66,29 @@ public class ProfileController {
     ));
     logger.trace("fetch from github, data: {}", organizations);
 
+    User user = userService.getUser(login);
+    logger.trace("get user");
+
     RepositoryService repositoryService = gitHubService.getRepositoryService();
-    Map<String, List<Repository>> repositories = new HashMap<>();
+    Map<String, List<Repository>> repositories = new LinkedHashMap<>();
     repositories.put(login, Lists.newArrayList(transformFromRepositories(repositoryService.getRepositories(login))));
     for (Map<String, Object> org : organizations) {
       repositories.put((String) org.get("login"), Lists.newArrayList(transformFromRepositories(repositoryService.getOrgRepositories((String) org.get("login")))));
     }
+    logger.trace("get repositories");
+
+    List<String> randomColors = ColorUtils.getRandomColors(organizations.size() + 1);
+    Map<String, Object> colors = new HashMap<>();
+    for (int i = 0; i < organizations.size(); ++i) {
+      colors.put(StringUtils.lowerCase((String) organizations.get(i).get("login")), randomColors.get(i));
+    }
+
+    colors.put(login, Iterables.getLast(randomColors));
+    logger.trace("make random colors: {}", colors);
 
     return new ModelAndView("profile")
-        .addObject("user", userService.getUser(login))
+        .addObject("colors", colors)
+        .addObject("user", user)
         .addObject("organizations", organizations)
         .addObject("repositories", repositories)
         ;
@@ -81,7 +97,7 @@ public class ProfileController {
   @RequestMapping(value = "/project", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
   public void importProject(@RequestBody Map<String, ?> req) throws IOException, NotSignedInException, UserNotFoundException {
-    String []strs = StringUtils.split((String)req.get("fullName"), '/');
+    String []strs = StringUtils.split((String) req.get("fullName"), '/');
     String account = strs[0].trim(), name = strs[1].trim();
 
     Project project = projectRepository.findByAccountAndName(account, name);

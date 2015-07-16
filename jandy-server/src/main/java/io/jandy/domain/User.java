@@ -21,6 +21,9 @@ public class User {
   private String login;
   private int publicRepos;
 
+  @Transient
+  private String color;
+
   @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "user")
   private List<Project> projects = new ArrayList<>();
 
@@ -72,5 +75,13 @@ public class User {
 
   public int getPublicRepos() {
     return publicRepos;
+  }
+
+  public String getColor() {
+    return color;
+  }
+
+  public void setColor(String color) {
+    this.color = color;
   }
 }

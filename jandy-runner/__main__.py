@@ -7,13 +7,20 @@ import yaml
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 
-URL = "http://localhost:3000"
+travis = os.getenv('TRAVIS')
+ci = os.getenv('CI')
+
+if travis == 'true' and ci == 'true':
+    URL = "http://jandy.io"
+else:
+    URL = "http://localhost:3000"
 JRAT_XML_URL = URL+"/jrat.xml"
 JRAT_JAR_URL = URL+"/jrat.jar"
 
 ownerName, repoName = os.getenv('TRAVIS_REPO_SLUG').split('/')
 branchName = os.getenv('TRAVIS_BRANCH')
 buildId = os.getenv('TRAVIS_BUILD_ID')
+buildNum = os.getenv('TRAVIS_BUILD_NUMBER')
 
 def get_latest_dir(basedir):
     latest_dirname = ''
@@ -46,7 +53,8 @@ with open(".travis.yml", "r") as stream:
                 'ownerName': ownerName,
                 'repoName': repoName,
                 'branchName': branchName,
-                'buildId': buildId
+                'buildId': buildId,
+                'buildNum': buildNum
             }
             datagen, headers = multipart_encode(params)
             request = urllib2.Request(URL+"/travis/java", datagen, headers)

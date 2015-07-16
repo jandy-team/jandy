@@ -1,4 +1,7 @@
 body {
   position: relative; }
 
+#profile ul#org-list .list-group-item a, #profile ul#org-list .list-group-item span {
+  font-size: 19px; }
+
 /*# sourceMappingURL=style.css.map */

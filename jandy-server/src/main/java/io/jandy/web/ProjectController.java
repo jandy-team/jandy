@@ -23,28 +23,10 @@ import java.util.List;
 @Controller
 @RequestMapping("/repos")
 public class ProjectController {
-  @Autowired
-  private ProjectRepository projectRepository;
-  @Autowired
-  private BuildRepository buildRepository;
 
   @RequestMapping(method = RequestMethod.GET)
-  public ModelAndView index() {
-    Page<Project> page = projectRepository.findAll(new PageRequest(0, 10));
-    List<Project> projects = Lists.newArrayList(page);
-    return projects.isEmpty() ? new ModelAndView("repos") : this.project(projects.get(0).getAccount(), projects.get(0).getName());
+  public String index() {
+    return "repos";
   }
-
-  @RequestMapping(value = "/{ownerName}/{repoName}", method = RequestMethod.GET)
-  public ModelAndView project(@PathVariable String ownerName, @PathVariable String repoName) {
-    Project project = projectRepository.findByAccountAndName(ownerName, repoName);
-    List<Build> builds = buildRepository.findByBranch_Project_Id(project.getId());
-
-    return new ModelAndView("repos")
-        .addObject("project", project)
-        .addObject("build", builds)
-        ;
-  }
-
 
 }

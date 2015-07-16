@@ -1,6 +1,4 @@
 spring:
-  datasource:
-    schema: classpath:org/springframework/social/connect/jdbc/JdbcUsersConnectionRepository.sql
   social.github:
     clientId: 5b6118bdbd4066c1ea7a
     clientSecret: 33e25aa49db0a3113ab222473b8e5483e5ec637d
@@ -8,6 +6,9 @@ spring:
   application.name: jandy
   freemarker:
     requestContextAttribute: rc
+security:
+  ignored: true
+  basic.enabled: false
 server.port: 3000
 
 logging.level:

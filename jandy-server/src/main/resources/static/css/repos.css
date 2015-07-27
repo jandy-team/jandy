@@ -1,0 +1,14 @@
+#repos #builds .bar {
+  fill: steelblue; }
+  #repos #builds .bar:hover {
+    fill: brown; }
+#repos #builds .axis {
+  font: 10px sans-serif; }
+  #repos #builds .axis path, #repos #builds .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges; }
+#repos #builds .x.axis path {
+  display: none; }
+
+/*# sourceMappingURL=repos.css.map */

@@ -1,0 +1,23 @@
+#repos {
+  #builds {
+    .bar {
+      &:hover {
+        fill: brown;
+      }
+      fill: steelblue;
+    }
+
+    .axis {
+      font: 10px sans-serif;
+      path, line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
+    }
+
+    .x.axis path {
+      display: none;
+    }
+  }
+}

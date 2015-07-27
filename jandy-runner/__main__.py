@@ -57,6 +57,6 @@ with open(".travis.yml", "r") as stream:
                 'buildNum': buildNum
             }
             datagen, headers = multipart_encode(params)
-            request = urllib2.Request(URL+"/travis/java", datagen, headers)
+            request = urllib2.Request(URL+"/rest/travis/java", datagen, headers)
             response = urllib2.urlopen(request)
             print response.read()

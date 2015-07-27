@@ -1,9 +1,11 @@
 package io.jandy.domain.java;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -25,6 +27,7 @@ public class JavaTreeNode {
   private long sumOfSquares = 0;    // used for std dev
   private int concurrentThreads = 0;
   private int maxConcurrentThreads = 0;
+  private long duration = 0;
 
   @Transient
   private double offset;
@@ -37,6 +40,7 @@ public class JavaTreeNode {
   private JavaMethod javaMethod;
 
   @ManyToOne
+  @JsonIgnore
   private JavaTreeNode parent;
 
   @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "parent")
@@ -185,5 +189,13 @@ public class JavaTreeNode {
 
   public void setDepth(int depth) {
     this.depth = depth;
+  }
+
+  public long getDuration() {
+    return duration;
+  }
+
+  public void setDuration(long duration) {
+    this.duration = duration;
   }
 }

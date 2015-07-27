@@ -9,6 +9,7 @@
     <criteria>
       <include/>
       <exclude className="com.sun.*"/>
+      <exclude className="com.apple.*"/>
     </criteria>
 
     <handlers>

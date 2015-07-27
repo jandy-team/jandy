@@ -1,5 +1,8 @@
 package io.jandy.domain;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import javax.persistence.Embeddable;
 import javax.persistence.Id;
 import java.io.Serializable;
@@ -45,5 +48,29 @@ public class UserConnectionId implements Serializable {
 
   public void setProviderUserId(String providerUserId) {
     this.providerUserId = providerUserId;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    UserConnectionId that = (UserConnectionId) o;
+
+    return new EqualsBuilder()
+        .append(userId, that.userId)
+        .append(providerId, that.providerId)
+        .append(providerUserId, that.providerUserId)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .append(userId)
+        .append(providerId)
+        .append(providerUserId)
+        .toHashCode();
   }
 }

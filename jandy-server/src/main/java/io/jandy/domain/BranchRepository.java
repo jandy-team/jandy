@@ -1,6 +1,7 @@
 package io.jandy.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,5 +12,6 @@ import java.util.List;
  */
 @Repository
 public interface BranchRepository extends JpaRepository<Branch, Long> {
-  Branch findByNameAndProject_AccountAndName(String name, String account, String projectName);
+  Branch findByNameAndProject_AccountAndProject_Name(String name, String account, String projectName);
+  Branch findByNameAndProject_Id(String name, long id);
 }

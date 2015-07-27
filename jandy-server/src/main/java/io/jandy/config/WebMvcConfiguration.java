@@ -31,7 +31,7 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addWebRequestInterceptor(springEnvironmentsAttributeInterceptor);
     registry.addInterceptor(userInterceptor)
-        .excludePathPatterns("/error", "/", "/travis/**", "/build/**");
+        .excludePathPatterns("/error", "/", "/build/**", "/repos/**", "/rest/**");
     registry.addInterceptor(userCheckingInterceptor);
   }
 

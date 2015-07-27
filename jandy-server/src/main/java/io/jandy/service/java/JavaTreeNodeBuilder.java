@@ -49,6 +49,7 @@ public class JavaTreeNodeBuilder {
     javaTreeNode.setTotalErrors(accumulator.getTotalErrors());
     javaTreeNode.setTotalExits(accumulator.getTotalExits());
     javaTreeNode.setJavaMethod(treeNode.getMethodKey() == null ? null : getJavaMethod(treeNode.getMethodKey()));
+    javaTreeNode.setDuration(javaTreeNode.getTotalDuration() - treeNode.getChildren().stream().mapToLong((node) -> node.getAccumulator().getTotalDuration()).sum());
     javaTreeNode.setParent(parent);
 
     javaTreeNode = javaTreeNodeRepository.save(javaTreeNode);

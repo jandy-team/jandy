@@ -40,7 +40,7 @@ public class BuildService {
   }
 
   private Branch getBranch(String ownerName, String repoName, String branchName) throws ProjectNotRegisteredException {
-    Branch branch = branchRepository.findByNameAndProject_AccountAndName(branchName, ownerName, repoName);
+    Branch branch = branchRepository.findByNameAndProject_AccountAndProject_Name(branchName, ownerName, repoName);
     return branch == null ? createBranch(ownerName, repoName, branchName) : branch;
   }
 

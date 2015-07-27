@@ -1,5 +1,6 @@
 package io.jandy.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.jandy.domain.java.JavaProfilingDump;
 
 import javax.persistence.*;
@@ -19,6 +20,7 @@ public class Build {
   private long number;
 
   @ManyToOne
+  @JsonIgnore
   private Branch branch;
 
   @OneToOne(mappedBy = "build")

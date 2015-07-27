@@ -17,6 +17,8 @@ package io.jandy.config.social;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+import io.jandy.domain.User;
+import io.jandy.domain.UserRepository;
 import io.jandy.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.connect.Connection;
@@ -33,9 +35,16 @@ import org.springframework.stereotype.Component;
 public final class SimpleConnectionSignUp implements ConnectionSignUp {
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private UserRepository userRepository;
 	
 	public String execute(Connection<?> connection) {
-		return Long.toString(userService.signUp((Connection<? extends GitHub>)connection).getId());
+		User user = userRepository.findByGitHubId(Long.parseLong(connection.getKey().getProviderUserId()));
+		if (user == null) {
+			user = userService.signUp((Connection<? extends GitHub>)connection);
+		}
+		return Long.toString(user.getId());
 	}
 
 }

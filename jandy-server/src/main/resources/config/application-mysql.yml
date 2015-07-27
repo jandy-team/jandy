@@ -2,8 +2,10 @@ spring:
   jpa.hibernate:
     ddl-auto: update
   datasource:
-    url: jdbc:mysql://localhost/jandy
+    url: jdbc:mysql://localhost/jandy?useUnicode=true&characterEncoding=utf8
     username: root
     password:
     driver-class-name: com.mysql.jdbc.Driver
     continue-on-error: true
+    validation-query: SELECT 1
+    test-on-borrow: true

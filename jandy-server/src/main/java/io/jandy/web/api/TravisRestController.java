@@ -1,11 +1,13 @@
 package io.jandy.web.api;
 
+import com.google.common.io.Closer;
 import io.jandy.core.jrat.TraceMetrics;
 import io.jandy.domain.BranchRepository;
 import io.jandy.domain.Build;
 import io.jandy.domain.ProjectRepository;
 import io.jandy.domain.java.JavaProfilingDump;
 import io.jandy.domain.java.JavaProfilingDumpRepository;
+import io.jandy.domain.java.JavaTreeNode;
 import io.jandy.exception.ProjectNotRegisteredException;
 import io.jandy.service.BuildService;
 import io.jandy.service.java.JavaTreeNodeBuilder;
@@ -18,14 +20,18 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Collections;
+import java.util.stream.StreamSupport;
 import java.util.zip.GZIPInputStream;
+
+import static java.util.stream.StreamSupport.stream;
 
 /**
  * @author JCooky
  * @since 2015-07-06
  */
 @RestController
-@RequestMapping("/travis")
+@RequestMapping("/rest/travis")
 public class TravisRestController {
   private static final Logger logger = LoggerFactory.getLogger(TravisRestController.class);
 
@@ -37,6 +43,7 @@ public class TravisRestController {
   private JavaProfilingDumpRepository javaProfilingDumpRepository;
 
   @RequestMapping(value = "/java", method = RequestMethod.POST)
+  @Transactional
   public void putResultsForJava(@RequestParam String ownerName,
                                 @RequestParam String repoName,
                                 @RequestParam String branchName,
@@ -45,21 +52,23 @@ public class TravisRestController {
                                 @RequestParam("results") MultipartFile results) throws IOException, ClassNotFoundException, ProjectNotRegisteredException {
     logger.debug("request /travis/java with ownerName: {}, repoName: {}, branchName: {}", ownerName, repoName, branchName);
 
+    try (Closer closer = Closer.create()) {
+      ObjectInputStream ois = closer.register(new ObjectInputStream(new GZIPInputStream(results.getInputStream())));
+      TraceMetrics traceMetrics = new TraceMetrics(ois.readObject());
 
-    ObjectInputStream ois = new ObjectInputStream(new GZIPInputStream(results.getInputStream()));
-    TraceMetrics traceMetrics = new TraceMetrics(ois.readObject());
+      Build build = buildService.getBuildForTravis(buildId);
+      if (build == null) {
+        build = buildService.createBuild(ownerName, repoName, branchName, buildId, "java", buildNum);
+        logger.trace("create the build: {}", build);
+      }
 
-    Build build = buildService.getBuildForTravis(buildId);
-    if (build == null) {
-      build = buildService.createBuild(ownerName, repoName, branchName, buildId, "java", buildNum);
-      logger.trace("create the build: {}", build);
+      JavaProfilingDump dump = new JavaProfilingDump();
+      dump.setRoot(javaTreeNodeBuilder.buildTreeNode(traceMetrics.getRoot(), null));
+      dump.setBuild(build);
+      dump.setMaxTotalDuration(stream(dump.spliterator(), false).mapToLong(JavaTreeNode::getTotalDuration).max().getAsLong());
+      javaProfilingDumpRepository.save(dump);
+
+      logger.info("add profiling dump to build: {}", build);
     }
-
-    JavaProfilingDump dump = new JavaProfilingDump();
-    dump.setRoot(javaTreeNodeBuilder.buildTreeNode(traceMetrics.getRoot(), null));
-    dump.setBuild(build);
-    javaProfilingDumpRepository.save(dump);
-
-    logger.info("add profiling dump to build: {}", build);
   }
 }

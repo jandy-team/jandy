@@ -48,7 +48,7 @@ public class TravisRestControllerTest extends AbstractWebAppTestCase {
     MockMultipartFile multipartFile = new MockMultipartFile("results", "results.jrat", MediaType.APPLICATION_OCTET_STREAM_VALUE, ClassLoader.getSystemResourceAsStream("results.jrat"));
 
     MockMvcBuilders.standaloneSetup(controller).build()
-        .perform(MockMvcRequestBuilders.fileUpload("/travis/java")
+        .perform(MockMvcRequestBuilders.fileUpload("/rest/travis/java")
                 .file(multipartFile)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .param("ownerName", "jcooky")

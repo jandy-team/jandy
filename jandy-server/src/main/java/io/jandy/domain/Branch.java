@@ -1,5 +1,7 @@
 package io.jandy.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,7 @@ public class Branch {
   private String name;
 
   @ManyToOne
+  @JsonIgnore
   private Project project;
 
   @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "branch")

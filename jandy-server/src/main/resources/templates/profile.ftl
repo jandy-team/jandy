@@ -2,7 +2,7 @@
 <@layoutFully>
   <div id="profile" class="container-fluid">
     <div class="row">
-      <aside id="left-menu" class="col-md-2 affix" role="navigation">
+      <aside id="left-menu" class="col-md-3 affix" role="navigation">
         <div class="panel panel-default">
           <div class="panel-heading" style="background-color: #fff">
             <h3 class="panel-title" style="color: rgb(139, 139, 139); font-size: 20px;">Organizations</h3>
@@ -25,7 +25,7 @@
           </ul>
         </div>
       </aside>
-      <section class="col-md-10 col-md-offset-2" role="main">
+      <section class="col-md-9 col-md-offset-3" role="main">
         <#foreach ownerName in repositories?keys>
           <div class="row">
             <div id="repos-${ownerName?lower_case}" class="panel panel-default" style="border-top: 5px ${colors[ownerName?lower_case]} solid;">

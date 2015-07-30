@@ -1,5 +1,6 @@
 body {
-  position: relative; }
+  position: relative;
+  padding-top: 60px; }
 
 #profile ul#org-list .list-group-item a, #profile ul#org-list .list-group-item span {
   font-size: 19px; }

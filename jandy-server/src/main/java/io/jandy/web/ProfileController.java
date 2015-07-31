@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
+import static org.apache.commons.lang3.StringUtils.lowerCase;
+
 /**
  * @author JCooky
  * @since 2015-06-30
@@ -80,10 +82,11 @@ public class ProfileController {
     List<String> randomColors = ColorUtils.getRandomColors(organizations.size() + 1);
     Map<String, Object> colors = new HashMap<>();
     for (int i = 0; i < organizations.size(); ++i) {
-      colors.put(StringUtils.lowerCase((String) organizations.get(i).get("login")), randomColors.get(i));
+      colors.put(lowerCase((String) organizations.get(i).get("login")), randomColors.get(i));
     }
 
-    colors.put(login, Iterables.getLast(randomColors));
+
+    colors.put(lowerCase(login), Iterables.getLast(randomColors));
     logger.trace("make random colors: {}", colors);
 
     return new ModelAndView("profile")

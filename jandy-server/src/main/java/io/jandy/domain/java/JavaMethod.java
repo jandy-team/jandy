@@ -15,10 +15,11 @@ public class JavaMethod {
   private long id;
 
   private String methodName = null;
-  private String signature = null;
+  private String descriptor = null;
 
   @ManyToOne
   private JavaClass javaClass;
+  private int access;
 
   public long getId() {
     return id;
@@ -36,12 +37,12 @@ public class JavaMethod {
     this.methodName = methodName;
   }
 
-  public String getSignature() {
-    return signature;
+  public String getDescriptor() {
+    return descriptor;
   }
 
-  public void setSignature(String signature) {
-    this.signature = signature;
+  public void setDescriptor(String descriptor) {
+    this.descriptor = descriptor;
   }
 
   public JavaClass getJavaClass() {
@@ -57,8 +58,16 @@ public class JavaMethod {
     return new ToStringBuilder(this)
         .append("id", id)
         .append("methodName", methodName)
-        .append("signature", signature)
+        .append("descriptor", descriptor)
         .append("javaClass", javaClass)
         .toString();
+  }
+
+  public void setAccess(int access) {
+    this.access = access;
+  }
+
+  public int getAccess() {
+    return access;
   }
 }

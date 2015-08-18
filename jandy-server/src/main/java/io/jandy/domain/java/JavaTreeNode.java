@@ -1,6 +1,7 @@
 package io.jandy.domain.java;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.jandy.java.metrics.ExceptionKey;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
@@ -18,16 +19,9 @@ public class JavaTreeNode {
   @GeneratedValue
   private long id;
 
-  private long totalEnters = 0;
-  private long totalExits = 0;
-  private long totalErrors = 0;
-  private long minDuration = Long.MAX_VALUE;
-  private long maxDuration = Long.MIN_VALUE;
-  private long totalDuration = 0;    // used for mean
-  private long sumOfSquares = 0;    // used for std dev
-  private int concurrentThreads = 0;
-  private int maxConcurrentThreads = 0;
-  private long duration = 0;
+  private long elapsedTime;
+  private long startTime;
+  private String concurThreadName;
 
   @Transient
   private double offset;
@@ -54,78 +48,6 @@ public class JavaTreeNode {
     this.id = id;
   }
 
-  public long getTotalEnters() {
-    return totalEnters;
-  }
-
-  public void setTotalEnters(long totalEnters) {
-    this.totalEnters = totalEnters;
-  }
-
-  public long getTotalExits() {
-    return totalExits;
-  }
-
-  public void setTotalExits(long totalExits) {
-    this.totalExits = totalExits;
-  }
-
-  public long getTotalErrors() {
-    return totalErrors;
-  }
-
-  public void setTotalErrors(long totalErrors) {
-    this.totalErrors = totalErrors;
-  }
-
-  public long getMinDuration() {
-    return minDuration;
-  }
-
-  public void setMinDuration(long minDuration) {
-    this.minDuration = minDuration;
-  }
-
-  public long getMaxDuration() {
-    return maxDuration;
-  }
-
-  public void setMaxDuration(long maxDuration) {
-    this.maxDuration = maxDuration;
-  }
-
-  public long getTotalDuration() {
-    return totalDuration;
-  }
-
-  public void setTotalDuration(long totalDuration) {
-    this.totalDuration = totalDuration;
-  }
-
-  public long getSumOfSquares() {
-    return sumOfSquares;
-  }
-
-  public void setSumOfSquares(long sumOfSquares) {
-    this.sumOfSquares = sumOfSquares;
-  }
-
-  public int getConcurrentThreads() {
-    return concurrentThreads;
-  }
-
-  public void setConcurrentThreads(int concurrentThreads) {
-    this.concurrentThreads = concurrentThreads;
-  }
-
-  public int getMaxConcurrentThreads() {
-    return maxConcurrentThreads;
-  }
-
-  public void setMaxConcurrentThreads(int maxConcurrentThreads) {
-    this.maxConcurrentThreads = maxConcurrentThreads;
-  }
-
   public JavaTreeNode getParent() {
     return parent;
   }
@@ -140,23 +62,6 @@ public class JavaTreeNode {
 
   public void setJavaMethod(JavaMethod javaMethod) {
     this.javaMethod = javaMethod;
-  }
-
-  @Override
-  public String toString() {
-    return new ToStringBuilder(this)
-        .append("id", id)
-        .append("totalEnters", totalEnters)
-        .append("totalExits", totalExits)
-        .append("totalErrors", totalErrors)
-        .append("minDuration", minDuration)
-        .append("maxDuration", maxDuration)
-        .append("totalDuration", totalDuration)
-        .append("sumOfSquares", sumOfSquares)
-        .append("concurrentThreads", concurrentThreads)
-        .append("maxConcurrentThreads", maxConcurrentThreads)
-        .append("javaMethod", javaMethod)
-        .toString();
   }
 
   public List<JavaTreeNode> getChildren() {
@@ -191,11 +96,42 @@ public class JavaTreeNode {
     this.depth = depth;
   }
 
-  public long getDuration() {
-    return duration;
+  public long getElapsedTime() {
+    return elapsedTime;
   }
 
-  public void setDuration(long duration) {
-    this.duration = duration;
+  public void setElapsedTime(long elapsedTime) {
+    this.elapsedTime = elapsedTime;
+  }
+
+  public long getStartTime() {
+    return startTime;
+  }
+
+  public void setStartTime(long startTime) {
+    this.startTime = startTime;
+  }
+
+  public String getConcurThreadName() {
+    return concurThreadName;
+  }
+
+  public void setConcurThreadName(String concurThreadName) {
+    this.concurThreadName = concurThreadName;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("JavaTreeNode{");
+    sb.append("javaMethod=").append(javaMethod);
+    sb.append(", depth=").append(depth);
+    sb.append(", width=").append(width);
+    sb.append(", offset=").append(offset);
+    sb.append(", concurThreadName='").append(concurThreadName).append('\'');
+    sb.append(", startTime=").append(startTime);
+    sb.append(", elapsedTime=").append(elapsedTime);
+    sb.append(", id=").append(id);
+    sb.append('}');
+    return sb.toString();
   }
 }

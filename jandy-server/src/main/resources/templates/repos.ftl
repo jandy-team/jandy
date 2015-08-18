@@ -13,11 +13,9 @@
 <script>
   $(function () {
 
-    var branchId = ${master.id};
-
     var graph = new ReposGraph({
-      width: 960,
-      height: 500,
+      width: 800,
+      height: 600,
       margin: {
         top: 20,
         right: 20,
@@ -30,12 +28,7 @@
       }
     });
 
-    graph.createBuilds(branchId);
-  });
-</script>
-<script>
-  $(function () {
-
+    graph.createBuilds(${master.id});
   });
 </script>
 </@layoutFully>

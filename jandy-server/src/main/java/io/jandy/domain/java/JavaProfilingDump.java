@@ -20,7 +20,6 @@ public class JavaProfilingDump implements Iterable<JavaTreeNode> {
   private long maxTotalDuration;
 
   @OneToOne
-  @JsonIgnore
   private JavaTreeNode root;
 
   @OneToOne

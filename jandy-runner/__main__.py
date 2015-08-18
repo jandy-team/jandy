@@ -14,8 +14,7 @@ if travis == 'true' and ci == 'true':
     URL = "http://jandy.io"
 else:
     URL = "http://localhost:3000"
-JRAT_XML_URL = URL+"/jrat.xml"
-JRAT_JAR_URL = URL+"/jrat.jar"
+JRAT_JAR_URL = URL+"/jandy-java-profiler.jar"
 
 ownerName, repoName = os.getenv('TRAVIS_REPO_SLUG').split('/')
 branchName = os.getenv('TRAVIS_BRANCH')
@@ -41,15 +40,14 @@ register_openers()
 with open(".travis.yml", "r") as stream:
     doc = yaml.load(stream)
     if doc['language'] == 'java':
-        wget(JRAT_JAR_URL, 'jrat.jar')
-        wget(JRAT_XML_URL, "jrat.xml")
+        wget(JRAT_JAR_URL, 'jandy-java-profiler.jar')
         args = sys.argv[1:]
-        args.insert(1, '-javaagent:jrat.jar')
+        args.insert(1, '-javaagent:jandy-java-profiler.jar')
         subprocess.call(args)
-        with open('jrat.output/%s/results.jrat' % get_latest_dir('jrat.output'), 'rb') as jrat_results:
+        with open('java-profiler-result.jandy', 'rb') as jrat_results:
             params = {
                 'results': jrat_results,
-                'name': 'results.jrat',
+                'name': 'java-profiler-result.jandy',
                 'ownerName': ownerName,
                 'repoName': repoName,
                 'branchName': branchName,

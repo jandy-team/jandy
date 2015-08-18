@@ -45,7 +45,7 @@ public class TravisRestControllerTest extends AbstractWebAppTestCase {
     project.setUser(user);
     project = projectRepository.save(project);
 
-    MockMultipartFile multipartFile = new MockMultipartFile("results", "results.jrat", MediaType.APPLICATION_OCTET_STREAM_VALUE, ClassLoader.getSystemResourceAsStream("results.jrat"));
+    MockMultipartFile multipartFile = new MockMultipartFile("results", "java-profiler-result.jandy", MediaType.APPLICATION_OCTET_STREAM_VALUE, ClassLoader.getSystemResourceAsStream("java-profiler-result.jandy"));
 
     MockMvcBuilders.standaloneSetup(controller).build()
         .perform(MockMvcRequestBuilders.fileUpload("/rest/travis/java")

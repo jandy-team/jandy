@@ -37,8 +37,8 @@ public class BuildController {
     node.setDepth(depth);
     if (node.getParent() != null) {
       node.setOffset(offset);
-      if (node.getParent().getTotalDuration() > 0)
-        node.setWidth(((double)node.getTotalDuration() / (double)node.getParent().getTotalDuration()) * parentWidth);
+      if (node.getParent().getElapsedTime() > 0)
+        node.setWidth(((double)node.getElapsedTime() / (double)node.getParent().getElapsedTime()) * parentWidth);
       else
         node.setWidth(parentWidth);
     }

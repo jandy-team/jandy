@@ -128,9 +128,9 @@
       <artifactId>commons-beanutils</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.anarres.jrat</groupId>
-      <artifactId>jrat-agent</artifactId>
-      <version>1.0.0</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>jandy-java-profiler</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>

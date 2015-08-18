@@ -1,21 +1,17 @@
 package io.jandy.service.java;
 
-import io.jandy.core.jrat.TraceMetrics;
-import io.jandy.domain.Build;
 import io.jandy.domain.java.*;
-import org.shiftone.jrat.core.Accumulator;
-import org.shiftone.jrat.core.MethodKey;
-import org.shiftone.jrat.provider.tree.TreeNode;
+import io.jandy.java.metrics.Accumulator;
+import io.jandy.java.metrics.ClassKey;
+import io.jandy.java.metrics.MethodKey;
+import io.jandy.java.metrics.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.util.concurrent.FutureAdapter;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 /**
  * @author JCooky
@@ -39,17 +35,10 @@ public class JavaTreeNodeBuilder {
     JavaTreeNode javaTreeNode = new JavaTreeNode();
 
     Accumulator accumulator = treeNode.getAccumulator();
-    javaTreeNode.setConcurrentThreads(accumulator.getConcurrentThreads());
-    javaTreeNode.setMaxConcurrentThreads(accumulator.getMaxConcurrentThreads());
-    javaTreeNode.setMaxDuration(accumulator.getMaxDuration());
-    javaTreeNode.setMinDuration(accumulator.getMinDuration());
-    javaTreeNode.setSumOfSquares(accumulator.getSumOfSquares());
-    javaTreeNode.setTotalDuration(accumulator.getTotalDuration());
-    javaTreeNode.setTotalEnters(accumulator.getTotalEnters());
-    javaTreeNode.setTotalErrors(accumulator.getTotalErrors());
-    javaTreeNode.setTotalExits(accumulator.getTotalExits());
+    javaTreeNode.setElapsedTime(accumulator.getElapsedTime());
+    javaTreeNode.setStartTime(accumulator.getStartTime());
+    javaTreeNode.setConcurThreadName(accumulator.getConcurThreadName());
     javaTreeNode.setJavaMethod(treeNode.getMethodKey() == null ? null : getJavaMethod(treeNode.getMethodKey()));
-    javaTreeNode.setDuration(javaTreeNode.getTotalDuration() - treeNode.getChildren().stream().mapToLong((node) -> node.getAccumulator().getTotalDuration()).sum());
     javaTreeNode.setParent(parent);
 
     javaTreeNode = javaTreeNodeRepository.save(javaTreeNode);
@@ -64,8 +53,8 @@ public class JavaTreeNodeBuilder {
   }
 
   private JavaMethod getJavaMethod(MethodKey methodKey) {
-    JavaClass javaClass = getJavaClass(methodKey.getClassName(), methodKey.getPackageName());
-    JavaMethod javaMethod = javaMethodRepository.findByMethodNameAndSignatureAndJavaClass_Id(methodKey.getMethodName(), methodKey.getSignature(), javaClass.getId());
+    JavaClass javaClass = getJavaClass(methodKey.getOwner());
+    JavaMethod javaMethod = javaMethodRepository.findByMethodNameAndDescriptorAndJavaClass_Id(methodKey.getName(), methodKey.getDescriptor(), javaClass.getId());
     return javaMethod == null ? buildJavaMethod(methodKey, javaClass) : javaMethod;
   }
 
@@ -73,16 +62,17 @@ public class JavaTreeNodeBuilder {
   private JavaMethod buildJavaMethod(MethodKey methodKey, JavaClass javaClass) {
     JavaMethod method = new JavaMethod();
     method.setJavaClass(javaClass);
-    method.setMethodName(methodKey.getMethodName());
-    method.setSignature(methodKey.getSignature());
+    method.setMethodName(methodKey.getName());
+    method.setDescriptor(methodKey.getDescriptor());
+    method.setAccess(methodKey.getAccess());
     method.setJavaClass(javaClass);
 
     return javaMethodRepository.save(method);
   }
 
-  private JavaClass getJavaClass(String className, String packageName) {
-    JavaClass javaClass = javaClassRepository.findByClassNameAndPackageName(className, packageName);
-    return javaClass == null ? buildJavaClass(className, packageName) : javaClass;
+  private JavaClass getJavaClass(ClassKey classKey) {
+    JavaClass javaClass = javaClassRepository.findByClassNameAndPackageName(classKey.getName(), classKey.getPackageName());
+    return javaClass == null ? buildJavaClass(classKey.getName(), classKey.getPackageName()) : javaClass;
   }
 
   @Transactional

@@ -1,7 +1,6 @@
 package io.jandy.web.api;
 
 import com.google.common.io.Closer;
-import io.jandy.core.jrat.TraceMetrics;
 import io.jandy.domain.BranchRepository;
 import io.jandy.domain.Build;
 import io.jandy.domain.ProjectRepository;
@@ -9,6 +8,8 @@ import io.jandy.domain.java.JavaProfilingDump;
 import io.jandy.domain.java.JavaProfilingDumpRepository;
 import io.jandy.domain.java.JavaTreeNode;
 import io.jandy.exception.ProjectNotRegisteredException;
+import io.jandy.java.metrics.ProfilingMetrics;
+import io.jandy.java.metrics.TreeNode;
 import io.jandy.service.BuildService;
 import io.jandy.service.java.JavaTreeNodeBuilder;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.StreamSupport;
 import java.util.zip.GZIPInputStream;
 
@@ -54,7 +56,7 @@ public class TravisRestController {
 
     try (Closer closer = Closer.create()) {
       ObjectInputStream ois = closer.register(new ObjectInputStream(new GZIPInputStream(results.getInputStream())));
-      TraceMetrics traceMetrics = new TraceMetrics(ois.readObject());
+      ProfilingMetrics metrics = (ProfilingMetrics)ois.readObject();
 
       Build build = buildService.getBuildForTravis(buildId);
       if (build == null) {
@@ -63,9 +65,9 @@ public class TravisRestController {
       }
 
       JavaProfilingDump dump = new JavaProfilingDump();
-      dump.setRoot(javaTreeNodeBuilder.buildTreeNode(traceMetrics.getRoot(), null));
+      dump.setRoot(javaTreeNodeBuilder.buildTreeNode(metrics.getRoot(), null));
       dump.setBuild(build);
-      dump.setMaxTotalDuration(stream(dump.spliterator(), false).mapToLong(JavaTreeNode::getTotalDuration).max().getAsLong());
+      dump.setMaxTotalDuration(stream(dump.spliterator(), false).mapToLong(JavaTreeNode::getElapsedTime).max().getAsLong());
       javaProfilingDumpRepository.save(dump);
 
       logger.info("add profiling dump to build: {}", build);

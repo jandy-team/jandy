@@ -12,6 +12,7 @@
   <modules>
     <module>jandy-runner</module>
     <module>jandy-server</module>
+    <module>jandy-java-profiler</module>
   </modules>
 
 </project>

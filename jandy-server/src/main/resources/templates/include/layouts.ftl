@@ -14,13 +14,13 @@
   </head>
   <body data-spy="scroll">
     <script src="${root}/webjars/jquery/2.1.4/jquery.min.js"></script>
-    <#nested/>
+    <script src="${root}/webjars/d3js/3.5.5/d3.min.js"></script>
+    <script src="${root}/webjars/lodash/3.9.0/lodash.min.js"></script>
     <script src="${root}/webjars/json2/20140204/json2.min.js"></script>
     <script src="${root}/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="${root}/webjars/bootstrap-switch/3.3.2/js/bootstrap-switch.min.js"></script>
-    <script src="${root}/webjars/d3js/3.5.5/d3.min.js"></script>
-    <script src="${root}/webjars/lodash/3.9.0/lodash.min.js"></script>
     <script src="${root}/js/bootstrap-waitingfor.js"></script>
+    <#nested/>
   </body>
   </html>
 </#macro>

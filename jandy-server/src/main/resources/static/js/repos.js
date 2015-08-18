@@ -138,15 +138,17 @@ ReposGraph.prototype = _.create(Object.prototype, {
     d3.json(ROOT_URL + '/rest/builds/' + buildId + '/java', function (prof) {
 
       var nodes = toArray(prof.root),
-          maxDepth = d3.max(nodes, function(n) { return n.depth; });
+          maxDepth = d3.max(nodes, function (n) {
+            return n.depth;
+          });
 
       angle.domain([d3.min(nodes, function (n) {
         return n.startTime;
       }), d3.max(nodes, function (n) {
-          return n.startTime + n.elapsedTime;
-        })]);
+        return n.startTime + n.elapsedTime;
+      })]);
 
-      radius.domain([0.0, maxDepth+1]);
+      radius.domain([0.0, maxDepth + 1]);
       red.domain([0.0, maxDepth]);
       blue.domain([0.0, maxDepth]);
       green.domain([0.0, maxDepth]);

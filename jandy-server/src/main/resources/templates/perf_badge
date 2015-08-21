@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="612px" height="792px" viewBox="0 0 612 792" enable-background="new 0 0 612 792" xml:space="preserve">
+<g id="XMLID_26_">
+	<linearGradient id="XMLID_8_" gradientUnits="userSpaceOnUse" x1="168" y1="286.1548" x2="168" y2="372.6505">
+		<stop  offset="0" style="stop-color:#555555"/>
+		<stop  offset="1" style="stop-color:#3D3D3D"/>
+	</linearGradient>
+	<path id="XMLID_27_" fill="url(#XMLID_8_)" d="M94.7,275c-7.975,0-14.7,6.325-14.7,14.3v70.6c0,7.975,6.725,14.1,14.7,14.1H256v-99
+		H94.7z"/>
+	<linearGradient id="XMLID_9_" gradientUnits="userSpaceOnUse" x1="385.5" y1="358.6665" x2="385.5" y2="292.4514">
+		<stop  offset="0" style="stop-color:#C9A115"/>
+		<stop  offset="1" style="stop-color:#DAB226"/>
+	</linearGradient>
+	<path id="XMLID_30_" fill="url(#XMLID_9_)" d="M500.2,275H256v99h244.2c7.975,0,14.8-6.125,14.8-14.1v-70.6
+		C515,281.325,508.175,275,500.2,275z"/>
+</g>
+<g id="XMLID_3_">
+	<g id="XMLID_17_">
+		
+			<text transform="matrix(1 0 0 1 111.999 345.7476)" fill="#3A3A3A" font-family="'Raavi'" font-size="73.8655" letter-spacing="-1">perf</text>
+	</g>
+	
+		<text id="XMLID_15_" transform="matrix(1 0 0 1 112.499 343.0474)" fill="#FFFFFF" font-family="'Raavi'" font-size="73.8655" letter-spacing="-1">perf</text>
+</g>
+<text id="XMLID_2_" transform="matrix(1 0 0 1 313.4658 348.4478)"><tspan x="0" y="0" fill="#9E722B" font-family="'Raavi'" font-size="68" letter-spacing="-6">22</tspan><tspan x="62.634" y="0" fill="#9E722B" font-family="'Raavi'" font-size="68" letter-spacing="-1">0</tspan><tspan x="104.837" y="0" fill="#9E722B" font-family="'Raavi'" font-size="68" letter-spacing="-3">ms</tspan></text>
+<text id="XMLID_18_" transform="matrix(1 0 0 1 313.4658 346.3477)"><tspan x="0" y="0" fill="#FFFFFF" font-family="'Raavi'" font-size="68" letter-spacing="-6">22</tspan><tspan x="62.634" y="0" fill="#FFFFFF" font-family="'Raavi'" font-size="68" letter-spacing="-1">0</tspan><tspan x="104.837" y="0" fill="#FFFFFF" font-family="'Raavi'" font-size="68" letter-spacing="-3">ms</tspan></text>
+<g id="XMLID_38_">
+	<g>
+		<path id="XMLID_29_" fill="#9B6E1F" d="M309.51,327.738h-12.901v12.901h-4.412v-12.901h-12.901v-4.56h12.901v-12.901h4.412v12.901
+			h12.901V327.738z"/>
+	</g>
+</g>
+<g id="XMLID_60_">
+	<linearGradient id="XMLID_10_" gradientUnits="userSpaceOnUse" x1="168" y1="408.1543" x2="168" y2="494.6504">
+		<stop  offset="0" style="stop-color:#555555"/>
+		<stop  offset="1" style="stop-color:#3D3D3D"/>
+	</linearGradient>
+	<path id="XMLID_66_" fill="url(#XMLID_10_)" d="M94.7,397c-7.975,0-14.7,6.325-14.7,14.3V481.9c0,7.975,6.725,14.1,14.7,14.1H256
+		v-99H94.7z"/>
+	<linearGradient id="XMLID_11_" gradientUnits="userSpaceOnUse" x1="385.5" y1="524" x2="385.5" y2="424.1486">
+		<stop  offset="0.1576" style="stop-color:#009B00"/>
+		<stop  offset="1" style="stop-color:#29CC29"/>
+	</linearGradient>
+	<path id="XMLID_61_" fill="url(#XMLID_11_)" d="M500.2,397H256v99h244.2c7.975,0,14.8-6.125,14.8-14.1V411.3
+		C515,403.325,508.175,397,500.2,397z"/>
+</g>
+<g id="XMLID_1_">
+	<g id="XMLID_56_">
+		
+			<text transform="matrix(1 0 0 1 111.999 467.748)" fill="#3A3A3A" font-family="'Raavi'" font-size="73.8655" letter-spacing="-1">perf</text>
+	</g>
+	
+		<text id="XMLID_55_" transform="matrix(1 0 0 1 112.499 465.0469)" fill="#FFFFFF" font-family="'Raavi'" font-size="73.8655" letter-spacing="-1">perf</text>
+</g>
+<text id="XMLID_54_" transform="matrix(1 0 0 1 313.4658 470.4473)"><tspan x="0" y="0" fill="#217C21" font-family="'Raavi'" font-size="68" letter-spacing="-6">22</tspan><tspan x="62.634" y="0" fill="#217C21" font-family="'Raavi'" font-size="68" letter-spacing="-1">0</tspan><tspan x="104.837" y="0" fill="#217C21" font-family="'Raavi'" font-size="68" letter-spacing="-3">ms</tspan></text>
+<text id="XMLID_53_" transform="matrix(1 0 0 1 313.4658 468.3477)"><tspan x="0" y="0" fill="#FFFFFF" font-family="'Raavi'" font-size="68" letter-spacing="-6">22</tspan><tspan x="62.634" y="0" fill="#FFFFFF" font-family="'Raavi'" font-size="68" letter-spacing="-1">0</tspan><tspan x="104.837" y="0" fill="#FFFFFF" font-family="'Raavi'" font-size="68" letter-spacing="-3">ms</tspan></text>
+<g id="XMLID_4_">
+	<g>
+		<path id="XMLID_25_" fill="#1B8E42" d="M309.51,449.738h-30.214v-4.56h30.214V449.738z"/>
+	</g>
+</g>
+</svg>

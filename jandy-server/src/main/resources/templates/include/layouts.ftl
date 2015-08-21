@@ -20,6 +20,7 @@
     <script src="${root}/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="${root}/webjars/bootstrap-switch/3.3.2/js/bootstrap-switch.min.js"></script>
     <script src="${root}/js/bootstrap-waitingfor.js"></script>
+    <script src="${root}/js/jandy.js"></script>
     <#nested/>
   </body>
   </html>

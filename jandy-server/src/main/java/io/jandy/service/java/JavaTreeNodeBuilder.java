@@ -1,17 +1,16 @@
 package io.jandy.service.java;
 
 import io.jandy.domain.java.*;
-import io.jandy.java.metrics.Accumulator;
-import io.jandy.java.metrics.ClassKey;
-import io.jandy.java.metrics.MethodKey;
-import io.jandy.java.metrics.TreeNode;
+import io.jandy.thrift.java.Accumulator;
+import io.jandy.thrift.java.ClassKey;
+import io.jandy.thrift.java.MethodKey;
+import io.jandy.thrift.java.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
 
 /**
  * @author JCooky
@@ -34,19 +33,23 @@ public class JavaTreeNodeBuilder {
   public JavaTreeNode buildTreeNode(TreeNode treeNode, JavaTreeNode parent) {
     JavaTreeNode javaTreeNode = new JavaTreeNode();
 
-    Accumulator accumulator = treeNode.getAccumulator();
-    javaTreeNode.setElapsedTime(accumulator.getElapsedTime());
-    javaTreeNode.setStartTime(accumulator.getStartTime());
-    javaTreeNode.setConcurThreadName(accumulator.getConcurThreadName());
-    javaTreeNode.setJavaMethod(treeNode.getMethodKey() == null ? null : getJavaMethod(treeNode.getMethodKey()));
+    Accumulator acc = treeNode.getAcc();
+    if (acc != null) {
+      javaTreeNode.setElapsedTime(acc.getElapsedTime());
+      javaTreeNode.setStartTime(acc.getStartTime());
+      javaTreeNode.setConcurThreadName(acc.getConcurThreadName());
+    }
+    javaTreeNode.setJavaMethod(treeNode.getMethod() == null ? null : getJavaMethod(treeNode.getMethod()));
     javaTreeNode.setParent(parent);
 
     javaTreeNode = javaTreeNodeRepository.save(javaTreeNode);
 
     logger.trace("Building java tree node: {}", javaTreeNode);
 
-    for (TreeNode childNode : treeNode.getChildren()) {
-      javaTreeNode.getChildren().add(buildTreeNode(childNode, javaTreeNode));
+    if (treeNode.isSetChildren()) {
+      for (TreeNode childNode : treeNode.getChildren()) {
+        javaTreeNode.getChildren().add(buildTreeNode(childNode, javaTreeNode));
+      }
     }
 
     return javaTreeNode;

@@ -3,10 +3,13 @@ package io.jandy.java.profiler;
 import com.github.jcooky.jaal.common.profile.ClassType;
 import com.github.jcooky.jaal.common.profile.MethodType;
 import com.github.jcooky.jaal.common.profile.Profiler;
-import io.jandy.java.metrics.ProfilingMetrics;
+import io.jandy.java.metrics.MetricsFactory;
+import io.jandy.org.apache.thrift.TException;
+import io.jandy.org.apache.thrift.protocol.TCompactProtocol;
+import io.jandy.org.apache.thrift.transport.TIOStreamTransport;
+import io.jandy.thrift.java.ProfilingMetrics;
 
 import java.io.*;
-import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -19,15 +22,17 @@ public class JandyProfiler implements Profiler {
   public JandyProfiler() {
     Runtime.getRuntime().addShutdownHook(new Thread() {
       public void run() {
-        ObjectOutputStream dos = null;
+        GZIPOutputStream dos = null;
         try {
-          dos = new ObjectOutputStream(new GZIPOutputStream(new FileOutputStream("java-profiler-result.jandy")));
-          ProfilingMetrics metrics = new ProfilingMetrics(collectorFactory.getRoots());
-          dos.writeObject(metrics);
+          dos = new GZIPOutputStream(new FileOutputStream("java-profiler-result.jandy"));
+          ProfilingMetrics metrics = MetricsFactory.getProfilingMetrics(collectorFactory.getRoots());
+          metrics.write(new TCompactProtocol(new TIOStreamTransport(dos)));
           dos.flush();
         } catch (FileNotFoundException e) {
           e.printStackTrace();
         } catch (IOException e) {
+          e.printStackTrace();
+        } catch (TException e) {
           e.printStackTrace();
         } finally {
           if (dos != null)

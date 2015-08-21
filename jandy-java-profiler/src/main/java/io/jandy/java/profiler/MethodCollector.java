@@ -2,8 +2,8 @@ package io.jandy.java.profiler;
 
 import com.github.jcooky.jaal.common.profile.ClassType;
 import com.github.jcooky.jaal.common.profile.MethodType;
-import io.jandy.java.metrics.TreeNode;
-import io.jandy.java.metrics.TreeNodeFactory;
+import io.jandy.java.metrics.MetricsFactory;
+import io.jandy.thrift.java.TreeNode;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -18,25 +18,24 @@ public class MethodCollector {
 
   public void enter(ClassType owner, MethodType method, long startTime) {
     treeNodes.push(latest);
-    latest = TreeNodeFactory.getTreeNode(owner, method);
-    latest.getAccumulator().setStartTime(startTime);
-    latest.getAccumulator().setConcurThreadName(Thread.currentThread().getName());
+    latest = MetricsFactory.getTreeNode(owner, method);
+    latest.acc.setStartTime(startTime);
+    latest.acc.setConcurThreadName(Thread.currentThread().getName());
   }
 
   public void exit(ClassType owner, MethodType method, Throwable throwable, long elapsedTime) {
-    assert(latest.getMethodKey().getName().equals(method.getName()));
-    assert(latest.getMethodKey().getDescriptor().equals(method.getDescriptor()));
-    assert(latest.getMethodKey().getAccess() == method.getAccess());
-    assert(latest.getMethodKey().getOwner().getName().equals(owner.getName()));
-    assert(latest.getMethodKey().getOwner().getPackageName().equals(owner.getPackageName()));
+    assert(latest.method.getName().equals(method.getName()));
+    assert(latest.method.getDescriptor().equals(method.getDescriptor()));
+    assert(latest.method.getAccess() == method.getAccess());
+    assert(latest.method.getOwner().getName().equals(owner.getName()));
+    assert(latest.method.getOwner().getPackageName().equals(owner.getPackageName()));
 
-    latest.getAccumulator().setElapsedTime(elapsedTime);
+    latest.acc.setElapsedTime(elapsedTime);
     if (throwable != null)
-      latest.getAccumulator().setExceptionKey(TreeNodeFactory.getExceptionKey(throwable));
+      latest.acc.setExceptionKey(MetricsFactory.getExceptionKey(throwable));
 
     TreeNode parent = treeNodes.pop();
-    latest.setParent(parent);
-    parent.getChildren().add(latest);
+    parent.addToChildren(latest);
     latest = parent;
   }
 

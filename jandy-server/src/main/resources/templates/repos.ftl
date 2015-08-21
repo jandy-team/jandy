@@ -13,7 +13,7 @@
 <script>
   $(function () {
 
-    var graph = new ReposGraph({
+    var graph = new jandy.ReposGraph({
       width: 800,
       height: 600,
       margin: {

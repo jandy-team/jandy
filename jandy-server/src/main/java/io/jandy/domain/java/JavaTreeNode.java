@@ -1,12 +1,9 @@
 package io.jandy.domain.java;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.jandy.java.metrics.ExceptionKey;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -134,4 +131,5 @@ public class JavaTreeNode {
     sb.append('}');
     return sb.toString();
   }
+
 }

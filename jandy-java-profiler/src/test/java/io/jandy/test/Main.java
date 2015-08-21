@@ -1,4 +1,4 @@
-package io.jandy.java;
+package io.jandy.test;
 
 import org.jasypt.util.password.PasswordEncryptor;
 import org.jasypt.util.password.StrongPasswordEncryptor;

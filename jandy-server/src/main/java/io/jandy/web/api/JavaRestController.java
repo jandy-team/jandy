@@ -1,30 +1,29 @@
 package io.jandy.web.api;
 
-import com.google.common.collect.Lists;
 import io.jandy.domain.Build;
 import io.jandy.domain.BuildRepository;
 import io.jandy.domain.java.JavaProfilingDump;
 import io.jandy.domain.java.JavaTreeNode;
+import io.jandy.domain.java.JavaTreeNodeRepository;
+import io.jandy.service.GitHubService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collection;
-
 /**
  * @author JCooky
  * @since 2015-07-23
  */
 @RestController
-@RequestMapping("/rest/builds")
-public class BuildRestController {
+@RequestMapping("/rest/java")
+public class JavaRestController {
 
   @Autowired
   private BuildRepository buildRepository;
 
-  @RequestMapping(value = "/{id}/java", method = RequestMethod.GET)
+  @RequestMapping(value = "/build/{id}", method = RequestMethod.GET)
   public JavaProfilingDump getJavaTreeNodes(@PathVariable long id) throws Exception {
 
     Build build = buildRepository.findOne(id);

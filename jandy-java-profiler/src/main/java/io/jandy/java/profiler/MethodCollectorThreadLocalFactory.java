@@ -1,6 +1,6 @@
 package io.jandy.java.profiler;
 
-import io.jandy.java.metrics.TreeNode;
+import io.jandy.thrift.java.TreeNode;
 
 import java.util.ArrayList;
 import java.util.List;

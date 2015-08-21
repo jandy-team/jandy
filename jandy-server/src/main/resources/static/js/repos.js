@@ -1,4 +1,4 @@
-var ReposGraph = function (options) {
+jandy.ReposGraph = function (options) {
   this.margin = options.margin;
   this.width = options.width - this.margin.left - this.margin.right;
   this.height = options.height - this.margin.top - this.margin.bottom;
@@ -7,8 +7,8 @@ var ReposGraph = function (options) {
   this.$methods = options.el.methods
 };
 
-ReposGraph.prototype = _.create(Object.prototype, {
-  constructor: ReposGraph,
+jandy.ReposGraph.prototype = _.create(Object.prototype, {
+  constructor: jandy.ReposGraph,
   createBuilds: function (branchId) {
     var _this = this,
         x = d3.scale.ordinal()
@@ -135,7 +135,7 @@ ReposGraph.prototype = _.create(Object.prototype, {
             .append('g')
             .attr('transform', 'translate(' + _this.width / 2 + ',' + _this.height / 2 + ')');
 
-    d3.json(ROOT_URL + '/rest/builds/' + buildId + '/java', function (prof) {
+    d3.json(ROOT_URL + '/rest/java/build/' + buildId, function (prof) {
 
       var nodes = toArray(prof.root),
           maxDepth = d3.max(nodes, function (n) {
@@ -171,4 +171,6 @@ ReposGraph.prototype = _.create(Object.prototype, {
       });
     });
   }
+
+
 });

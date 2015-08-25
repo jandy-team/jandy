@@ -1,10 +1,14 @@
 package io.jandy.web.api;
 
 import com.google.common.io.Closer;
+import com.mysema.query.support.Expressions;
 import io.jandy.domain.Build;
+import io.jandy.domain.QBuild;
+import io.jandy.domain.QProject;
 import io.jandy.domain.java.JavaProfilingDump;
 import io.jandy.domain.java.JavaProfilingDumpRepository;
 import io.jandy.domain.java.JavaTreeNode;
+import io.jandy.domain.java.QJavaProfilingDump;
 import io.jandy.exception.ProjectNotRegisteredException;
 import io.jandy.service.BuildService;
 import io.jandy.service.java.JavaTreeNodeBuilder;
@@ -20,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.zip.GZIPInputStream;
 
@@ -51,8 +56,10 @@ public class TravisRestController {
                                 @RequestParam("results") MultipartFile results) throws IOException, ClassNotFoundException, ProjectNotRegisteredException, TException {
     logger.debug("request /travis/java with ownerName: {}, repoName: {}, branchName: {}", ownerName, repoName, branchName);
 
+    QJavaProfilingDump d = QJavaProfilingDump.javaProfilingDump;
+
     try (Closer closer = Closer.create()) {
-      GZIPInputStream ois = closer.register(new GZIPInputStream(results.getInputStream()));
+      InputStream ois = closer.register(results.getInputStream());
       ProfilingMetrics metrics = new ProfilingMetrics();
       metrics.read(new TCompactProtocol(new TIOStreamTransport(ois)));
 
@@ -61,6 +68,8 @@ public class TravisRestController {
         build = buildService.createBuild(ownerName, repoName, branchName, buildId, "java", buildNum);
         logger.trace("create the build: {}", build);
       }
+
+      if (build.getJavaProfilingDump() != null) javaProfilingDumpRepository.delete(build.getJavaProfilingDump());
 
       JavaProfilingDump dump = new JavaProfilingDump();
       dump.setRoot(javaTreeNodeBuilder.buildTreeNode(metrics.getRoot(), null));

@@ -1,3 +1,5 @@
+'use strict';
+
 jandy.ReposGraph = function (options) {
   this.margin = options.margin;
   this.width = options.width - this.margin.left - this.margin.right;
@@ -102,12 +104,13 @@ jandy.ReposGraph.prototype = _.create(Object.prototype, {
           return arr;
         },
 
+
         red = d3.scale.linear()
-            .range([0, 255]),
-        blue = d3.scale.linear()
-            .range([255, 255]),
+            .range([0xAD, 255]),
         green = d3.scale.linear()
-            .range([0, 255]),
+            .range([0xD8, 255]),
+        blue = d3.scale.linear()
+            .range([0xE6, 255]),
 
         angle = d3.scale.linear()
             .range([0, 2.0 * Math.PI]),
@@ -171,6 +174,5 @@ jandy.ReposGraph.prototype = _.create(Object.prototype, {
       });
     });
   }
-
-
 });
+

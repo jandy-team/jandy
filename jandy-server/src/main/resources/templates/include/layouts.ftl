@@ -6,7 +6,8 @@
     <title>Jandy</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="${root}/css/style.css"/>
-    <link rel="stylesheet" href="${root}/css/bootstrap.css"/>
+    <link rel="stylesheet" href="${root}/webjars/bootstrap/3.3.5/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="${root}/css/bootstrap-theme.css"/>
     <link rel="stylesheet" href="${root}/webjars/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.min.css"/>
     <script>
       var ROOT_URL = '${root}';

@@ -30,32 +30,36 @@ public class JavaProfilingDump implements Iterable<JavaTreeNode> {
     return id;
   }
 
-  public void setId(long id) {
+  public JavaProfilingDump setId(long id) {
     this.id = id;
-  }
-
-  public JavaTreeNode getRoot() {
-    return root;
-  }
-
-  public void setRoot(JavaTreeNode root) {
-    this.root = root;
-  }
-
-  public void setBuild(Build build) {
-    this.build = build;
-  }
-
-  public Build getBuild() {
-    return build;
+    return this;
   }
 
   public long getMaxTotalDuration() {
     return maxTotalDuration;
   }
 
-  public void setMaxTotalDuration(long maxTotalDuration) {
+  public JavaProfilingDump setMaxTotalDuration(long maxTotalDuration) {
     this.maxTotalDuration = maxTotalDuration;
+    return this;
+  }
+
+  public JavaTreeNode getRoot() {
+    return root;
+  }
+
+  public JavaProfilingDump setRoot(JavaTreeNode root) {
+    this.root = root;
+    return this;
+  }
+
+  public Build getBuild() {
+    return build;
+  }
+
+  public JavaProfilingDump setBuild(Build build) {
+    this.build = build;
+    return this;
   }
 
   @Override

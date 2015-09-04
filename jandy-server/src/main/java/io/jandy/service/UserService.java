@@ -37,6 +37,7 @@ public class UserService {
     user.setAvatarUrl(ghUser.getAvatarUrl());
     user.setLogin(ghUser.getLogin());
     user.setPublicRepos(ghUser.getPublicRepos());
+    user.setEmail(ghUser.getEmail());
     return userRepository.save(user);
   }
 

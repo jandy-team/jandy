@@ -25,32 +25,45 @@ public class JavaMethod {
     return id;
   }
 
-  public void setId(long id) {
+  public JavaMethod setId(long id) {
     this.id = id;
+    return this;
   }
 
   public String getMethodName() {
     return methodName;
   }
 
-  public void setMethodName(String methodName) {
+  public JavaMethod setMethodName(String methodName) {
     this.methodName = methodName;
+    return this;
   }
 
   public String getDescriptor() {
     return descriptor;
   }
 
-  public void setDescriptor(String descriptor) {
+  public JavaMethod setDescriptor(String descriptor) {
     this.descriptor = descriptor;
+    return this;
   }
 
   public JavaClass getJavaClass() {
     return javaClass;
   }
 
-  public void setJavaClass(JavaClass javaClass) {
+  public JavaMethod setJavaClass(JavaClass javaClass) {
     this.javaClass = javaClass;
+    return this;
+  }
+
+  public int getAccess() {
+    return access;
+  }
+
+  public JavaMethod setAccess(int access) {
+    this.access = access;
+    return this;
   }
 
   @Override
@@ -61,13 +74,5 @@ public class JavaMethod {
         .append("descriptor", descriptor)
         .append("javaClass", javaClass)
         .toString();
-  }
-
-  public void setAccess(int access) {
-    this.access = access;
-  }
-
-  public int getAccess() {
-    return access;
   }
 }

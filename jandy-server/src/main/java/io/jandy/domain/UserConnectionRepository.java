@@ -24,9 +24,4 @@ public interface UserConnectionRepository extends JpaRepository<UserConnection, 
 
   List<UserConnection> findById_UserIdAndId_ProviderIdOrderByRankAsc(String userId, String providerId);
 
-  @Modifying
-  @Transactional
-  @Query("delete from UserConnection u where u.id.userId = :userId and u.id.providerId = :providerId")
-  void delete(@Param("userId") String userId,
-              @Param("providerId") String providerId);
 }

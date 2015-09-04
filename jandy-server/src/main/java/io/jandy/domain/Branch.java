@@ -29,31 +29,35 @@ public class Branch {
     return id;
   }
 
-  public void setId(long id) {
+  public Branch setId(long id) {
     this.id = id;
+    return this;
   }
 
   public String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public Branch setName(String name) {
     this.name = name;
+    return this;
   }
 
   public Project getProject() {
     return project;
   }
 
-  public void setProject(Project project) {
+  public Branch setProject(Project project) {
     this.project = project;
+    return this;
   }
 
   public List<Build> getBuilds() {
     return builds;
   }
 
-  public void setBuilds(List<Build> builds) {
+  public Branch setBuilds(List<Build> builds) {
     this.builds = builds;
+    return this;
   }
 }

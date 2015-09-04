@@ -30,48 +30,54 @@ public class Build {
     return id;
   }
 
-  public void setId(long id) {
+  public Build setId(long id) {
     this.id = id;
+    return this;
   }
 
   public String getLanguage() {
     return language;
   }
 
-  public void setLanguage(String language) {
+  public Build setLanguage(String language) {
     this.language = language;
+    return this;
   }
 
   public long getTravisBuildId() {
     return travisBuildId;
   }
 
-  public void setTravisBuildId(long travisBuildId) {
+  public Build setTravisBuildId(long travisBuildId) {
     this.travisBuildId = travisBuildId;
+    return this;
   }
 
   public long getNumber() {
     return number;
   }
 
-  public void setNumber(long number) {
+  public Build setNumber(long number) {
     this.number = number;
+    return this;
   }
 
   public Branch getBranch() {
     return branch;
   }
 
-  public void setBranch(Branch branch) {
+  public Build setBranch(Branch branch) {
     this.branch = branch;
+    return this;
   }
 
   public JavaProfilingDump getJavaProfilingDump() {
     return javaProfilingDump;
   }
 
-  public void setJavaProfilingDump(JavaProfilingDump javaProfilingDump) {
+  public Build setJavaProfilingDump(JavaProfilingDump javaProfilingDump) {
     this.javaProfilingDump = javaProfilingDump;
+    return this;
   }
 
   @Override

@@ -14,7 +14,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.social.UserIdSource;
 import org.springframework.social.config.annotation.ConnectionFactoryConfigurer;
-import org.springframework.social.config.annotation.EnableSocial;
 import org.springframework.social.config.annotation.SocialConfigurer;
 import org.springframework.social.connect.*;
 import org.springframework.social.connect.web.ProviderSignInController;
@@ -28,10 +27,7 @@ import javax.sql.DataSource;
  * @since 2015-07-03
  */
 @Configuration
-@EnableSocial
 public class SocialConfiguration implements SocialConfigurer {
-  @Autowired
-  private DataSource dataSource;
   @Autowired
   private SimpleConnectionSignUp simpleConnectionSignUp;
   @Autowired
@@ -55,12 +51,7 @@ public class SocialConfiguration implements SocialConfigurer {
   }
 
   public UserIdSource getUserIdSource() {
-    return new UserIdSource() {
-      @Override
-      public String getUserId() {
-        return Long.toString(SecurityContext.getCurrentUser().getId());
-      }
-    };
+    return () -> Long.toString(SecurityContext.getCurrentUser().getId());
   }
 
   @Bean

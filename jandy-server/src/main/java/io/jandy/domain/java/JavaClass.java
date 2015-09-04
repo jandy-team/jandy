@@ -21,28 +21,40 @@ public class JavaClass {
   @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "javaClass")
   private List<JavaMethod> methods;
 
-  public void setClassName(String className) {
-    this.className = className;
+  public long getId() {
+    return id;
   }
 
-  public String getClassName() {
-    return className;
-  }
-
-  public void setPackageName(String packageName) {
-    this.packageName = packageName;
+  public JavaClass setId(long id) {
+    this.id = id;
+    return this;
   }
 
   public String getPackageName() {
     return packageName;
   }
 
-  public long getId() {
-    return id;
+  public JavaClass setPackageName(String packageName) {
+    this.packageName = packageName;
+    return this;
   }
 
-  public void setId(long id) {
-    this.id = id;
+  public String getClassName() {
+    return className;
+  }
+
+  public JavaClass setClassName(String className) {
+    this.className = className;
+    return this;
+  }
+
+  public List<JavaMethod> getMethods() {
+    return methods;
+  }
+
+  public JavaClass setMethods(List<JavaMethod> methods) {
+    this.methods = methods;
+    return this;
   }
 
   @Override

@@ -10,4 +10,5 @@ import java.util.Map;
 public interface UserConnectionRepositoryCustom {
   List<UserConnection> findByUserIdAndProviderUsers(String userId, Map<String, List<String>> providerUsers);
   int getIncrementRank(String userId, String providerId);
+  long deleteByUserIdAndProviderId(String userId, String providerId);
 }

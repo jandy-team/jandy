@@ -13,4 +13,6 @@ public interface BuildRepository extends JpaRepository<Build, Long>, QueryDslPre
   Build findByTravisBuildId(long travisBuildId);
   List<Build> findByBranch_Project_Id(long projectId);
   Build findByNumberAndBranch_NameAndBranch_Project_AccountAndBranch_Project_Name(long number, String branchName, String account, String projectName);
+
+  Build findByNumberAndBranch_Id(long number, long id);
 }

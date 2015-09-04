@@ -5,6 +5,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.mysema.query.support.Expressions;
 import io.jandy.domain.*;
+import io.jandy.util.SmallTime;
 import org.apache.commons.io.IOUtils;
 import org.apache.el.lang.EvaluationContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,44 +88,11 @@ public class ProjectController {
     Build latest = buildPage.getContent().get(0), old = buildPage.getContent().get(1);
 
     long durationInNanoSeconds = latest.getJavaProfilingDump().getMaxTotalDuration() - old.getJavaProfilingDump().getMaxTotalDuration();
-    SmallTime t = format(Math.abs(durationInNanoSeconds));
+    SmallTime t = SmallTime.format(Math.abs(durationInNanoSeconds));
 
     return new SpelExpressionParser().parseExpression(IOUtils.toString(Thread.currentThread().getContextClassLoader().getResourceAsStream(durationInNanoSeconds <= 0 ? "green-badge.svg" : "yellow-badge.svg")),
         new TemplateParserContext()).getValue(new StandardEvaluationContext(t), String.class);
   }
 
-  private static SmallTime format(long value) {
-    SmallTime t = new SmallTime();
 
-    int loop = 0;
-    while (value >= 1000) {
-      value *= 0.001;
-      loop++;
-    }
-
-    switch (loop) {
-      case 0:
-        t.unit = "ns";
-        break;
-      case 1:
-        t.unit = "µs";
-        break;
-      case 2:
-        t.unit = "ms";
-        break;
-      case 3:
-        t.unit = "s";
-        break;
-      default:
-        throw new IllegalArgumentException();
-    }
-    t.value = value;
-
-    return t;
-  }
-
-  private static class SmallTime {
-    public long value;
-    public String unit;
-  }
 }

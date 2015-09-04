@@ -1,4 +1,6 @@
-<#assign root=rc.getContextPath()>
+<#if rc??>
+  <#assign root=rc.getContextPath()>
+</#if>
 <#macro layout>
   <!DOCTYPE HTML>
   <html>
@@ -9,11 +11,17 @@
     <link rel="stylesheet" href="${root}/webjars/bootstrap/3.3.5/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="${root}/css/bootstrap-theme.css"/>
     <link rel="stylesheet" href="${root}/webjars/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.min.css"/>
+  </head>
+  <body data-spy="scroll">
+    <#nested/>
+  </body>
+  </html>
+</#macro>
+<#macro layoutFully>
+  <@layout>
     <script>
       var ROOT_URL = '${root}';
     </script>
-  </head>
-  <body data-spy="scroll">
     <script src="${root}/webjars/jquery/2.1.4/jquery.min.js"></script>
     <script src="${root}/webjars/d3js/3.5.5/d3.min.js"></script>
     <script src="${root}/webjars/lodash/3.9.0/lodash.min.js"></script>
@@ -22,12 +30,6 @@
     <script src="${root}/webjars/bootstrap-switch/3.3.2/js/bootstrap-switch.min.js"></script>
     <script src="${root}/js/bootstrap-waitingfor.js"></script>
     <script src="${root}/js/jandy.js"></script>
-    <#nested/>
-  </body>
-  </html>
-</#macro>
-<#macro layoutFully>
-  <@layout>
     <nav class="navbar navbar-fixed-top navbar-default">
       <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->

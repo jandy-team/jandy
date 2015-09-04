@@ -163,7 +163,7 @@ public class JpaConnectionRepository implements ConnectionRepository {
   @Override
   @Transactional
   public void removeConnections(String providerId) {
-    userConnectionRepository.delete(userId, providerId);
+    userConnectionRepository.deleteByUserIdAndProviderId(userId, providerId);
   }
 
   @Override

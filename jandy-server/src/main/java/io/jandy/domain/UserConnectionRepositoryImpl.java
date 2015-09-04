@@ -1,6 +1,7 @@
 package io.jandy.domain;
 
 import com.google.common.collect.Iterables;
+import com.mysema.query.jpa.impl.JPADeleteClause;
 import com.mysema.query.jpa.impl.JPAQuery;
 import com.mysema.query.jpa.impl.JPAQueryFactory;
 import com.mysema.query.support.Expressions;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author JCooky
@@ -19,20 +21,17 @@ import java.util.Map;
  */
 public class UserConnectionRepositoryImpl implements UserConnectionRepositoryCustom {
   @Autowired
-  private EntityManager em;
+  private JPAQueryFactory queryFactory;
 
   @Override
   public List<UserConnection> findByUserIdAndProviderUsers(String userId, Map<String, List<String>> providerUsers) {
     QUserConnection uc = QUserConnection.userConnection;
-    BooleanExpression[] expressions = new BooleanExpression[providerUsers.size()];
-    int i = 0;
-    for (Map.Entry<String, List<String>> entry : providerUsers.entrySet()) {
-      String providerId = entry.getKey();
 
-      expressions[i++] = uc.id.providerId.eq(providerId).and(uc.id.providerUserId.in(entry.getValue()));
-    }
-    return new JPAQuery(em).from(uc)
-        .where(uc.id.userId.eq(userId), Expressions.anyOf(expressions))
+    return queryFactory.from(uc)
+        .where(uc.id.userId.eq(userId), providerUsers.entrySet().stream()
+            .map((e) -> uc.id.providerId.eq(e.getKey()).and(uc.id.providerUserId.in(e.getValue())))
+            .reduce(BooleanExpression::or)
+            .get())
         .orderBy(uc.id.providerId.asc(), uc.rank.asc())
         .list(uc);
   }
@@ -40,11 +39,17 @@ public class UserConnectionRepositoryImpl implements UserConnectionRepositoryCus
   @Override
   public int getIncrementRank(String userId, String providerId) {
     QUserConnection uc = QUserConnection.userConnection;
-    Integer result = new JPAQuery(em).from(uc)
+    return queryFactory.from(uc)
         .where(uc.id.userId.eq(userId), uc.id.providerId.eq(providerId))
         .singleResult(uc.rank.max().add(1).coalesce(1).as("rank"));
+  }
 
+  public long deleteByUserIdAndProviderId(String userId, String providerId) {
+//    delete from UserConnection u where u.id.userId = :userId and u.id.providerId = :providerId
+    QUserConnection uc = QUserConnection.userConnection;
 
-    return result;
+    return queryFactory.delete(uc)
+        .where(uc.id.userId.eq(userId), uc.id.providerId.eq(providerId))
+        .execute();
   }
 }

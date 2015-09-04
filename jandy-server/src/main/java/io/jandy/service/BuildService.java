@@ -1,6 +1,7 @@
 package io.jandy.service;
 
 import io.jandy.domain.*;
+import io.jandy.exception.IllegalBuildNumberException;
 import io.jandy.exception.ProjectNotRegisteredException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,15 @@ public class BuildService {
   private BranchRepository branchRepository;
   @Autowired
   private ProjectRepository projectRepository;
+
+  public Build getPrev(Build build) {
+    long number = build.getNumber() - 1;
+
+    if (number == 0)
+      throw new IllegalBuildNumberException();
+
+    return buildRepository.findByNumberAndBranch_Id(number, build.getBranch().getId());
+  }
 
   public Build getBuildForTravis(long travisBuildId) throws ProjectNotRegisteredException {
     Build build = buildRepository.findByTravisBuildId(travisBuildId);

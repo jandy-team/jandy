@@ -26,6 +26,7 @@ public class User {
 
   @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "user")
   private List<Project> projects = new ArrayList<>();
+  private String email;
 
 
   public long getId() {
@@ -83,5 +84,13 @@ public class User {
 
   public void setColor(String color) {
     this.color = color;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
   }
 }

@@ -9,19 +9,24 @@ import io.jandy.domain.java.JavaProfilingDump;
 import io.jandy.domain.java.JavaProfilingDumpRepository;
 import io.jandy.domain.java.JavaTreeNode;
 import io.jandy.domain.java.QJavaProfilingDump;
+import io.jandy.exception.IllegalBuildNumberException;
 import io.jandy.exception.ProjectNotRegisteredException;
 import io.jandy.service.BuildService;
+import io.jandy.service.Reporter;
 import io.jandy.service.java.JavaTreeNodeBuilder;
 import io.jandy.thrift.java.ProfilingMetrics;
+import io.jandy.web.service.ReportReasonType;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.transport.TIOStreamTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +50,8 @@ public class TravisRestController {
   private BuildService buildService;
   @Autowired
   private JavaProfilingDumpRepository javaProfilingDumpRepository;
+  @Autowired
+  private Reporter reporter;
 
   @RequestMapping(value = "/java", method = RequestMethod.POST)
   @Transactional
@@ -53,10 +60,8 @@ public class TravisRestController {
                                 @RequestParam String branchName,
                                 @RequestParam Long buildId,
                                 @RequestParam Long buildNum,
-                                @RequestParam("results") MultipartFile results) throws IOException, ClassNotFoundException, ProjectNotRegisteredException, TException {
+                                @RequestParam("results") MultipartFile results) throws IOException, ClassNotFoundException, ProjectNotRegisteredException, TException, MessagingException {
     logger.debug("request /travis/java with ownerName: {}, repoName: {}, branchName: {}", ownerName, repoName, branchName);
-
-    QJavaProfilingDump d = QJavaProfilingDump.javaProfilingDump;
 
     try (Closer closer = Closer.create()) {
       InputStream ois = closer.register(results.getInputStream());
@@ -75,9 +80,21 @@ public class TravisRestController {
       dump.setRoot(javaTreeNodeBuilder.buildTreeNode(metrics.getRoot(), null));
       dump.setBuild(build);
       dump.setMaxTotalDuration(stream(dump.spliterator(), false).mapToLong(JavaTreeNode::getElapsedTime).max().getAsLong());
-      javaProfilingDumpRepository.save(dump);
+      dump = javaProfilingDumpRepository.save(dump);
+      build.setJavaProfilingDump(dump);
 
       logger.info("add profiling dump to build: {}", build);
+
+      try {
+        Build prevBuild = buildService.getPrev(build);
+        reporter.sendMail(build.getBranch().getProject().getUser(), dump.getMaxTotalDuration() - prevBuild.getJavaProfilingDump().getMaxTotalDuration(),
+            build,
+            prevBuild);
+      } catch (IllegalBuildNumberException e) {
+        logger.info(e.getMessage(), e);
+      }
+
+      logger.info("FINISH", build);
     }
   }
 }

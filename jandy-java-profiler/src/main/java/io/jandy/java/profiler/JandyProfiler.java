@@ -6,8 +6,6 @@ import com.github.jcooky.jaal.common.profile.Profiler;
 import io.jandy.java.metrics.MetricsFactory;
 import io.jandy.org.apache.thrift.TException;
 import io.jandy.org.apache.thrift.protocol.TCompactProtocol;
-import io.jandy.org.apache.thrift.transport.TFileTransport;
-import io.jandy.org.apache.thrift.transport.TIOStreamTransport;
 import io.jandy.org.apache.thrift.transport.TSimpleFileTransport;
 import io.jandy.org.apache.thrift.transport.TTransport;
 import io.jandy.thrift.java.ProfilingMetrics;

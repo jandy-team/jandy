@@ -20,13 +20,13 @@ public class User {
   private String avatarUrl;
   private String login;
   private int publicRepos;
+  private String email;
 
   @Transient
   private String color;
 
   @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "user")
   private List<Project> projects = new ArrayList<>();
-  private String email;
 
 
   public long getId() {
@@ -86,11 +86,11 @@ public class User {
     this.color = color;
   }
 
-  public String getEmail() {
-    return email;
-  }
-
   public void setEmail(String email) {
     this.email = email;
+  }
+
+  public String getEmail() {
+    return email;
   }
 }

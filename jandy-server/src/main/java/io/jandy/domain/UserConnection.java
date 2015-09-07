@@ -27,84 +27,89 @@ public class UserConnection {
 
   private Long expireTime;
 
-  public UserConnectionId getId() {
-    return id;
-  }
-
-  public UserConnection setId(UserConnectionId id) {
-    this.id = id;
-    return this;
-  }
-
   public int getRank() {
     return rank;
   }
 
-  public UserConnection setRank(int rank) {
+  public void setRank(int rank) {
     this.rank = rank;
-    return this;
   }
 
   public String getDisplayName() {
     return displayName;
   }
 
-  public UserConnection setDisplayName(String displayName) {
+  public void setDisplayName(String displayName) {
     this.displayName = displayName;
-    return this;
   }
 
   public String getProfileUrl() {
     return profileUrl;
   }
 
-  public UserConnection setProfileUrl(String profileUrl) {
+  public void setProfileUrl(String profileUrl) {
     this.profileUrl = profileUrl;
-    return this;
   }
 
   public String getImageUrl() {
     return imageUrl;
   }
 
-  public UserConnection setImageUrl(String imageUrl) {
+  public void setImageUrl(String imageUrl) {
     this.imageUrl = imageUrl;
-    return this;
   }
 
   public String getAccessToken() {
     return accessToken;
   }
 
-  public UserConnection setAccessToken(String accessToken) {
+  public void setAccessToken(String accessToken) {
     this.accessToken = accessToken;
-    return this;
   }
 
   public String getSecret() {
     return secret;
   }
 
-  public UserConnection setSecret(String secret) {
+  public void setSecret(String secret) {
     this.secret = secret;
-    return this;
   }
 
   public String getRefreshToken() {
     return refreshToken;
   }
 
-  public UserConnection setRefreshToken(String refreshToken) {
+  public void setRefreshToken(String refreshToken) {
     this.refreshToken = refreshToken;
-    return this;
   }
 
   public Long getExpireTime() {
     return expireTime;
   }
 
-  public UserConnection setExpireTime(Long expireTime) {
+  public void setExpireTime(Long expireTime) {
     this.expireTime = expireTime;
-    return this;
+  }
+
+  public UserConnectionId getId() {
+    return id;
+  }
+
+  public void setId(UserConnectionId id) {
+    this.id = id;
   }
 }
+
+//  create table UserConnection (userId varchar(255) not null,
+//  providerId varchar(255) not null,
+//  providerUserId varchar(255),
+//  rank int not null,
+//  displayName varchar(255),
+//  profileUrl varchar(512),
+//  imageUrl varchar(512),
+//  accessToken varchar(512) not null,
+//  secret varchar(512),
+//  refreshToken varchar(512),
+//  expireTime bigint,
+//  primary key (userId, providerId, providerUserId));
+//  create unique index UserConnectionRank on UserConnection(userId, providerId, rank);

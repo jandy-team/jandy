@@ -41,90 +41,80 @@ public class JavaTreeNode {
     return id;
   }
 
-  public JavaTreeNode setId(long id) {
+  public void setId(long id) {
     this.id = id;
-    return this;
-  }
-
-  public long getElapsedTime() {
-    return elapsedTime;
-  }
-
-  public JavaTreeNode setElapsedTime(long elapsedTime) {
-    this.elapsedTime = elapsedTime;
-    return this;
-  }
-
-  public long getStartTime() {
-    return startTime;
-  }
-
-  public JavaTreeNode setStartTime(long startTime) {
-    this.startTime = startTime;
-    return this;
-  }
-
-  public String getConcurThreadName() {
-    return concurThreadName;
-  }
-
-  public JavaTreeNode setConcurThreadName(String concurThreadName) {
-    this.concurThreadName = concurThreadName;
-    return this;
-  }
-
-  public double getOffset() {
-    return offset;
-  }
-
-  public JavaTreeNode setOffset(double offset) {
-    this.offset = offset;
-    return this;
-  }
-
-  public double getWidth() {
-    return width;
-  }
-
-  public JavaTreeNode setWidth(double width) {
-    this.width = width;
-    return this;
-  }
-
-  public int getDepth() {
-    return depth;
-  }
-
-  public JavaTreeNode setDepth(int depth) {
-    this.depth = depth;
-    return this;
-  }
-
-  public JavaMethod getJavaMethod() {
-    return javaMethod;
-  }
-
-  public JavaTreeNode setJavaMethod(JavaMethod javaMethod) {
-    this.javaMethod = javaMethod;
-    return this;
   }
 
   public JavaTreeNode getParent() {
     return parent;
   }
 
-  public JavaTreeNode setParent(JavaTreeNode parent) {
+  public void setParent(JavaTreeNode parent) {
     this.parent = parent;
-    return this;
+  }
+
+  public JavaMethod getJavaMethod() {
+    return javaMethod;
+  }
+
+  public void setJavaMethod(JavaMethod javaMethod) {
+    this.javaMethod = javaMethod;
   }
 
   public List<JavaTreeNode> getChildren() {
     return children;
   }
 
-  public JavaTreeNode setChildren(List<JavaTreeNode> children) {
+  public void setChildren(List<JavaTreeNode> children) {
     this.children = children;
-    return this;
+  }
+
+  public double getOffset() {
+    return offset;
+  }
+
+  public void setOffset(double offset) {
+    this.offset = offset;
+  }
+
+  public double getWidth() {
+    return width;
+  }
+
+  public void setWidth(double width) {
+    this.width = width;
+  }
+
+  public int getDepth() {
+    return depth;
+  }
+
+  public void setDepth(int depth) {
+    this.depth = depth;
+  }
+
+  public long getElapsedTime() {
+    return elapsedTime;
+  }
+
+  public void setElapsedTime(long elapsedTime) {
+    this.elapsedTime = elapsedTime;
+  }
+
+  public long getStartTime() {
+    return startTime;
+  }
+
+  public void setStartTime(long startTime) {
+    this.startTime = startTime;
+  }
+
+  public String getConcurThreadName() {
+    return concurThreadName;
+  }
+
+  public void setConcurThreadName(String concurThreadName) {
+    this.concurThreadName = concurThreadName;
   }
 
   @Override

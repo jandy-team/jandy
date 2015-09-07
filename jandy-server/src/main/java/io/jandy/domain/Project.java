@@ -30,54 +30,48 @@ public class Project {
     return id;
   }
 
-  public Project setId(long id) {
+  public void setId(long id) {
     this.id = id;
-    return this;
   }
 
   public String getAccount() {
     return account;
   }
 
-  public Project setAccount(String account) {
+  public void setAccount(String account) {
     this.account = account;
-    return this;
   }
 
   public String getName() {
     return name;
   }
 
-  public Project setName(String name) {
+  public void setName(String name) {
     this.name = name;
-    return this;
   }
 
   public long getGitHubId() {
     return gitHubId;
   }
 
-  public Project setGitHubId(long gitHubId) {
+  public void setGitHubId(long gitHubId) {
     this.gitHubId = gitHubId;
-    return this;
   }
 
   public User getUser() {
     return user;
   }
 
-  public Project setUser(User user) {
+  public void setUser(User user) {
     this.user = user;
-    return this;
   }
 
   public List<Branch> getBranches() {
     return branches;
   }
 
-  public Project setBranches(List<Branch> branches) {
+  public void setBranches(List<Branch> branches) {
     this.branches = branches;
-    return this;
   }
 
   @Override

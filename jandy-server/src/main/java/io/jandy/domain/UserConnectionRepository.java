@@ -23,5 +23,4 @@ public interface UserConnectionRepository extends JpaRepository<UserConnection, 
   List<UserConnection> findById_UserIdOrderById_ProviderIdAscRankAsc(String userId);
 
   List<UserConnection> findById_UserIdAndId_ProviderIdOrderByRankAsc(String userId, String providerId);
-
 }

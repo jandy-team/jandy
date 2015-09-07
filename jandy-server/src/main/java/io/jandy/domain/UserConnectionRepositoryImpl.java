@@ -45,7 +45,6 @@ public class UserConnectionRepositoryImpl implements UserConnectionRepositoryCus
   }
 
   public long deleteByUserIdAndProviderId(String userId, String providerId) {
-//    delete from UserConnection u where u.id.userId = :userId and u.id.providerId = :providerId
     QUserConnection uc = QUserConnection.userConnection;
 
     return queryFactory.delete(uc)

@@ -87,7 +87,8 @@ public class TravisRestController {
 
       try {
         Build prevBuild = buildService.getPrev(build);
-        reporter.sendMail(build.getBranch().getProject().getUser(), dump.getMaxTotalDuration() - prevBuild.getJavaProfilingDump().getMaxTotalDuration(),
+        reporter.sendMail(build.getBranch().getProject().getUser(),
+            dump.getMaxTotalDuration() - prevBuild.getJavaProfilingDump().getMaxTotalDuration(),
             build,
             prevBuild);
       } catch (IllegalBuildNumberException e) {

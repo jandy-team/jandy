@@ -20,8 +20,8 @@
 	<text id="XMLID_45_" transform="matrix(1 0 0 1 6.5137 13.6396)" fill="#FFFFFF" font-family="'Raavi'" font-size="14.8057">perf</text>
 </g>
 <text id="XMLID_42_" transform="matrix(1 0 0 1 46.7949 14.7217)">
-	<tspan x="0" y="0" fill="#9F732B" font-family="'Raavi'" font-size="13.63" letter-spacing="-1">#{value}</tspan>
-	<tspan x="21.014" y="0" fill="#9F732B" font-family="'Raavi'" font-size="13.63">#{unit}</tspan>
+	<tspan x="0" y="0" fill="#9F732B" font-family="'Raavi'" font-size="13.63" letter-spacing="-1">${value}</tspan>
+	<tspan x="21.014" y="0" fill="#9F732B" font-family="'Raavi'" font-size="13.63">${unit}</tspan>
 </text>
 <g id="XMLID_33_">
 	<g>

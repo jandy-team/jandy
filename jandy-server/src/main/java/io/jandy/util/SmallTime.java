@@ -44,4 +44,12 @@ public class SmallTime {
     return String.valueOf(value) + unit
         ;
   }
+
+  public long getValue() {
+    return value;
+  }
+
+  public String getUnit() {
+    return unit;
+  }
 }

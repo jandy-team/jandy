@@ -1,6 +1,4 @@
-<#if rc??>
-  <#assign root=rc.getContextPath()>
-</#if>
+<#assign root=rc.getContextPath()>
 <#macro layout>
   <!DOCTYPE HTML>
   <html>

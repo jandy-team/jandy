@@ -23,8 +23,8 @@ public class MetricsFactory {
     MethodKey m = new MethodKey();
     m.owner = getClassKey(classType);
     m.name = methodType.getName();
-    m.access = m.getAccess();
-    m.descriptor = m.getDescriptor();
+    m.access = methodType.getAccess();
+    m.descriptor = methodType.getDescriptor();
     return m;
   }
 

@@ -12,7 +12,7 @@ import java.util.LinkedList;
  * @author JCooky
  * @since 2015-08-17
  */
-public class MethodCollector {
+public class MethodHandler {
   private TreeNode root = new TreeNode(), latest = root;
   private Deque<TreeNode> treeNodes = new LinkedList<TreeNode>();
 

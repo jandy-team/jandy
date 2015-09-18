@@ -10,15 +10,12 @@ import io.jandy.org.apache.thrift.transport.TSimpleFileTransport;
 import io.jandy.org.apache.thrift.transport.TTransport;
 import io.jandy.thrift.java.ProfilingMetrics;
 
-import java.io.*;
-import java.util.zip.GZIPOutputStream;
-
 /**
  * @author JCooky
  * @since 2015-08-17
  */
 public class JandyProfiler implements Profiler {
-  private MethodCollectorThreadLocalFactory collectorFactory = new MethodCollectorThreadLocalFactory();
+  private MethodHandlerContext context = new MethodHandlerContext();
 
   public JandyProfiler() {
     Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -26,7 +23,7 @@ public class JandyProfiler implements Profiler {
         TTransport transport = null;
         try {
           transport = new TSimpleFileTransport("java-profiler-result.jandy", false, true);
-          ProfilingMetrics metrics = MetricsFactory.getProfilingMetrics(collectorFactory.getRoots());
+          ProfilingMetrics metrics = MetricsFactory.getProfilingMetrics(context.getRoots());
           metrics.write(new TCompactProtocol(transport));
           transport.flush();
         } catch (TException e) {
@@ -40,10 +37,10 @@ public class JandyProfiler implements Profiler {
   }
 
   public void begin(ClassType owner, MethodType method) {
-    collectorFactory.get().enter(owner, method);
+    context.get().enter(owner, method);
   }
 
   public void end(ClassType owner, MethodType method, long startTime, Throwable throwable, long elapsedTime) {
-    collectorFactory.get().exit(owner, method, startTime, throwable, elapsedTime);
+    context.get().exit(owner, method, startTime, throwable, elapsedTime);
   }
 }

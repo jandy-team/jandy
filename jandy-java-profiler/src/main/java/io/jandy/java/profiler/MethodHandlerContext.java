@@ -9,12 +9,12 @@ import java.util.List;
  * @author JCooky
  * @since 2015-08-17
  */
-public class MethodCollectorThreadLocalFactory extends ThreadLocal<MethodCollector> {
+public class MethodHandlerContext extends ThreadLocal<MethodHandler> {
   private List<TreeNode> roots = new ArrayList<TreeNode>();
 
   @Override
-  protected MethodCollector initialValue() {
-    MethodCollector collector = new MethodCollector();
+  protected MethodHandler initialValue() {
+    MethodHandler collector = new MethodHandler();
     roots.add(collector.getRoot());
     return collector;
   }

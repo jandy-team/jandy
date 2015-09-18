@@ -1,8 +1,11 @@
 from distutils.dir_util import mkpath
-from setuptools import setup, find_packages
+import os
+import shutil
+
+from setuptools import setup
 from target import pom
-import os, shutil
-import yaml, poster
+import yaml
+import poster
 
 mkpath('build')
 mkpath('build/lib')

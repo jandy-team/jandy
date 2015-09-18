@@ -15,7 +15,6 @@ import io.jandy.service.BuildService;
 import io.jandy.service.Reporter;
 import io.jandy.service.java.JavaTreeNodeBuilder;
 import io.jandy.thrift.java.ProfilingMetrics;
-import io.jandy.web.service.ReportReasonType;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.transport.TIOStreamTransport;

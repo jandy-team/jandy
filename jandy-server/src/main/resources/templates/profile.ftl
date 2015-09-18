@@ -1,5 +1,6 @@
 <#include "include/layouts.ftl">
 <@layoutFully>
+  <link rel="stylesheet" href="${root}/css/profile.css">
   <div id="profile" class="container-fluid">
     <div class="row">
       <aside id="left-menu" class="col-md-3 affix" role="navigation">

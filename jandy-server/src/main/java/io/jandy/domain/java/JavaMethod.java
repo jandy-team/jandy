@@ -14,8 +14,8 @@ public class JavaMethod {
   @GeneratedValue
   private long id;
 
-  private String methodName = null;
-  private String descriptor = null;
+  private String methodName;
+  private String descriptor;
 
   @ManyToOne
   private JavaClass javaClass;

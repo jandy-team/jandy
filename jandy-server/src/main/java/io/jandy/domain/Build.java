@@ -1,7 +1,6 @@
 package io.jandy.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.jandy.domain.java.JavaProfilingDump;
 
 import javax.persistence.*;
 
@@ -23,8 +22,8 @@ public class Build {
   @JsonIgnore
   private Branch branch;
 
-  @OneToOne(mappedBy = "build")
-  private JavaProfilingDump javaProfilingDump;
+  @OneToOne(mappedBy = "build", cascade = CascadeType.REMOVE)
+  private ProfContextDump profContextDump;
 
   public long getId() {
     return id;
@@ -66,12 +65,12 @@ public class Build {
     this.branch = branch;
   }
 
-  public JavaProfilingDump getJavaProfilingDump() {
-    return javaProfilingDump;
+  public ProfContextDump getProfContextDump() {
+    return profContextDump;
   }
 
-  public void setJavaProfilingDump(JavaProfilingDump javaProfilingDump) {
-    this.javaProfilingDump = javaProfilingDump;
+  public void setProfContextDump(ProfContextDump profContextDump) {
+    this.profContextDump = profContextDump;
   }
 
   @Override

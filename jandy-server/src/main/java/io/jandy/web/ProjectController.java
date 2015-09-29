@@ -2,14 +2,10 @@ package io.jandy.web;
 
 import io.jandy.domain.*;
 import io.jandy.util.SmallTime;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.querydsl.QPageRequest;
-import org.springframework.expression.common.TemplateParserContext;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -76,7 +72,7 @@ public class ProjectController {
     Page<Build> buildPage = buildRepository.findAll(b.branch.name.eq(branchName).and(b.branch.project.account.eq(account)).and(b.branch.project.name.eq(projectName)), new QPageRequest(0, 2, b.number.desc()));
     Build latest = buildPage.getContent().get(0), old = buildPage.getContent().get(1);
 
-    long durationInNanoSeconds = latest.getJavaProfilingDump().getMaxTotalDuration() - old.getJavaProfilingDump().getMaxTotalDuration();
+    long durationInNanoSeconds = latest.getProfContextDump().getMaxTotalDuration() - old.getProfContextDump().getMaxTotalDuration();
     SmallTime t = SmallTime.format(Math.abs(durationInNanoSeconds));
 
     return FreeMarkerTemplateUtils.processTemplateIntoString(configurer.getConfiguration().getTemplate(durationInNanoSeconds <= 0 ? "badge/green-badge.ftl" : "badge/yellow-badge.ftl"), t);

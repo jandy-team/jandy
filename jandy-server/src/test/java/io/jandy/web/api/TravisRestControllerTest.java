@@ -5,19 +5,16 @@ import io.jandy.domain.ProjectRepository;
 import io.jandy.domain.User;
 import io.jandy.domain.UserRepository;
 import io.jandy.test.AbstractWebAppTestCase;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.result.RequestResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
 /**
  * @author user1
@@ -33,8 +30,8 @@ public class TravisRestControllerTest extends AbstractWebAppTestCase {
   @Autowired
   private UserRepository userRepository;
 
-  @Test
-  public void testPutResultsForJava() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     User user = new User();
     user = userRepository.save(user);
 
@@ -44,11 +41,23 @@ public class TravisRestControllerTest extends AbstractWebAppTestCase {
     project.setAccount("jcooky");
     project.setUser(user);
     project = projectRepository.save(project);
+  }
 
-    MockMultipartFile multipartFile = new MockMultipartFile("results", "java-profiler-result.jandy", MediaType.APPLICATION_OCTET_STREAM_VALUE, ClassLoader.getSystemResourceAsStream("java-profiler-result.jandy"));
+  @After
+  public void tearDown() throws Exception {
+    projectRepository.deleteAll();
+    userRepository.deleteAll();
+  }
+
+  @Test
+  public void testPutResultsForJava() throws Exception {
+
+
+    MockMultipartFile multipartFile = new MockMultipartFile("results", "java-profiler-result.jandy",
+        MediaType.APPLICATION_OCTET_STREAM_VALUE, ClassLoader.getSystemResourceAsStream("java-profiler-result.jandy"));
 
     MockMvcBuilders.standaloneSetup(controller).build()
-        .perform(MockMvcRequestBuilders.fileUpload("/rest/travis/java")
+        .perform(MockMvcRequestBuilders.fileUpload("/rest/travis")
                 .file(multipartFile)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .param("ownerName", "jcooky")
@@ -56,6 +65,36 @@ public class TravisRestControllerTest extends AbstractWebAppTestCase {
                 .param("buildId", "1")
                 .param("branchName", "master")
                 .param("buildNum", "1")
+                .param("language", "java")
+        ).andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+        .andDo(MockMvcResultHandlers.print());
+  }
+
+  @Test
+  public void testPutResultsForPython() throws Exception {
+//    User user = new User();
+//    user = userRepository.save(user);
+//
+//    Project project = new Project();
+//    project.setUser(null);
+//    project.setName("jandy");
+//    project.setAccount("jcooky");
+//    project.setUser(user);
+//    project = projectRepository.save(project);
+
+    MockMultipartFile multipartFile = new MockMultipartFile("results", "python-profiler-result.jandy",
+        MediaType.APPLICATION_OCTET_STREAM_VALUE, ClassLoader.getSystemResourceAsStream("python-profiler-result.jandy"));
+
+    MockMvcBuilders.standaloneSetup(controller).build()
+        .perform(MockMvcRequestBuilders.fileUpload("/rest/travis")
+                .file(multipartFile)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .param("ownerName", "jcooky")
+                .param("repoName", "jandy")
+                .param("buildId", "1")
+                .param("branchName", "master")
+                .param("buildNum", "1")
+                .param("language", "python")
         ).andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
         .andDo(MockMvcResultHandlers.print());
   }

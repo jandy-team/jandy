@@ -7,7 +7,7 @@
   <parent>
     <groupId>io.jandy</groupId>
     <artifactId>jandy</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>jandy-server</artifactId>
@@ -31,6 +31,19 @@
   </dependencyManagement>
 
   <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>jandy-java-profiler</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>jandy-python</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-freemarker</artifactId>

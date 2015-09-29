@@ -1,8 +1,7 @@
-package io.jandy.domain.java;
+package io.jandy.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Lists;
-import io.jandy.domain.Build;
 
 import javax.persistence.*;
 import java.util.*;
@@ -12,7 +11,7 @@ import java.util.*;
  * @since 2015-07-08
  */
 @Entity
-public class JavaProfilingDump implements Iterable<JavaTreeNode> {
+public class ProfContextDump implements Iterable<ProfTreeNode> {
   @Id
   @GeneratedValue
   private long id;
@@ -20,7 +19,7 @@ public class JavaProfilingDump implements Iterable<JavaTreeNode> {
   private long maxTotalDuration;
 
   @OneToOne
-  private JavaTreeNode root;
+  private ProfTreeNode root;
 
   @OneToOne
   @JsonIgnore
@@ -34,11 +33,11 @@ public class JavaProfilingDump implements Iterable<JavaTreeNode> {
     this.id = id;
   }
 
-  public JavaTreeNode getRoot() {
+  public ProfTreeNode getRoot() {
     return root;
   }
 
-  public void setRoot(JavaTreeNode root) {
+  public void setRoot(ProfTreeNode root) {
     this.root = root;
   }
 
@@ -59,15 +58,15 @@ public class JavaProfilingDump implements Iterable<JavaTreeNode> {
   }
 
   @Override
-  public Iterator<JavaTreeNode> iterator() {
+  public Iterator<ProfTreeNode> iterator() {
     return new JavaTreeNodeIterator(root);
   }
 
-  private class JavaTreeNodeIterator implements Iterator<JavaTreeNode> {
+  private class JavaTreeNodeIterator implements Iterator<ProfTreeNode> {
 
-    private Deque<JavaTreeNode> nodes = new LinkedList<>();
+    private Deque<ProfTreeNode> nodes = new LinkedList<>();
 
-    public JavaTreeNodeIterator(JavaTreeNode root) {
+    public JavaTreeNodeIterator(ProfTreeNode root) {
       this.nodes.addAll(Lists.reverse(root.getChildren()));
     }
 
@@ -77,8 +76,8 @@ public class JavaProfilingDump implements Iterable<JavaTreeNode> {
     }
 
     @Override
-    public JavaTreeNode next() {
-      JavaTreeNode node = nodes.pop();
+    public ProfTreeNode next() {
+      ProfTreeNode node = nodes.pop();
 
       nodes.addAll(Lists.reverse(node.getChildren()));
 

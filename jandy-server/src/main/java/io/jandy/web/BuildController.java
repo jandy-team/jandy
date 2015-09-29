@@ -2,7 +2,7 @@ package io.jandy.web;
 
 import io.jandy.domain.Build;
 import io.jandy.domain.BuildRepository;
-import io.jandy.domain.java.JavaTreeNode;
+import io.jandy.domain.ProfTreeNode;
 import io.jandy.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,13 +27,13 @@ public class BuildController {
 
     if (build == null)
       throw new ResourceNotFoundException();
-    calculateModelInView(build.getJavaProfilingDump().getRoot().getChildren().get(0), 0, 0.0, 1.0);
+    calculateModelInView(build.getProfContextDump().getRoot().getChildren().get(0), 0, 0.0, 1.0);
 
     return new ModelAndView("build")
         .addObject("build", build);
   }
 
-  private void calculateModelInView(JavaTreeNode node, int depth, double offset, double parentWidth) {
+  private void calculateModelInView(ProfTreeNode node, int depth, double offset, double parentWidth) {
     node.setDepth(depth);
     if (node.getParent() != null) {
       node.setOffset(offset);
@@ -43,7 +43,7 @@ public class BuildController {
         node.setWidth(parentWidth);
     }
     offset = node.getOffset();
-    for (JavaTreeNode child : node.getChildren()) {
+    for (ProfTreeNode child : node.getChildren()) {
       calculateModelInView(child, depth+1, offset, node.getWidth());
       offset += child.getWidth();
     }

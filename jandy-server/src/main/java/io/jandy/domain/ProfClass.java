@@ -1,4 +1,4 @@
-package io.jandy.domain.java;
+package io.jandy.domain;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -10,23 +10,23 @@ import java.util.List;
  * @since 2015-07-08
  */
 @Entity
-public class JavaClass {
+public class ProfClass {
   @Id
   @GeneratedValue
   private long id;
 
   private String packageName;
-  private String className;
+  private String name;
 
-  @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "javaClass")
-  private List<JavaMethod> methods;
+  @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "owner")
+  private List<ProfMethod> methods;
 
-  public void setClassName(String className) {
-    this.className = className;
+  public void setName(String name) {
+    this.name = name;
   }
 
-  public String getClassName() {
-    return className;
+  public String getName() {
+    return name;
   }
 
   public void setPackageName(String packageName) {
@@ -48,7 +48,7 @@ public class JavaClass {
   @Override
   public String toString() {
     return new ToStringBuilder(this)
-        .append("className", className)
+        .append("name", name)
         .append("packageName", packageName)
         .append("id", id)
         .toString();

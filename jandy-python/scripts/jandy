@@ -1,0 +1,77 @@
+#!/usr/bin/env python
+
+import os
+import subprocess
+import sys
+import urllib2
+
+import yaml
+from poster.encode import multipart_encode
+from poster.streaminghttp import register_openers
+
+travis = os.getenv('TRAVIS')
+ci = os.getenv('CI')
+
+if travis == 'true' and ci == 'true':
+    URL = "http://jandy.io"
+else:
+    URL = "http://localhost:3000"
+JAVA_PROFILER_URL = URL + "/jandy-java-profiler.jar"
+PYTHON_PROFILER_URL = URL + "/jandy-python-profiler.zip"
+
+ownerName, repoName = os.getenv('TRAVIS_REPO_SLUG').split('/')
+branchName = os.getenv('TRAVIS_BRANCH')
+buildId = os.getenv('TRAVIS_BUILD_ID')
+buildNum = os.getenv('TRAVIS_BUILD_NUMBER')
+
+
+def wget(url, filename):
+    with open(filename, 'wb') as dest:
+        response = urllib2.urlopen(url)
+        dest.write(response.read())
+        response.close()
+
+
+register_openers()
+with open(".travis.yml", "r") as stream:
+    doc = yaml.load(stream)
+    if doc['language'] == 'java':
+        wget(JAVA_PROFILER_URL, 'jandy-java-profiler.jar')
+        args = sys.argv[1:]
+        args.insert(1, '-javaagent:jandy-java-profiler.jar')
+        subprocess.call(args)
+        with open('java-profiler-result.jandy', 'rb') as java_results:
+            params = {
+                'results': java_results,
+                'name': 'java-profiler-result.jandy',
+                'ownerName': ownerName,
+                'repoName': repoName,
+                'branchName': branchName,
+                'buildId': buildId,
+                'buildNum': buildNum,
+                'language': 'java'
+            }
+            datagen, headers = multipart_encode(params)
+            request = urllib2.Request(URL + "/rest/travis", datagen, headers)
+            response = urllib2.urlopen(request)
+            print(response.read())
+    if doc['language'] == 'python':
+        args = sys.argv[1:]
+        args.insert(1, '-m')
+        args.insert(2, 'jandy')
+        subprocess.call(args)
+        with open('python-profiler-result.jandy', 'rb') as python_results:
+            params = {
+                'results': python_results,
+                'name': 'python-profiler-result.jandy',
+                'ownerName': ownerName,
+                'repoName': repoName,
+                'branchName': branchName,
+                'buildId': buildId,
+                'buildNum': buildNum,
+                'language': 'python'
+            }
+            datagen, headers = multipart_encode(params)
+            request = urllib2.Request(URL + '/rest/travis', datagen, headers)
+            response = urllib2.urlopen(request)
+            print(response.read())

@@ -1,36 +1,48 @@
 namespace java io.jandy.thrift.java
+namespace py jandy
 
-struct ClassKey {
-  1: string packageName,
-  2: string name
+typedef string UUID
+
+struct ClassObject {
+  1: UUID id,
+  2: string packageName,
+  3: string name
 }
 
-struct MethodKey {
-  1: string name
-  2: i32 access,
-  3: string descriptor,
-  4: ClassKey owner
+struct MethodObject {
+  1: UUID id,
+  2: string name,
+  3: i32 access,
+  4: string descriptor,
+  5: UUID ownerId
 }
 
-struct ExceptionKey {
-  1: ClassKey classKey,
-  2: ExceptionKey caused,
-  3: string message
+struct ExceptionObject {
+  1: UUID id,
+  2: UUID classId,
+  3: optional UUID casedById,
+  4: string message,
 }
 
 struct Accumulator {
-  1: i64 elapsedTime,
-  2: i64 startTime,
-  3: string concurThreadName,
-  4: ExceptionKey exceptionKey
+  1: UUID id,
+  2: i64 elapsedTime,
+  3: i64 startTime,
+  4: string concurThreadName,
+  5: optional UUID exceptionId,
 }
 
 struct TreeNode {
-  1: list<TreeNode> children
-  2: Accumulator acc,
-  3: MethodKey method
+  1: UUID id,
+  2: list<UUID> childrenIds,
+  3: Accumulator acc,
+  4: UUID methodId
 }
 
-struct ProfilingMetrics {
-  1: TreeNode root
+struct ProfilingContext {
+  1: list<ClassObject> classes,
+  2: list<MethodObject> methods,
+  3: list<ExceptionObject> exceptions,
+  4: list<TreeNode> nodes,
+  5: TreeNode root
 }

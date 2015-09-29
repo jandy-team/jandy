@@ -1,0 +1,4 @@
+
+class JandyClassError(Exception):
+    pass
+

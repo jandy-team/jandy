@@ -1,4 +1,4 @@
-package io.jandy.domain.java;
+package io.jandy.domain;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -9,17 +9,17 @@ import javax.persistence.*;
  * @since 2015-07-08
  */
 @Entity
-public class JavaMethod {
+public class ProfMethod {
   @Id
   @GeneratedValue
   private long id;
 
-  private String methodName;
+  private String name;
   private String descriptor;
+  private int access;
 
   @ManyToOne
-  private JavaClass javaClass;
-  private int access;
+  private ProfClass owner;
 
   public long getId() {
     return id;
@@ -29,12 +29,12 @@ public class JavaMethod {
     this.id = id;
   }
 
-  public String getMethodName() {
-    return methodName;
+  public String getName() {
+    return name;
   }
 
-  public void setMethodName(String methodName) {
-    this.methodName = methodName;
+  public void setName(String name) {
+    this.name = name;
   }
 
   public String getDescriptor() {
@@ -45,21 +45,21 @@ public class JavaMethod {
     this.descriptor = descriptor;
   }
 
-  public JavaClass getJavaClass() {
-    return javaClass;
+  public ProfClass getOwner() {
+    return owner;
   }
 
-  public void setJavaClass(JavaClass javaClass) {
-    this.javaClass = javaClass;
+  public void setOwner(ProfClass owner) {
+    this.owner = owner;
   }
 
   @Override
   public String toString() {
     return new ToStringBuilder(this)
         .append("id", id)
-        .append("methodName", methodName)
+        .append("name", name)
         .append("descriptor", descriptor)
-        .append("javaClass", javaClass)
+        .append("owner", owner)
         .toString();
   }
 

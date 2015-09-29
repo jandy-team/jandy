@@ -3,12 +3,9 @@ package io.jandy.test;
 
 import io.jandy.org.apache.thrift.protocol.TCompactProtocol;
 import io.jandy.org.apache.thrift.transport.TIOStreamTransport;
-import io.jandy.thrift.java.ProfilingMetrics;
+import io.jandy.thrift.java.ProfilingContext;
 
 import java.io.FileInputStream;
-import java.io.ObjectInputStream;
-import java.util.List;
-import java.util.zip.GZIPInputStream;
 
 /**
  * @author JCooky
@@ -18,9 +15,8 @@ public class Viewer {
   public static void main(String[] args) throws Exception {
     String filename = "java-profiler-result.jandy";
 
-    GZIPInputStream ois = new GZIPInputStream(new FileInputStream(filename));
-    ProfilingMetrics metrics = new ProfilingMetrics();
-    metrics.read(new TCompactProtocol(new TIOStreamTransport(ois)));
+    ProfilingContext metrics = new ProfilingContext();
+    metrics.read(new TCompactProtocol(new TIOStreamTransport(new FileInputStream(filename))));
 
     System.out.println(metrics);
   }

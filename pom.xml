@@ -6,17 +6,42 @@
 
   <groupId>io.jandy</groupId>
   <artifactId>jandy</artifactId>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.1.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
-    <module>jandy-runner</module>
     <module>jandy-server</module>
     <module>jandy-java-profiler</module>
+    <module>jandy-python</module>
   </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+
+  <profiles>
+    <profile>
+      <id>unix</id>
+      <activation>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+      <properties>
+        <python.executable.name>python2.7</python.executable.name>
+      </properties>
+    </profile>
+    <profile>
+      <id>windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <properties>
+        <python.executable.name>python</python.executable.name>
+      </properties>
+    </profile>
+  </profiles>
 
 </project>

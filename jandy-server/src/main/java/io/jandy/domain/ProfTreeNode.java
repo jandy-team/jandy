@@ -1,6 +1,7 @@
-package io.jandy.domain.java;
+package io.jandy.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.List;
  * @since 2015-07-08
  */
 @Entity
-public class JavaTreeNode {
+public class ProfTreeNode {
   @Id
   @GeneratedValue
   private long id;
@@ -28,14 +29,14 @@ public class JavaTreeNode {
   private int depth;
 
   @ManyToOne
-  private JavaMethod javaMethod;
+  private ProfMethod method;
 
   @ManyToOne
   @JsonIgnore
-  private JavaTreeNode parent;
+  private ProfTreeNode parent;
 
   @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "parent")
-  private List<JavaTreeNode> children = new ArrayList<JavaTreeNode>();
+  private List<ProfTreeNode> children = new ArrayList<ProfTreeNode>();
 
   public long getId() {
     return id;
@@ -45,27 +46,27 @@ public class JavaTreeNode {
     this.id = id;
   }
 
-  public JavaTreeNode getParent() {
+  public ProfTreeNode getParent() {
     return parent;
   }
 
-  public void setParent(JavaTreeNode parent) {
+  public void setParent(ProfTreeNode parent) {
     this.parent = parent;
   }
 
-  public JavaMethod getJavaMethod() {
-    return javaMethod;
+  public ProfMethod getMethod() {
+    return method;
   }
 
-  public void setJavaMethod(JavaMethod javaMethod) {
-    this.javaMethod = javaMethod;
+  public void setMethod(ProfMethod method) {
+    this.method = method;
   }
 
-  public List<JavaTreeNode> getChildren() {
+  public List<ProfTreeNode> getChildren() {
     return children;
   }
 
-  public void setChildren(List<JavaTreeNode> children) {
+  public void setChildren(List<ProfTreeNode> children) {
     this.children = children;
   }
 
@@ -119,17 +120,16 @@ public class JavaTreeNode {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("JavaTreeNode{");
-    sb.append("javaMethod=").append(javaMethod);
-    sb.append(", depth=").append(depth);
-    sb.append(", width=").append(width);
-    sb.append(", offset=").append(offset);
-    sb.append(", concurThreadName='").append(concurThreadName).append('\'');
-    sb.append(", startTime=").append(startTime);
-    sb.append(", elapsedTime=").append(elapsedTime);
-    sb.append(", id=").append(id);
-    sb.append('}');
-    return sb.toString();
+    return new ToStringBuilder(this)
+        .append("id", id)
+        .append("method", method)
+        .append("depth", depth)
+        .append("width", width)
+        .append("offset", offset)
+        .append("concurThreadName", concurThreadName)
+        .append("startTime", startTime)
+        .append("elapsedTime", elapsedTime)
+        .toString();
   }
 
 }

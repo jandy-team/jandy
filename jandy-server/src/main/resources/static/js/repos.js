@@ -47,7 +47,7 @@ jandy.ReposGraph.prototype = _.create(Object.prototype, {
         return d.number;
       }));
       y.domain([0, d3.max(data, function (d) {
-        return d.javaProfilingDump.maxTotalDuration
+        return d.profContextDump.maxTotalDuration
       })]);
 
       svg.append("g")
@@ -74,10 +74,10 @@ jandy.ReposGraph.prototype = _.create(Object.prototype, {
           })
           .attr("width", x.rangeBand())
           .attr("y", function (d) {
-            return y(d.javaProfilingDump.maxTotalDuration);
+            return y(d.profContextDump.maxTotalDuration);
           })
           .attr("height", function (d) {
-            return _this.height - y(d.javaProfilingDump.maxTotalDuration)
+            return _this.height - y(d.profContextDump.maxTotalDuration)
           })
           .on('click', function (d) {
             _this.createMethods(d.id);
@@ -93,7 +93,7 @@ jandy.ReposGraph.prototype = _.create(Object.prototype, {
           var arr = arr || [];
           obj.parent = parent;
 
-          if (obj.javaMethod != null) {
+          if (obj.method != null) {
             arr.push(obj);
           }
 
@@ -138,7 +138,7 @@ jandy.ReposGraph.prototype = _.create(Object.prototype, {
             .append('g')
             .attr('transform', 'translate(' + _this.width / 2 + ',' + _this.height / 2 + ')');
 
-    d3.json(ROOT_URL + '/rest/java/build/' + buildId, function (prof) {
+    d3.json(ROOT_URL + '/rest/build/' + buildId + "/prof", function (prof) {
 
       var nodes = toArray(prof.root),
           maxDepth = d3.max(nodes, function (n) {
@@ -164,7 +164,7 @@ jandy.ReposGraph.prototype = _.create(Object.prototype, {
             return d3.rgb(red(d.depth), green(d.depth), blue(d.depth)).toString();
           })
           .attr('title', function (d) {
-            return d.javaMethod.javaClass.packageName + '.' + d.javaMethod.javaClass.className + '.' + d.javaMethod.methodName;
+            return d.method.owner.packageName + '.' + d.method.owner.className + '.' + d.method.name;
           })
       ;
 

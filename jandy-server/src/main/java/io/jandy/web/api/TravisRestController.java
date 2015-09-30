@@ -12,7 +12,9 @@ import io.jandy.service.Reporter;
 import io.jandy.service.ProfContextBuilder;
 import io.jandy.thrift.java.ProfilingContext;
 import org.apache.thrift.TException;
+import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TCompactProtocol;
+import org.apache.thrift.protocol.TJSONProtocol;
 import org.apache.thrift.transport.TIOStreamTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,19 +49,19 @@ public class TravisRestController {
 
   @RequestMapping(method = RequestMethod.POST)
   @Transactional
-  public void putResultsForJava(@RequestParam String ownerName,
-                                @RequestParam String repoName,
-                                @RequestParam String branchName,
-                                @RequestParam Long buildId,
-                                @RequestParam Long buildNum,
-                                @RequestParam String language,
-                                @RequestParam("results") MultipartFile results) throws IOException, ClassNotFoundException, ProjectNotRegisteredException, TException, MessagingException {
+  public void putResults(@RequestParam String ownerName,
+                         @RequestParam String repoName,
+                         @RequestParam String branchName,
+                         @RequestParam Long buildId,
+                         @RequestParam Long buildNum,
+                         @RequestParam String language,
+                         @RequestParam("results") MultipartFile results) throws IOException, ClassNotFoundException, ProjectNotRegisteredException, TException, MessagingException {
     logger.debug("request /travis/java with ownerName: {}, repoName: {}, branchName: {}", ownerName, repoName, branchName);
 
     try (Closer closer = Closer.create()) {
       InputStream ois = closer.register(results.getInputStream());
       ProfilingContext context = new ProfilingContext();
-      context.read(new TCompactProtocol(new TIOStreamTransport(ois)));
+      context.read(new TJSONProtocol(new TIOStreamTransport(ois)));
 
       Build build = buildService.getBuildForTravis(buildId);
       if (build == null) {

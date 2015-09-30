@@ -1,5 +1,6 @@
 import threading
 import sys
+from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 from thrift.protocol.TJSONProtocol import TJSONProtocol
 from jandy.exceptions import JandyClassError
 
@@ -36,12 +37,12 @@ class MethodHandler(object):
 
         self.current.acc.startTime = long(startTime * 1000.0 * 1000.0 * 1000.0)
         self.current.acc.elapsedTime = long(elapsedTime * 1000.0 * 1000.0 * 1000.0)
-        if excepted is True:
+        if excepted:
             (exception, value, traceback) = arg
             self.current.acc.exceptionId = exceptionObject(exception, value, traceback).id
 
         # print('EXIT - '+str(self.current))
-        if excepted is not True:
+        if not excepted:
             self.current = self.nodes.pop()
 
 
@@ -74,7 +75,7 @@ class Profiler(object):
         # print(context.methods)
         with open("python-profiler-result.jandy", "w") as f:
             tp = TFileObjectTransport(f)
-            context.write(TCompactProtocol(tp))
+            context.write(TJSONProtocol(tp))
             tp.flush()
 
     def trace(self, frame, event, arg):

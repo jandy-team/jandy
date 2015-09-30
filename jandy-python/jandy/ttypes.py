@@ -28,11 +28,11 @@ class ClassObject:
   thrift_spec = (
     None, # 0
     (1, TType.STRING, 'id', None, None, ), # 1
-    (2, TType.STRING, 'packageName', None, None, ), # 2
-    (3, TType.STRING, 'name', None, None, ), # 3
+    (2, TType.STRING, 'packageName', None, "", ), # 2
+    (3, TType.STRING, 'name', None, "", ), # 3
   )
 
-  def __init__(self, id=None, packageName=None, name=None,):
+  def __init__(self, id=None, packageName=thrift_spec[2][4], name=thrift_spec[3][4],):
     self.id = id
     self.packageName = packageName
     self.name = name

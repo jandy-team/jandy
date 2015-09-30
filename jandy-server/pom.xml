@@ -13,7 +13,7 @@
   <artifactId>jandy-server</artifactId>
 
   <properties>
-    <spring.boot.version>1.2.5.RELEASE</spring.boot.version>
+    <spring.boot.version>1.2.6.RELEASE</spring.boot.version>
     <java.version>1.8</java.version>
     <querydsl.version>3.6.5</querydsl.version>
   </properties>

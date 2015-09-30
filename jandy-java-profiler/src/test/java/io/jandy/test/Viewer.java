@@ -2,6 +2,7 @@ package io.jandy.test;
 
 
 import io.jandy.org.apache.thrift.protocol.TCompactProtocol;
+import io.jandy.org.apache.thrift.protocol.TJSONProtocol;
 import io.jandy.org.apache.thrift.transport.TIOStreamTransport;
 import io.jandy.thrift.java.ProfilingContext;
 
@@ -16,7 +17,7 @@ public class Viewer {
     String filename = "java-profiler-result.jandy";
 
     ProfilingContext metrics = new ProfilingContext();
-    metrics.read(new TCompactProtocol(new TIOStreamTransport(new FileInputStream(filename))));
+    metrics.read(new TJSONProtocol(new TIOStreamTransport(new FileInputStream(filename))));
 
     System.out.println(metrics);
   }

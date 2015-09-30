@@ -5,8 +5,8 @@ typedef string UUID
 
 struct ClassObject {
   1: UUID id,
-  2: string packageName,
-  3: string name
+  2: string packageName = "",
+  3: string name = ""
 }
 
 struct MethodObject {

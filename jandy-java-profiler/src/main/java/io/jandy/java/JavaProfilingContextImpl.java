@@ -7,6 +7,7 @@ import io.jandy.java.key.MethodKey;
 import io.jandy.java.profiler.MethodHandler;
 import io.jandy.org.apache.thrift.TException;
 import io.jandy.org.apache.thrift.protocol.TCompactProtocol;
+import io.jandy.org.apache.thrift.protocol.TJSONProtocol;
 import io.jandy.org.apache.thrift.protocol.TProtocol;
 import io.jandy.org.apache.thrift.transport.TSimpleFileTransport;
 import io.jandy.org.apache.thrift.transport.TTransport;
@@ -135,7 +136,7 @@ public class JavaProfilingContextImpl extends ThreadLocal<MethodHandler> impleme
     TTransport transport = null;
     try {
       transport = new TSimpleFileTransport("java-profiler-result.jandy", false, true);
-      getProfilingContext().write(new TCompactProtocol(transport));
+      getProfilingContext().write(new TJSONProtocol(transport));
       transport.flush();
     } catch (TException e) {
       e.printStackTrace();

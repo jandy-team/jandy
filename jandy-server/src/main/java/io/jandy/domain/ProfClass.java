@@ -15,14 +15,14 @@ public class ProfClass {
   @GeneratedValue
   private long id;
 
-  private String packageName;
-  private String name;
+  private String packageName = "";
+  private String name = "";
 
   @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "owner")
   private List<ProfMethod> methods;
 
   public void setName(String name) {
-    this.name = name;
+    this.name = name != null ? name : "";
   }
 
   public String getName() {
@@ -30,7 +30,7 @@ public class ProfClass {
   }
 
   public void setPackageName(String packageName) {
-    this.packageName = packageName;
+    this.packageName = packageName != null ? packageName : "";
   }
 
   public String getPackageName() {

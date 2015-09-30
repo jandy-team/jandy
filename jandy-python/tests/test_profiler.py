@@ -1,8 +1,10 @@
 import os
 import unittest
 import re
+from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 
 from thrift.protocol.TCompactProtocol import TCompactProtocol
+from thrift.protocol.TJSONProtocol import TJSONProtocol
 
 from jandy.ttypes import ProfilingContext
 from jandy.transport import TFileObjectTransport
@@ -33,11 +35,12 @@ class TestJandyProfiler(unittest.TestCase):
             prof.done()
 
         self.assertNotEqual(os.path.getsize('python-profiler-result.jandy'), 0)
-        with open("python-profiler-result.jandy") as file:
+        with open("python-profiler-result.jandy", "r") as file:
             trans = TFileObjectTransport(file)
             context = ProfilingContext()
-            context.read(TCompactProtocol(trans))
+            context.read(TJSONProtocol(trans))
 
+        print(context)
         self.assertIsNotNone(context.root)
 
 

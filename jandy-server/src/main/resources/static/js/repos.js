@@ -164,7 +164,9 @@ jandy.ReposGraph.prototype = _.create(Object.prototype, {
             return d3.rgb(red(d.depth), green(d.depth), blue(d.depth)).toString();
           })
           .attr('title', function (d) {
-            return d.method.owner.packageName + '.' + d.method.owner.className + '.' + d.method.name;
+            var name = d.method.owner.packageName != '' ? d.method.owner.packageName + '.' : '';
+
+            return name + d.method.owner.name + '.' + d.method.name;
           })
       ;
 

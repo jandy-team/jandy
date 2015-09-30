@@ -54,8 +54,9 @@ def classObject(name=None, packageName=None, frame=None):
             cls = getattr(_self, '__class__')
             return classObject(name=cls.__name__, packageName=cls.__module__)
         else:
-            moduleName = frame.f_globals['__spec__'].name
-            return classObject(name=None, packageName=moduleName)
+            moduleName = frame.f_globals['__package__']
+            name = frame.f_globals['__name__']
+            return classObject(name=name, packageName=moduleName)
     else:
         if packageName is not None and packageName.startswith('jandy'):
             raise JandyClassError()

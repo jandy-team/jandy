@@ -54,7 +54,7 @@ def classObject(name=None, packageName=None, frame=None):
             cls = getattr(_self, '__class__')
             return classObject(name=cls.__name__, packageName=cls.__module__)
         else:
-            moduleName = frame.f_globals['__package__']
+            moduleName = frame.f_globals['__package__'] if '__package__' in frame.f_globals.keys() else ''
             name = frame.f_globals['__name__']
             return classObject(name=name, packageName=moduleName)
     else:

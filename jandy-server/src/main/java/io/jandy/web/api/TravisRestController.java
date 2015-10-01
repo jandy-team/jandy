@@ -19,6 +19,9 @@ import org.apache.thrift.transport.TIOStreamTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.AsyncResult;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.SuccessCallback;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +29,7 @@ import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.Future;
 
 import static java.util.stream.StreamSupport.stream;
 
@@ -71,19 +75,24 @@ public class TravisRestController {
 
       if (build.getProfContextDump() != null) profContextDumpRepository.delete(build.getProfContextDump());
 
-      ProfContextDump contextDump = profContextBuilder.build(context, build);
+      ListenableFuture<ProfContextDump> futureContextDump = profContextBuilder.buildForAsync(context, build);
 
       logger.info("add profiling dump to build: {}", build);
 
-      try {
-        Build prevBuild = buildService.getPrev(build);
-        reporter.sendMail(build.getBranch().getProject().getUser(),
-            contextDump.getMaxTotalDuration() - prevBuild.getProfContextDump().getMaxTotalDuration(),
-            build,
-            prevBuild);
-      } catch (IllegalBuildNumberException e) {
-        logger.info(e.getMessage(), e);
-      }
+      futureContextDump.addCallback(contextDump -> {
+        try {
+          Build currentBuild = contextDump.getBuild();
+          Build prevBuild = buildService.getPrev(currentBuild);
+          reporter.sendMail(currentBuild.getBranch().getProject().getUser(),
+              contextDump.getMaxTotalDuration() - prevBuild.getProfContextDump().getMaxTotalDuration(),
+              currentBuild,
+              prevBuild);
+        } catch (IllegalBuildNumberException | MessagingException e) {
+          logger.error(e.getMessage(), e);
+        }
+      }, (e) -> {
+        logger.error(e.getMessage(), e);
+      });
 
       logger.info("FINISH", build);
     }

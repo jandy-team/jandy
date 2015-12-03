@@ -24,7 +24,6 @@ branchName = os.getenv('TRAVIS_BRANCH')
 buildId = os.getenv('TRAVIS_BUILD_ID')
 buildNum = os.getenv('TRAVIS_BUILD_NUMBER')
 
-
 def wget(url, filename):
     with open(filename, 'wb') as dest:
         response = urllib2.urlopen(url)

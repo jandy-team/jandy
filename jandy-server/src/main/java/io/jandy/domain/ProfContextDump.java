@@ -18,6 +18,10 @@ public class ProfContextDump implements Iterable<ProfTreeNode> {
 
   private long maxTotalDuration;
 
+  @ElementCollection
+  @CollectionTable
+  private List<ProfTreeNode> slowedNodes;
+
   @OneToOne
   private ProfTreeNode root;
 
@@ -29,20 +33,23 @@ public class ProfContextDump implements Iterable<ProfTreeNode> {
     return id;
   }
 
-  public void setId(long id) {
+  public ProfContextDump setId(long id) {
     this.id = id;
+    return this;
   }
 
   public ProfTreeNode getRoot() {
     return root;
   }
 
-  public void setRoot(ProfTreeNode root) {
+  public ProfContextDump setRoot(ProfTreeNode root) {
     this.root = root;
+    return this;
   }
 
-  public void setBuild(Build build) {
+  public ProfContextDump setBuild(Build build) {
     this.build = build;
+    return this;
   }
 
   public Build getBuild() {
@@ -53,13 +60,23 @@ public class ProfContextDump implements Iterable<ProfTreeNode> {
     return maxTotalDuration;
   }
 
-  public void setMaxTotalDuration(long maxTotalDuration) {
+  public ProfContextDump setMaxTotalDuration(long maxTotalDuration) {
     this.maxTotalDuration = maxTotalDuration;
+    return this;
   }
 
   @Override
   public Iterator<ProfTreeNode> iterator() {
     return new JavaTreeNodeIterator(root);
+  }
+
+  public List<ProfTreeNode> getSlowedNodes() {
+    return slowedNodes;
+  }
+
+  public ProfContextDump setSlowedNodes(List<ProfTreeNode> slowedNodes) {
+    this.slowedNodes = slowedNodes;
+    return this;
   }
 
   private class JavaTreeNodeIterator implements Iterator<ProfTreeNode> {

@@ -5,9 +5,12 @@ import io.jandy.domain.ProjectRepository;
 import io.jandy.domain.User;
 import io.jandy.domain.UserRepository;
 import io.jandy.test.AbstractWebAppTestCase;
+import io.jandy.web.util.TravisClient;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -23,12 +26,16 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 public class TravisRestControllerTest extends AbstractWebAppTestCase {
 
   @Autowired
+  @InjectMocks
   private TravisRestController controller;
 
   @Autowired
   private ProjectRepository projectRepository;
   @Autowired
   private UserRepository userRepository;
+
+  @Mock
+  private TravisClient travisClient;
 
   @Before
   public void setUp() throws Exception {

@@ -54,14 +54,14 @@ public class ProjectController {
   @RequestMapping(value = "/{account}/{name}", method = RequestMethod.GET)
   public ModelAndView getRepo(@PathVariable String account, @PathVariable String name) throws Exception {
     Project project = projectRepository.findByAccountAndName(account, name);
-    Branch master = branchRepository.findByNameAndProject_Id("master", project.getId());
+    Branch branch = branchRepository.findByNameAndProject_Id("master", project.getId());
 
     String url = request.getRequestURL().toString();
     url = url.substring(0, url.indexOf(request.getServletPath()));
 
     return new ModelAndView("repos")
         .addObject("project", project)
-        .addObject("branch", master)
+        .addObject("branch", branch)
         .addObject("url", url);
   }
 

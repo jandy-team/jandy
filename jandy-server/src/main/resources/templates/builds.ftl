@@ -29,7 +29,7 @@
         <#foreach build in builds>
           <div class="row">
             <div class="panel panel-default">
-              <div class="panel-heading clearfix" style="border-left: 10px ${color} solid;">
+              <div class="panel-heading clearfix" style="border-left: 10px ${build.color.cssValue} solid;">
                 <div class="panel-title">
                   <h4>
                     <span style="padding-right: 5px;"><a
@@ -39,7 +39,6 @@
                       <a href="https://github.com/${project.account}/${project.name}/commit/${(build.commit.sha)!"25a362115243352598617072f435c606658f14f1"}"
                          class="btn btn-primary btn-sm"
                          role="button">${(build.commit.sha?substring(0, 7))!"c90978e"}</a>
-                      <a href="${root}/builds/${build.id}" class="btn btn-primary btn-sm" role="button">More</a>
                     </span>
                     <img class="pull-right" src="${(build.commit.committerAvatarUrl)!user.avatarUrl}"
                          style="margin-right: 5px; display: inline-block; background-size: cover; border-radius: 5px;"
@@ -60,11 +59,15 @@
                 <hr>
                 <#foreach prof in build.profiles>
                   <#assign elapsedDuration = (prof.elapsedDuration)!0>
+                  <#assign percent = ((elapsedDuration?abs?double/prof.maxTotalDuration?double)*100)?string('0.#')>
                   <#assign color = (elapsedDuration <= 0)?then("green", "red")>
-                  <#assign message = (elapsedDuration <= 0)?then((elapsedDuration/1000000)?abs+"ms faster than before", (elapsedDuration/1000000)?abs+"ms slower than before")>
+                  <#assign message = (elapsedDuration <= 0)?then(percent+"% faster than before", percent+"% slower than before")>
                   <dl class="dl-horizontal">
                     <dt>${prof.sample.name}</dt>
                     <dd>
+                      <span class="pull-right">
+                        <a href="${root}/prof/${prof.id}" class="btn btn-primary btn-sm" role="button">More</a>
+                      </span>
                       ${prof.maxTotalDuration/1000000}ms<br>
                       <span style="color: ${color}">${message}</span>
                     </dd>

@@ -1,8 +1,6 @@
 package io.jandy.web;
 
-import io.jandy.domain.Build;
-import io.jandy.domain.BuildRepository;
-import io.jandy.domain.ProjectRepository;
+import io.jandy.domain.*;
 import io.jandy.service.GitHubService;
 import org.kohsuke.github.GHUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,30 +16,29 @@ import java.io.IOException;
  * @since 2015-07-10
  */
 @Controller
-@RequestMapping("/builds")
-public class BuildController {
-  @Autowired
-  private BuildRepository buildRepository;
+@RequestMapping("/prof")
+public class BenchmarkController {
 
+  @Autowired
+  private ProfContextDumpRepository profRepository;
+  @Autowired
+  private GitHubService github;
   @Autowired
   private ProjectRepository projectRepository;
 
-  @Autowired
-  private GitHubService github;
-
   @RequestMapping("/{id:\\d+}")
-  public ModelAndView build(@PathVariable long id) throws IOException {
-    Build build = buildRepository.findOne(id);
-//    build.getCommit().getCommitterName()
+  public ModelAndView getProf(@PathVariable("id") ProfContextDump prof) throws IOException {
+    String account = prof.getBuild().getBranch().getProject().getAccount();
+    Build build = prof.getBuild();
 
     GHUser user = null;
     if (build.getCommit() != null)
       user = github.getUser(build.getCommit().getCommitterName());
 
     return new ModelAndView("benchmark")
-        .addObject("projects", projectRepository.findAll())
+        .addObject("projects", projectRepository.findByAccount(account))
         .addObject("build", build)
-        .addObject("prof", build.getProfiles().get(0))
+        .addObject("prof", prof)
         .addObject("committerAvatarUrl", user == null ? null : user.getAvatarUrl());
   }
 }

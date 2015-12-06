@@ -5,8 +5,6 @@ import io.jandy.domain.*;
 import io.jandy.exception.BadgeUnknownException;
 import io.jandy.exception.ProjectNotRegisteredException;
 import io.jandy.service.GitHubService;
-import io.jandy.util.Color;
-import io.jandy.util.ColorUtils;
 import org.kohsuke.github.GHUser;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.slf4j.Logger;
@@ -21,14 +19,18 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * @author JCooky

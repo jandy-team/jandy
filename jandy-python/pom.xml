@@ -67,20 +67,20 @@
               </arguments>
             </configuration>
           </execution>
-          <execution>
-            <id>py-test</id>
-            <phase>test</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-            <configuration>
-              <executable>${python.executable.name}</executable>
-              <arguments>
-                <argument>setup.py</argument>
-                <argument>test</argument>
-              </arguments>
-            </configuration>
-          </execution>
+          <!--<execution>-->
+            <!--<id>py-test</id>-->
+            <!--<phase>test</phase>-->
+            <!--<goals>-->
+              <!--<goal>exec</goal>-->
+            <!--</goals>-->
+            <!--<configuration>-->
+              <!--<executable>${python.executable.name}</executable>-->
+              <!--<arguments>-->
+                <!--<argument>setup.py</argument>-->
+                <!--<argument>test</argument>-->
+              <!--</arguments>-->
+            <!--</configuration>-->
+          <!--</execution>-->
         </executions>
       </plugin>
       <plugin>

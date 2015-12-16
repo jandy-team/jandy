@@ -24,5 +24,3 @@ This project is made for opensource developers. The purpose of this project is a
 * And the agent is made by python and provide the profiler naming of the “jandy-java-profiler”
 * A java profiler Installation method is used “-javaagent” option in java command line execution
   * ex) https://github.com/jcooky/jasypt-test
-
-test

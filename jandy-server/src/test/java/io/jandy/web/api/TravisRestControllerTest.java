@@ -19,6 +19,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.when;
+
 /**
  * @author user1
  * @date 2015-07-08
@@ -58,7 +61,7 @@ public class TravisRestControllerTest extends AbstractWebAppTestCase {
 
   @Test
   public void testPutResultsForJava() throws Exception {
-
+//    when(travisClient.getBuild(anyLong())).thenReturn()
 
     MockMultipartFile multipartFile = new MockMultipartFile("results", "java-profiler-result.jandy",
         MediaType.APPLICATION_OCTET_STREAM_VALUE, ClassLoader.getSystemResourceAsStream("java-profiler-result.jandy"));

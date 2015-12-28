@@ -96,29 +96,7 @@ public class TravisRestController {
         logger.error(e.getMessage(), e);
       });
 
-      taskExecutor.execute(new Runnable() {
-        @Override
-        public void run() {
-          try {
-            boolean checked = false;
-            while (!checked) {
-              TravisClient.Result result = travisClient.getBuild(buildId);
-              String state = (String) result.getBuild().get("state");
-
-              if ("failed".equals(state) || "passed".equals(state)) {
-                Build build = buildRepository.findByTravisBuildId(buildId);
-                build.setState(BuildState.valueOf(state.toUpperCase()));
-                build.setCommit(result.getCommit());
-                buildRepository.save(build);
-
-                checked = true;
-              }
-            }
-          } catch(IOException e){
-            logger.error(e.getMessage(), e);
-          }
-        }
-      });
+      buildService.saveBuildInfo(buildId);
 
       logger.info("FINISH", build);
     }

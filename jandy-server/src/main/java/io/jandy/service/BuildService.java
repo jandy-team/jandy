@@ -3,10 +3,17 @@ package io.jandy.service;
 import io.jandy.domain.*;
 import io.jandy.exception.IllegalBuildNumberException;
 import io.jandy.exception.ProjectNotRegisteredException;
+import io.jandy.web.util.TravisClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
+import java.util.concurrent.Future;
 
 /**
  * @author JCooky
@@ -14,12 +21,47 @@ import javax.transaction.Transactional;
  */
 @Service
 public class BuildService {
+  private static final Logger LOGGER = LoggerFactory.getLogger(BuildService.class);
+
+  private TravisClient travisClient = new TravisClient();
   @Autowired
   private BuildRepository buildRepository;
   @Autowired
   private BranchRepository branchRepository;
   @Autowired
   private ProjectRepository projectRepository;
+
+  @Transactional
+  @Async
+  public Future<Build> saveBuildInfo(long buildId) {
+    Build build = null;
+    try {
+      boolean checked = false;
+      while (!checked) {
+        TravisClient.Result result = travisClient.getBuild(buildId);
+        String state = (String) result.getBuild().get("state");
+
+        if ("failed".equals(state) || "passed".equals(state)) {
+          build = buildRepository.findByTravisBuildId(buildId);
+          build.setState(BuildState.valueOf(state.toUpperCase()));
+          build.setCommit(result.getCommit());
+          build = buildRepository.save(build);
+
+          checked = true;
+        } else if ("created".equals(state) || "started".equals(state)) {
+          Thread.sleep(1);
+        } else {
+          throw new IllegalStateException();
+        }
+      }
+
+      LOGGER.trace("Save the build information{buildId: {}}", buildId);
+    } catch(InterruptedException | IOException | IllegalStateException e) {
+      LOGGER.error(e.getMessage(), e);
+    }
+
+    return new AsyncResult<>(build);
+  }
 
   public Build getPrev(Build build) {
     long number = build.getNumber() - 1;

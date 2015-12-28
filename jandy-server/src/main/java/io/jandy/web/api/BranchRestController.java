@@ -1,9 +1,7 @@
 package io.jandy.web.api;
 
-import io.jandy.domain.Build;
-import io.jandy.domain.BuildRepository;
-import io.jandy.domain.Project;
-import io.jandy.domain.QBuild;
+import com.google.common.collect.Iterables;
+import io.jandy.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,7 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * @author JCooky
@@ -29,8 +31,6 @@ public class BranchRestController {
 
   @RequestMapping(value = "/{id}/builds", method = RequestMethod.GET)
   public Iterable<Build> getBuilds(@PathVariable long id) {
-    Page<Build> builds = buildRepository.findAll(QBuild.build.branch.id.eq(id), new QPageRequest(0, 10, QBuild.build.number.desc()));
-
-    return builds.getContent();
+    return buildRepository.findAll(QBuild.build.branch.id.eq(id), new QPageRequest(0, 10, QBuild.build.number.desc()));
   }
 }

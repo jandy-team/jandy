@@ -17,6 +17,10 @@ public class Build {
   private String language;
   private long travisBuildId;
   private long number;
+  private BuildState state;
+
+  @OneToOne
+  private Commit commit;
 
   @ManyToOne
   @JsonIgnore
@@ -82,5 +86,22 @@ public class Build {
     sb.append(", number=").append(number);
     sb.append('}');
     return sb.toString();
+  }
+
+  public void setCommit(Commit commit) {
+    this.commit = commit;
+  }
+
+  public Commit getCommit() {
+    return commit;
+  }
+
+  public BuildState getState() {
+    return state;
+  }
+
+  public Build setState(BuildState state) {
+    this.state = state;
+    return this;
   }
 }

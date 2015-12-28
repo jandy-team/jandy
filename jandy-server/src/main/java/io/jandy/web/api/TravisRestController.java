@@ -1,27 +1,22 @@
 package io.jandy.web.api;
 
 import com.google.common.io.Closer;
-import io.jandy.domain.Build;
-import io.jandy.domain.ProfContextDump;
-import io.jandy.domain.ProfContextDumpRepository;
-import io.jandy.domain.ProfTreeNode;
+import io.jandy.domain.*;
 import io.jandy.exception.IllegalBuildNumberException;
 import io.jandy.exception.ProjectNotRegisteredException;
 import io.jandy.service.BuildService;
 import io.jandy.service.Reporter;
 import io.jandy.service.ProfContextBuilder;
 import io.jandy.thrift.java.ProfilingContext;
+import io.jandy.web.util.TravisClient;
 import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TJSONProtocol;
 import org.apache.thrift.transport.TIOStreamTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.AsyncResult;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.SuccessCallback;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,7 +24,6 @@ import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.Future;
 
 import static java.util.stream.StreamSupport.stream;
 
@@ -47,9 +41,16 @@ public class TravisRestController {
   @Autowired
   private BuildService buildService;
   @Autowired
+  private BuildRepository buildRepository;
+  @Autowired
   private ProfContextDumpRepository profContextDumpRepository;
   @Autowired
   private Reporter reporter;
+
+  @Autowired
+  private TaskExecutor taskExecutor;
+
+  private TravisClient travisClient = new TravisClient();
 
   @RequestMapping(method = RequestMethod.POST)
   @Transactional
@@ -83,6 +84,7 @@ public class TravisRestController {
         try {
           Build currentBuild = contextDump.getBuild();
           Build prevBuild = buildService.getPrev(currentBuild);
+
           reporter.sendMail(currentBuild.getBranch().getProject().getUser(),
               contextDump.getMaxTotalDuration() - prevBuild.getProfContextDump().getMaxTotalDuration(),
               currentBuild,
@@ -92,6 +94,30 @@ public class TravisRestController {
         }
       }, (e) -> {
         logger.error(e.getMessage(), e);
+      });
+
+      taskExecutor.execute(new Runnable() {
+        @Override
+        public void run() {
+          try {
+            boolean checked = false;
+            while (!checked) {
+              TravisClient.Result result = travisClient.getBuild(buildId);
+              String state = (String) result.getBuild().get("state");
+
+              if ("failed".equals(state) || "passed".equals(state)) {
+                Build build = buildRepository.findByTravisBuildId(buildId);
+                build.setState(BuildState.valueOf(state.toUpperCase()));
+                build.setCommit(result.getCommit());
+                buildRepository.save(build);
+
+                checked = true;
+              }
+            }
+          } catch(IOException e){
+            logger.error(e.getMessage(), e);
+          }
+        }
       });
 
       logger.info("FINISH", build);

@@ -20,6 +20,15 @@ public class Commit {
   private String message;
   private String committedAt;
 
+  public String getMessage() {
+    return message;
+  }
+
+  public Commit setMessage(String message) {
+    this.message = message;
+    return this;
+  }
+
   public String getCommitId() {
     return commitId;
   }
@@ -37,5 +46,13 @@ public class Commit {
         .add("message", message)
         .add("committedAt", committedAt)
         .toString();
+  }
+
+  public long getId() {
+    return id;
+  }
+
+  public void setId(long id) {
+    this.id = id;
   }
 }

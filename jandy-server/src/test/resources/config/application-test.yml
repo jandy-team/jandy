@@ -1,2 +1,3 @@
 logging.level:
+  io.jandy: TRACE
   org.springframework.web: DEBUG

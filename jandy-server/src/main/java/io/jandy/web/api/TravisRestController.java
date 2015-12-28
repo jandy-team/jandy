@@ -47,11 +47,6 @@ public class TravisRestController {
   @Autowired
   private Reporter reporter;
 
-  @Autowired
-  private TaskExecutor taskExecutor;
-
-  private TravisClient travisClient = new TravisClient();
-
   @RequestMapping(method = RequestMethod.POST)
   @Transactional
   public void putResults(@RequestParam String ownerName,

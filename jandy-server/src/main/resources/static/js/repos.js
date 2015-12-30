@@ -1,6 +1,6 @@
 'use strict';
 
-jandy.ReposGraph = function (options) {
+greem.ReposGraph = function (options) {
   this.margin = options.margin;
   this.width = options.width - this.margin.left - this.margin.right;
   this.height = options.height - this.margin.top - this.margin.bottom;
@@ -9,8 +9,8 @@ jandy.ReposGraph = function (options) {
   this.$methods = options.el.methods
 };
 
-jandy.ReposGraph.prototype = _.create(Object.prototype, {
-  constructor: jandy.ReposGraph,
+greem.ReposGraph.prototype = _.create(Object.prototype, {
+  constructor: greem.ReposGraph,
   createBuilds: function (branchId) {
     var _this = this,
         x = d3.scale.ordinal()

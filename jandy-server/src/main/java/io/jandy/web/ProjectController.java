@@ -2,6 +2,8 @@ package io.jandy.web;
 
 import io.jandy.domain.*;
 import io.jandy.util.SmallTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +27,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/repos")
 public class ProjectController {
+  private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
   @Autowired
   private ProjectRepository projectRepository;
@@ -44,10 +47,10 @@ public class ProjectController {
     List<Project> projects = projectRepository.findAll(new PageRequest(0, 10)).getContent();
 
     if (projects.isEmpty()) {
+      logger.debug("Send redirect to /profile");
       return new ModelAndView("redirect:/profile");
     } else {
-      Project project = projects.get(0);
-      return getRepo(project.getAccount(), project.getName());
+      return new ModelAndView("repos", "repos", projects);
     }
   }
 
@@ -59,10 +62,12 @@ public class ProjectController {
     String url = request.getRequestURL().toString();
     url = url.substring(0, url.indexOf(request.getServletPath()));
 
-    return new ModelAndView("repos")
+    return new ModelAndView("builds")
         .addObject("project", project)
         .addObject("branch", branch)
-        .addObject("url", url);
+        .addObject("url", url)
+        .addObject("builds", branch.getBuilds())
+        ;
   }
 
   @RequestMapping(value = "/{account}/{projectName}/{branchName}.svg", method = RequestMethod.GET, produces = "image/svg+xml")

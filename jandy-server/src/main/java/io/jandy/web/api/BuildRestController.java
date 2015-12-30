@@ -1,9 +1,6 @@
 package io.jandy.web.api;
 
-import io.jandy.domain.Build;
-import io.jandy.domain.BuildRepository;
-import io.jandy.domain.ProfContextDump;
-import io.jandy.domain.ProfTreeNode;
+import io.jandy.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,19 +12,16 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2015-07-23
  */
 @RestController
-@RequestMapping("/rest/build")
+@RequestMapping("/rest/prof")
 public class BuildRestController {
 
   @Autowired
-  private BuildRepository buildRepository;
+  private ProfContextDumpRepository profContextDumpRepository;
 
-  @RequestMapping(value = "/{id}/prof", method = RequestMethod.GET)
-  public ProfContextDump getJavaTreeNodes(@PathVariable long id) throws Exception {
+  @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+  public ProfContextDump getProfContextDump(@PathVariable long id) throws Exception {
 
-    ProfContextDump profContextDump = buildRepository.findOne(id).getProfContextDump();
-    calculateModelInView(profContextDump.getRoot().getChildren().get(0), 0);
-
-    return profContextDump;
+    return profContextDumpRepository.findOne(id);
   }
 
   private void calculateModelInView(ProfTreeNode node, int depth) {

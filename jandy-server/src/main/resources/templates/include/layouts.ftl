@@ -21,12 +21,7 @@
       var ROOT_URL = '${root}';
     </script>
     <script src="${root}/webjars/jquery/2.1.4/jquery.min.js"></script>
-    <script src="${root}/webjars/d3js/3.5.5/d3.min.js"></script>
-    <script src="${root}/webjars/lodash/3.9.0/lodash.min.js"></script>
-    <script src="${root}/webjars/json2/20140204/json2.min.js"></script>
-    <script src="${root}/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <script src="${root}/webjars/bootstrap-switch/3.3.2/js/bootstrap-switch.min.js"></script>
-    <script src="${root}/js/bootstrap-waitingfor.js"></script>
+
     <script src="${root}/js/jandy.js"></script>
     <nav class="navbar navbar-fixed-top navbar-default">
       <div class="container-fluid">
@@ -73,5 +68,12 @@
       </div><!-- /.container-fluid -->
     </nav>
     <#nested/>
+    <script src="${root}/webjars/d3js/3.5.5/d3.min.js"></script>
+    <script src="${root}/webjars/lodash/3.9.0/lodash.min.js"></script>
+    <script src="${root}/webjars/json2/20140204/json2.min.js"></script>
+    <script src="${root}/webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="${root}/webjars/bootstrap-switch/3.3.2/js/bootstrap-switch.min.js"></script>
+    <script src="${root}/js/bootstrap-waitingfor.js"></script>
+    <script src="${root}/webjars/raphaeljs/2.1.4/raphael-min.js"></script>
   </@layout>
 </#macro>

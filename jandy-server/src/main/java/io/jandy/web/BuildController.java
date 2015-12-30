@@ -16,7 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @since 2015-07-10
  */
 @Controller
-@RequestMapping("/build")
+@RequestMapping("/builds")
 public class BuildController {
   @Autowired
   private BuildRepository buildRepository;
@@ -29,8 +29,9 @@ public class BuildController {
       throw new ResourceNotFoundException();
     calculateModelInView(build.getProfContextDump().getRoot().getChildren().get(0), 0, 0.0, 1.0);
 
-    return new ModelAndView("build")
-        .addObject("build", build);
+    return new ModelAndView("benchmark")
+        .addObject("build", build)
+        .addObject("prof", build.getProfContextDump());
   }
 
   private void calculateModelInView(ProfTreeNode node, int depth, double offset, double parentWidth) {

@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.concurrent.ListenableFuture;
 
 import java.util.Map;
-import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -81,6 +80,7 @@ public class ProfContextBuilder {
       profTreeNode.setStartTime(acc.getStartTime());
       profTreeNode.setConcurThreadName(acc.getConcurThreadName());
     }
+    profTreeNode.setRoot(treeNode.isRoot());
     profTreeNode.setMethod(treeNode.methodId == null ? null : getProfMethod(context, context.methods.get(treeNode.methodId)));
     profTreeNode.setParent(parent);
 

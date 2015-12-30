@@ -20,6 +20,7 @@ public class ProfTreeNode {
   private long elapsedTime;
   private long startTime;
   private String concurThreadName;
+  private boolean root;
 
   @Transient
   private double offset;
@@ -132,4 +133,12 @@ public class ProfTreeNode {
         .toString();
   }
 
+  public boolean isRoot() {
+    return root;
+  }
+
+  public ProfTreeNode setRoot(boolean root) {
+    this.root = root;
+    return this;
+  }
 }

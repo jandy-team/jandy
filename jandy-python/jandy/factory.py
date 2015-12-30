@@ -19,6 +19,7 @@ def treeNode(frame=None):
     n.acc = Accumulator()
     n.methodId = methodObject(frame=frame).id
     n.childrenIds = []
+    n.root = False
 
     nodes_lock.acquire()
     try:
@@ -96,7 +97,7 @@ def profilingContext(roots):
     context.classes = classes.values()
     context.exceptions = exceptions
 
-    context.root = TreeNode(id=str(uuid.uuid4()), childrenIds=[])
+    context.root = TreeNode(id=str(uuid.uuid4()), childrenIds=[], root=True)
 
     for n in roots:
         if n.childrenIds is not None and len(n.childrenIds) > 0:

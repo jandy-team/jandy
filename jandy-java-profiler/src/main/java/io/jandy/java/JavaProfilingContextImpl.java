@@ -37,6 +37,7 @@ public class JavaProfilingContextImpl extends ThreadLocal<MethodHandler> impleme
     n.id = UUID.randomUUID().toString();
     n.methodId = getMethodObject(classType, methodType).getId();
     n.acc = new Accumulator();
+    n.root = false;
     synchronized(nodes) {
       nodes.add(n);
     }
@@ -122,6 +123,7 @@ public class JavaProfilingContextImpl extends ThreadLocal<MethodHandler> impleme
     m.exceptions = exceptions;
 
     m.root = new TreeNode();
+    m.root.root = true;
     for (TreeNode n : roots) {
       if (n.getChildrenIds() != null && !n.getChildrenIds().isEmpty()) {
         m.getRoot().addToChildrenIds(n.getChildrenIds().get(0));

@@ -453,6 +453,7 @@ class TreeNode:
    - childrenIds
    - acc
    - methodId
+   - root
   """
 
   thrift_spec = (
@@ -461,13 +462,15 @@ class TreeNode:
     (2, TType.LIST, 'childrenIds', (TType.STRING,None), None, ), # 2
     (3, TType.STRUCT, 'acc', (Accumulator, Accumulator.thrift_spec), None, ), # 3
     (4, TType.STRING, 'methodId', None, None, ), # 4
+    (5, TType.BOOL, 'root', None, None, ), # 5
   )
 
-  def __init__(self, id=None, childrenIds=None, acc=None, methodId=None,):
+  def __init__(self, id=None, childrenIds=None, acc=None, methodId=None, root=None,):
     self.id = id
     self.childrenIds = childrenIds
     self.acc = acc
     self.methodId = methodId
+    self.root = root
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -504,6 +507,11 @@ class TreeNode:
           self.methodId = iprot.readString();
         else:
           iprot.skip(ftype)
+      elif fid == 5:
+        if ftype == TType.BOOL:
+          self.root = iprot.readBool();
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -533,6 +541,10 @@ class TreeNode:
       oprot.writeFieldBegin('methodId', TType.STRING, 4)
       oprot.writeString(self.methodId)
       oprot.writeFieldEnd()
+    if self.root is not None:
+      oprot.writeFieldBegin('root', TType.BOOL, 5)
+      oprot.writeBool(self.root)
+      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -546,6 +558,7 @@ class TreeNode:
     value = (value * 31) ^ hash(self.childrenIds)
     value = (value * 31) ^ hash(self.acc)
     value = (value * 31) ^ hash(self.methodId)
+    value = (value * 31) ^ hash(self.root)
     return value
 
   def __repr__(self):

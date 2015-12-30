@@ -36,7 +36,8 @@ struct TreeNode {
   1: UUID id,
   2: list<UUID> childrenIds,
   3: Accumulator acc,
-  4: UUID methodId
+  4: UUID methodId,
+  5: bool root
 }
 
 struct ProfilingContext {

@@ -153,6 +153,11 @@
       <artifactId>raphaeljs</artifactId>
       <version>2.1.4</version>
     </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>font-awesome</artifactId>
+      <version>4.5.0</version>
+    </dependency>
 
     <dependency>
       <groupId>org.eclipse.mylyn.github</groupId>

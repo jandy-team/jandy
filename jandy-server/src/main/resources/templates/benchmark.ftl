@@ -1,17 +1,17 @@
 <#include "include/layouts.ftl">
 <@layoutFully>
-<section class="container-fluid">
+<section class="container">
   <h2>Summary</h2>
   <p>
-    Max Total Duration: ${prof.maxTotalDuration/1000000000}s
-    Message: ${(build.commit.message)!"Merge pull-request"}
-    Commit ID: ${(build.commit.id)!"asdasd1sd2"}
+    Max Total Duration: ${prof.maxTotalDuration/1000000000}s<br>
+    Message: ${(build.commit.message)!"Merge pull-request"}<br>
+    Commit ID: ${(build.commit.id)!"asdasd1sd2"}<br>
   </p>
 </section>
 <section class="container" style="padding-top: 10px;">
   <div id="canvas"></div>
 </section>
-<div class="container-fluid">
+<div class="container">
   <h2>Information</h2>
   <div id="menus">
 

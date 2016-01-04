@@ -64,13 +64,13 @@ public class BuildServiceTest {
     );
     result.setCommit(
         new Commit()
-            .setCommitId("172831")
+            .setId(172831L)
     );
     when(travisClient.getBuild(buildId)).thenReturn(result);
 
     Future<Build> fBuild = buildService.saveBuildInfo(buildId);
-
     Build b = fBuild.get();
+
     assertThat(b.getCommit(), is(result.getCommit()));
 //    assertThat(b.get)
   }

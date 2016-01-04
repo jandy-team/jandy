@@ -23,12 +23,4 @@ public class BuildRestController {
 
     return profContextDumpRepository.findOne(id);
   }
-
-  private void calculateModelInView(ProfTreeNode node, int depth) {
-    node.setDepth(depth);
-
-    for (ProfTreeNode child : node.getChildren()) {
-      calculateModelInView(child, depth+1);
-    }
-  }
 }

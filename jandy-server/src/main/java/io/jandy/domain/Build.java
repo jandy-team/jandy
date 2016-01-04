@@ -17,7 +17,7 @@ public class Build {
   private String language;
   private long travisBuildId;
   private long number;
-  private BuildState state;
+  private BuildState state = BuildState.PROGRESSING;
 
   @OneToOne
   private Commit commit;

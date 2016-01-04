@@ -22,13 +22,6 @@ public class ProfTreeNode {
   private String concurThreadName;
   private boolean root;
 
-  @Transient
-  private double offset;
-  @Transient
-  private double width;
-  @Transient
-  private int depth;
-
   @ManyToOne
   private ProfMethod method;
 
@@ -71,30 +64,6 @@ public class ProfTreeNode {
     this.children = children;
   }
 
-  public double getOffset() {
-    return offset;
-  }
-
-  public void setOffset(double offset) {
-    this.offset = offset;
-  }
-
-  public double getWidth() {
-    return width;
-  }
-
-  public void setWidth(double width) {
-    this.width = width;
-  }
-
-  public int getDepth() {
-    return depth;
-  }
-
-  public void setDepth(int depth) {
-    this.depth = depth;
-  }
-
   public long getElapsedTime() {
     return elapsedTime;
   }
@@ -124,9 +93,6 @@ public class ProfTreeNode {
     return new ToStringBuilder(this)
         .append("id", id)
         .append("method", method)
-        .append("depth", depth)
-        .append("width", width)
-        .append("offset", offset)
         .append("concurThreadName", concurThreadName)
         .append("startTime", startTime)
         .append("elapsedTime", elapsedTime)

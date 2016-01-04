@@ -23,6 +23,7 @@ public class Branch {
   private Project project;
 
   @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "branch")
+  @OrderBy("number DESC")
   private List<Build> builds = new ArrayList<>();
 
   public long getId() {

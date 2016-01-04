@@ -18,6 +18,8 @@ public class TravisClientTest {
 
     TravisClient.Result result = client.getBuild(79083233);
 
+    System.out.println(result);
+
     assertThat(result.getCommit().getId(), is(22542817L));
     assertThat(result.getCommit().getMessage(), is("add depedency of icu4j"));
   }

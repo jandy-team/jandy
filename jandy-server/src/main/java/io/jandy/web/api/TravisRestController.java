@@ -79,14 +79,19 @@ public class TravisRestController {
         try {
           Build currentBuild = contextDump.getBuild();
           Build prevBuild = buildService.getPrev(currentBuild);
+          long elapsedDuration = contextDump.getMaxTotalDuration() - prevBuild.getProfContextDump().getMaxTotalDuration();
+
+          contextDump.setElapsedDuration(elapsedDuration);
+          contextDump = profContextDumpRepository.save(contextDump);
 
           reporter.sendMail(currentBuild.getBranch().getProject().getUser(),
-              contextDump.getMaxTotalDuration() - prevBuild.getProfContextDump().getMaxTotalDuration(),
+              elapsedDuration,
               currentBuild,
               prevBuild);
         } catch (IllegalBuildNumberException | MessagingException e) {
           logger.error(e.getMessage(), e);
         }
+
       }, (e) -> {
         logger.error(e.getMessage(), e);
       });

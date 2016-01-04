@@ -25,28 +25,9 @@ public class BuildController {
   public ModelAndView build(@PathVariable long id) {
     Build build = buildRepository.findOne(id);
 
-    if (build == null)
-      throw new ResourceNotFoundException();
-    calculateModelInView(build.getProfContextDump().getRoot().getChildren().get(0), 0, 0.0, 1.0);
-
     return new ModelAndView("benchmark")
         .addObject("build", build)
         .addObject("prof", build.getProfContextDump());
   }
 
-  private void calculateModelInView(ProfTreeNode node, int depth, double offset, double parentWidth) {
-    node.setDepth(depth);
-    if (node.getParent() != null) {
-      node.setOffset(offset);
-      if (node.getParent().getElapsedTime() > 0)
-        node.setWidth(((double)node.getElapsedTime() / (double)node.getParent().getElapsedTime()) * parentWidth);
-      else
-        node.setWidth(parentWidth);
-    }
-    offset = node.getOffset();
-    for (ProfTreeNode child : node.getChildren()) {
-      calculateModelInView(child, depth+1, offset, node.getWidth());
-      offset += child.getWidth();
-    }
-  }
 }

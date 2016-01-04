@@ -16,9 +16,18 @@ public class Commit {
   @GeneratedValue
   private long id;
 
-  private String commitId;
   private String message;
   private String committedAt;
+  private String sha;
+
+  public String getCommittedAt() {
+    return committedAt;
+  }
+
+  public Commit setCommittedAt(String committedAt) {
+    this.committedAt = committedAt;
+    return this;
+  }
 
   public String getMessage() {
     return message;
@@ -29,22 +38,13 @@ public class Commit {
     return this;
   }
 
-  public String getCommitId() {
-    return commitId;
-  }
-
-  public Commit setCommitId(String commitId) {
-    this.commitId = commitId;
-    return this;
-  }
-
   @Override
   public String toString() {
     return Objects.toStringHelper(this)
         .add("id", id)
-        .add("commitId", commitId)
         .add("message", message)
         .add("committedAt", committedAt)
+        .add("sha", sha)
         .toString();
   }
 
@@ -52,7 +52,17 @@ public class Commit {
     return id;
   }
 
-  public void setId(long id) {
+  public Commit setId(long id) {
     this.id = id;
+    return this;
+  }
+
+  public String getSha() {
+    return sha;
+  }
+
+  public Commit setSha(String sha) {
+    this.sha = sha;
+    return this;
   }
 }

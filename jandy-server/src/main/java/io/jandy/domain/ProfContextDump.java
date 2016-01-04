@@ -17,6 +17,8 @@ public class ProfContextDump implements Iterable<ProfTreeNode> {
   private long id;
 
   private long maxTotalDuration;
+  // elapsed duration to be compare prev build
+  private Long elapsedDuration;
 
   @ElementCollection
   @CollectionTable
@@ -77,6 +79,14 @@ public class ProfContextDump implements Iterable<ProfTreeNode> {
   public ProfContextDump setSlowedNodes(List<ProfTreeNode> slowedNodes) {
     this.slowedNodes = slowedNodes;
     return this;
+  }
+
+  public void setElapsedDuration(Long elapsedDuration) {
+    this.elapsedDuration = elapsedDuration;
+  }
+
+  public Long getElapsedDuration() {
+    return elapsedDuration;
   }
 
   private class JavaTreeNodeIterator implements Iterator<ProfTreeNode> {

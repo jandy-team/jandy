@@ -11,15 +11,15 @@
           <ul id="org-list" class="list-group">
             <a href="#repos-${user.login}" class="list-group-item" style="border-left: 5px solid ${colors[user.login?lower_case]};">
               <div class="row">
-                <span class="col-md-10">${user.login}</span>
-                <span class="col-md-2" style="text-align: center; border-left: 1px #dddddd solid;">${user.publicRepos}</span>
+                <span class="col-md-9">${user.login}</span>
+                <span class="col-md-3" style="text-align: center; border-left: 1px #dddddd solid;">${user.publicRepos}</span>
               </div>
             </a>
             <#foreach org in organizations>
               <a href="#repos-${org['login']?lower_case}" class="list-group-item" style="border-left: 5px solid ${colors[org['login']?lower_case]};">
                 <div class="row">
-                  <span class="col-md-10">${org['login']}</span>
-                  <span class="col-md-2" style="text-align: center; border-left: 1px #dddddd solid;">${org['publicRepos']}</span>
+                  <span class="col-md-9">${org['login']}</span>
+                  <span class="col-md-3" style="text-align: center; border-left: 1px #dddddd solid;">${org['publicRepos']}</span>
                 </div>
               </a>
             </#foreach>
@@ -37,10 +37,8 @@
                 <article class="container-fluid">
                   <#list repositories[ownerName] as repo>
                     <div class="row" style="vertical-align: middle; height: 30px;" data-full-name="${repo.owner.login}/${repo.name}" data-github-id="${repo.id?c}">
-                      <div class="col-md-1">
+                      <div class="col-md-12">
                         <input type="checkbox" role="bootstrap-switch" data-size="small" data-on-color="success" <#if repo.imported>checked</#if>>
-                      </div>
-                      <div class="col-md-11">
                         <span data-toggle="tooltip" data-placement="right" title="${repo.description}" style="font-size: 16px;">${repo.name}</span>
                       </div>
                     </div>

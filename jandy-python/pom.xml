@@ -53,20 +53,6 @@
               </arguments>
             </configuration>
           </execution>
-          <execution>
-            <id>py-install</id>
-            <phase>install</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-            <configuration>
-              <executable>${python.executable.name}</executable>
-              <arguments>
-                <argument>setup.py</argument>
-                <argument>install</argument>
-              </arguments>
-            </configuration>
-          </execution>
           <!--<execution>-->
             <!--<id>py-test</id>-->
             <!--<phase>test</phase>-->

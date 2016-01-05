@@ -1,4 +1,6 @@
-# Greem
+# Greem 
+[![Build Status](https://travis-ci.org/jcooky/greem.svg?branch=master)](https://travis-ci.org/jcooky/greem)
+
 Greem is a dynamic analysis project for opensource developer using on github and travis-ci
 
 # Abstract

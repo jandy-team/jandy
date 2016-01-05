@@ -23,8 +23,8 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.when;
 
 /**
- * @author user1
- * @date 2015-07-08
+ * @author JCooky
+ * @since 2015-07-08
  */
 public class TravisRestControllerTest extends AbstractWebAppTestCase {
 

@@ -31,7 +31,7 @@
         <configuration>
           <thriftExecutable>${thrift.program}</thriftExecutable>
           <generator>py</generator>
-          <thriftSourceRoot>${project.basedir}/..</thriftSourceRoot>
+          <thriftSourceRoot>${project.basedir}/../jandy-thrift</thriftSourceRoot>
         </configuration>
       </plugin>
       <plugin>

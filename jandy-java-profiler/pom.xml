@@ -91,7 +91,7 @@
         </executions>
         <configuration>
           <thriftExecutable>${thrift.program}</thriftExecutable>
-          <thriftSourceRoot>${project.basedir}/..</thriftSourceRoot>
+          <thriftSourceRoot>${project.basedir}/../jandy-thrift</thriftSourceRoot>
         </configuration>
       </plugin>
       <plugin>

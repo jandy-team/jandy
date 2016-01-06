@@ -1,7 +1,7 @@
-[![Build Status](https://travis-ci.org/jcooky/greem.svg?branch=master)](https://travis-ci.org/jcooky/greem)
+[![Build Status](https://travis-ci.org/jcooky/jandy.svg?branch=master)](https://travis-ci.org/jcooky/jandy)
 
-# Greem 
-Greem is a dynamic analysis project for opensource developer using on github and travis-ci
+# Jandy 
+Jandy is a dynamic analysis project for opensource developer using on github and travis-ci
 
 # Abstract
 This project is made for opensource developers. The purpose of this project is analysis of performance and finds a tunning point of your applications. To open source developer who want to improve performance of your application, he and she should be used to find performance improvement on this service by application profiling. Hence, it support for many languages(java, python, ruby, etc…), then our service focused language specific performance(multi threaded, bad syntax uses, …). Then, we show the profile result how calling methods through intuitive, intelligent and efficiently data visualization.

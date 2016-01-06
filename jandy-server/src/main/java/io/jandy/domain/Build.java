@@ -14,12 +14,17 @@ public class Build {
   @GeneratedValue
   private long id;
 
+  private String startedAt, finishedAt;
+  private long duration;
   private String language;
   private long travisBuildId;
   private long number;
   private BuildState state = BuildState.PROGRESSING;
 
-  @OneToOne
+  @Transient
+  private String buildAt;
+
+  @OneToOne(cascade = CascadeType.REMOVE)
   private Commit commit;
 
   @ManyToOne
@@ -102,6 +107,42 @@ public class Build {
 
   public Build setState(BuildState state) {
     this.state = state;
+    return this;
+  }
+
+  public String getStartedAt() {
+    return startedAt;
+  }
+
+  public Build setStartedAt(String startedAt) {
+    this.startedAt = startedAt;
+    return this;
+  }
+
+  public String getFinishedAt() {
+    return finishedAt;
+  }
+
+  public Build setFinishedAt(String finishedAt) {
+    this.finishedAt = finishedAt;
+    return this;
+  }
+
+  public long getDuration() {
+    return duration;
+  }
+
+  public Build setDuration(long duration) {
+    this.duration = duration;
+    return this;
+  }
+
+  public String getBuildAt() {
+    return buildAt;
+  }
+
+  public Build setBuildAt(String buildAt) {
+    this.buildAt = buildAt;
     return this;
   }
 }

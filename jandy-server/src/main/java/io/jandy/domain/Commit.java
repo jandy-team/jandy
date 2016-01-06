@@ -13,12 +13,13 @@ import javax.persistence.Id;
 @Entity
 public class Commit {
   @Id
-  @GeneratedValue
   private long id;
 
   private String message;
   private String committedAt;
   private String sha;
+  private String committerName;
+  private String committerEmail;
 
   public String getCommittedAt() {
     return committedAt;
@@ -45,6 +46,8 @@ public class Commit {
         .add("message", message)
         .add("committedAt", committedAt)
         .add("sha", sha)
+        .add("commiterName", committerName)
+        .add("committerEmail", committerEmail)
         .toString();
   }
 
@@ -63,6 +66,24 @@ public class Commit {
 
   public Commit setSha(String sha) {
     this.sha = sha;
+    return this;
+  }
+
+  public String getCommitterName() {
+    return committerName;
+  }
+
+  public Commit setCommitterName(String committerName) {
+    this.committerName = committerName;
+    return this;
+  }
+
+  public String getCommitterEmail() {
+    return committerEmail;
+  }
+
+  public Commit setCommitterEmail(String committerEmail) {
+    this.committerEmail = committerEmail;
     return this;
   }
 }

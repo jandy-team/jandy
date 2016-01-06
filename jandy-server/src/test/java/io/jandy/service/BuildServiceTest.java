@@ -68,8 +68,7 @@ public class BuildServiceTest {
     );
     when(travisClient.getBuild(buildId)).thenReturn(result);
 
-    Future<Build> fBuild = buildService.saveBuildInfo(buildId);
-    Build b = fBuild.get();
+    Build b = buildService.saveBuildInfo(buildId);
 
     assertThat(b.getCommit(), is(result.getCommit()));
 //    assertThat(b.get)

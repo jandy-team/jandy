@@ -30,10 +30,11 @@ public class BuildService {
   private BranchRepository branchRepository;
   @Autowired
   private ProjectRepository projectRepository;
+  @Autowired
+  private CommitRepository commitRepository;
 
   @Transactional
-  @Async
-  public Future<Build> saveBuildInfo(long buildId) {
+  public Build saveBuildInfo(long buildId) {
     Build build = null;
     try {
       boolean checked = false;
@@ -44,7 +45,10 @@ public class BuildService {
         if ("failed".equals(state) || "passed".equals(state)) {
           build = buildRepository.findByTravisBuildId(buildId);
           build.setState(BuildState.valueOf(state.toUpperCase()));
-          build.setCommit(result.getCommit());
+          build.setCommit(commitRepository.save(result.getCommit()));
+          build.setStartedAt(String.valueOf(result.getBuild().get("started_at")));
+          build.setFinishedAt(String.valueOf(result.getBuild().get("finished_at")));
+          build.setDuration(Number.class.cast(result.getBuild().get("duration")).longValue());
           build = buildRepository.save(build);
 
           checked = true;
@@ -60,7 +64,7 @@ public class BuildService {
       LOGGER.error(e.getMessage(), e);
     }
 
-    return new AsyncResult<>(build);
+    return build;
   }
 
   public Build getPrev(Build build) {

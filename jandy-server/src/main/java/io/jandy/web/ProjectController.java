@@ -2,6 +2,7 @@ package io.jandy.web;
 
 import io.jandy.domain.*;
 import io.jandy.util.SmallTime;
+import org.ocpsoft.prettytime.PrettyTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.DatatypeConverter;
 import java.util.*;
 
 /**
@@ -44,13 +46,13 @@ public class ProjectController {
 
   @RequestMapping(method = RequestMethod.GET)
   public ModelAndView index() throws Exception {
-    List<Project> projects = projectRepository.findAll(new PageRequest(0, 10)).getContent();
+    List<Project> projects = projectRepository.findAll(new PageRequest(0, 1)).getContent();
 
     if (projects.isEmpty()) {
       logger.debug("Send redirect to /profile");
       return new ModelAndView("redirect:/profile");
     } else {
-      return new ModelAndView("repos", "repos", projects);
+      return new ModelAndView("redirect:/repos/"+projects.get(0).getAccount()+"/"+projects.get(0).getName());
     }
   }
 
@@ -62,7 +64,14 @@ public class ProjectController {
     String url = request.getRequestURL().toString();
     url = url.substring(0, url.indexOf(request.getServletPath()));
 
+    PrettyTime p = new PrettyTime(Locale.ENGLISH);
+    branch.getBuilds().stream().forEach(b -> {
+      if (b.getFinishedAt() != null)
+        b.setBuildAt(p.format(DatatypeConverter.parseDateTime(b.getFinishedAt())));
+    });
+
     return new ModelAndView("builds")
+        .addObject("projects", projectRepository.findAll())
         .addObject("project", project)
         .addObject("branch", branch)
         .addObject("url", url)

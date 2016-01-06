@@ -52,6 +52,8 @@ public class ProfTreeNode {
     return method;
   }
 
+  public Long getParentId() { return this.parent == null ? null : this.parent.id; }
+
   public void setMethod(ProfMethod method) {
     this.method = method;
   }

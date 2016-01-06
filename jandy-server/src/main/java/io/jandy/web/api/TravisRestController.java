@@ -46,6 +46,8 @@ public class TravisRestController {
   private ProfContextDumpRepository profContextDumpRepository;
   @Autowired
   private Reporter reporter;
+  @Autowired
+  private ProjectRepository projectRepository;
 
   @RequestMapping(method = RequestMethod.POST)
   @Transactional
@@ -71,18 +73,18 @@ public class TravisRestController {
 
       if (build.getProfContextDump() != null) profContextDumpRepository.delete(build.getProfContextDump());
 
-      ListenableFuture<ProfContextDump> futureContextDump = profContextBuilder.buildForAsync(context, build);
+      ListenableFuture<ProfContextDump> postProf = profContextBuilder.buildForAsync(context, build);
 
       logger.info("add profiling dump to build: {}", build);
 
-      futureContextDump.addCallback(contextDump -> {
+      postProf.addCallback(prof -> {
         try {
-          Build currentBuild = contextDump.getBuild();
+          Build currentBuild = prof.getBuild();
           Build prevBuild = buildService.getPrev(currentBuild);
-          long elapsedDuration = contextDump.getMaxTotalDuration() - prevBuild.getProfContextDump().getMaxTotalDuration();
+          long elapsedDuration = prof.getMaxTotalDuration() - prevBuild.getProfContextDump().getMaxTotalDuration();
 
-          contextDump.setElapsedDuration(elapsedDuration);
-          contextDump = profContextDumpRepository.save(contextDump);
+          prof.setElapsedDuration(elapsedDuration);
+          prof = profContextDumpRepository.save(prof);
 
           reporter.sendMail(currentBuild.getBranch().getProject().getUser(),
               elapsedDuration,
@@ -92,11 +94,23 @@ public class TravisRestController {
           logger.error(e.getMessage(), e);
         }
 
-      }, (e) -> {
-        logger.error(e.getMessage(), e);
-      });
+        logger.info("Calculate duration compared to prev build");
 
-      buildService.saveBuildInfo(buildId);
+      }, (e) -> logger.error(e.getMessage(), e));
+
+      postProf.addCallback(prof -> {
+        buildService.saveBuildInfo(buildId);
+
+        logger.info("Save build information, so on");
+
+      }, (e) -> logger.error(e.getMessage(), e));
+
+      postProf.addCallback(prof -> {
+        Project project = prof.getBuild().getBranch().getProject();
+        project.setCurrentBuild(prof.getBuild());
+
+        projectRepository.save(project);
+      }, (e) -> logger.error(e.getMessage(), e));
 
       logger.info("FINISH", build);
     }

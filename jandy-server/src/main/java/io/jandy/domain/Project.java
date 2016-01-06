@@ -23,6 +23,9 @@ public class Project {
   @ManyToOne
   private User user;
 
+  @OneToOne
+  private Build currentBuild;
+
   @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "project")
   private List<Branch> branches = new ArrayList<>();
 
@@ -83,5 +86,13 @@ public class Project {
     sb.append(", id=").append(id);
     sb.append('}');
     return sb.toString();
+  }
+
+  public void setCurrentBuild(Build currentBuild) {
+    this.currentBuild = currentBuild;
+  }
+
+  public Build getCurrentBuild() {
+    return currentBuild;
   }
 }

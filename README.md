@@ -12,6 +12,9 @@ This project is made for opensource developers. The purpose of this project is a
 * Intuitive, Effective and Detailed application profling visualization
 * Reporting: Provides to report by E-Mail, Twitter
 
+# Architecture & Introduction Paper
+* Korean: [Slideshare](http://www.slideshare.net/ssuserea348e/jandy-introduction-paper)
+
 # How to build
 ## Prebuild Specification
 * JDK 1.8
@@ -21,8 +24,7 @@ This project is made for opensource developers. The purpose of this project is a
 
 ## Build
 * #mvn -DskipTests=true clean package
-* The greem-server is packaged named by “greem-server-#VERSION.jar” in jandy-server/target location
-* Execution method: “java -jar greem-server-#VERSION.jar”
-* And the agent is made by python and provide the profiler naming of the “jandy-java-profiler”
-* A java profiler Installation method is used “-javaagent” option in java command line execution
-  * ex) https://github.com/jcooky/jasypt-test
+  * The jandy-server is packaged named by “jandy-server-#VERSION.jar” in jandy-server/target location
+  * executing method is “java -jar jandy-server-#VERSION.jar”
+  * profiling method is "jandy java -jar <project>.jar"
+* ex) https://github.com/jcooky/jasypt-test

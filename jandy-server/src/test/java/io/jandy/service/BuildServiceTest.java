@@ -1,10 +1,7 @@
 package io.jandy.service;
 
 import com.google.common.collect.ImmutableMap;
-import io.jandy.domain.Branch;
-import io.jandy.domain.Build;
-import io.jandy.domain.BuildRepository;
-import io.jandy.domain.Commit;
+import io.jandy.domain.*;
 import io.jandy.test.AbstractWebAppTestCase;
 import io.jandy.web.util.TravisClient;
 import org.junit.Before;
@@ -34,6 +31,9 @@ public class BuildServiceTest {
   @Mock(name = "travisClient")
   private TravisClient travisClient;
 
+  @Mock(name = "commitRepository")
+  private CommitRepository dbCommit;
+
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
@@ -51,21 +51,24 @@ public class BuildServiceTest {
     build.setNumber(99);
     build.setProfContextDump(null);
     build.setTravisBuildId(buildId);
+    build.setDuration(2048L);
 
     when(dbBuild.findByTravisBuildId(buildId)).thenReturn(build);
     when(dbBuild.save(build)).thenReturn(build);
+
+    Commit commit = new Commit();
+    commit.setId(102947L);
+    when(dbCommit.save(commit)).thenReturn(commit);
 
     TravisClient.Result result = new TravisClient.Result();
     result.setBuild(
         ImmutableMap.<String, Object>builder()
             .put("number", 9)
             .put("state", "passed")
+            .put("duration", 2048L)
             .build()
     );
-    result.setCommit(
-        new Commit()
-            .setId(172831L)
-    );
+    result.setCommit(commit);
     when(travisClient.getBuild(buildId)).thenReturn(result);
 
     Build b = buildService.saveBuildInfo(buildId);

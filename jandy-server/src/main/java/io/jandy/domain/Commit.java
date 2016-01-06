@@ -5,6 +5,7 @@ import com.google.common.base.Objects;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 /**
  * @author JCooky
@@ -20,6 +21,9 @@ public class Commit {
   private String sha;
   private String committerName;
   private String committerEmail;
+
+  @Transient
+  private String committerAvatarUrl;
 
   public String getCommittedAt() {
     return committedAt;
@@ -84,6 +88,15 @@ public class Commit {
 
   public Commit setCommitterEmail(String committerEmail) {
     this.committerEmail = committerEmail;
+    return this;
+  }
+
+  public String getCommitterAvatarUrl() {
+    return committerAvatarUrl;
+  }
+
+  public Commit setCommitterAvatarUrl(String committerAvatarUrl) {
+    this.committerAvatarUrl = committerAvatarUrl;
     return this;
   }
 }

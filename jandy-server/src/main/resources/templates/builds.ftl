@@ -27,7 +27,7 @@
         </div>
         <br>
         <#foreach build in builds>
-          <#assign elapsedDuration = build.profContextDump.elapsedDuration!0>
+          <#assign elapsedDuration = (build.profContextDump.elapsedDuration)!0>
           <#assign color = (elapsedDuration <= 0)?then("green", "red")>
           <#assign after = (elapsedDuration <= 0)?then(" faster than", " slower than")>
           <div class="row">
@@ -35,7 +35,7 @@
               <div class="panel-heading clearfix">
                 <div class="panel-title">
                   <h4>
-                <span style="padding-right: 5px;"><a
+                    <span style="padding-right: 5px;"><a
                     href="https://travis-ci.org/${project.account}/${project.name}/builds/${build.travisBuildId}">#${build.number}</a></span>
                     <span style="padding-left: 5px; color: ${color};">${(elapsedDuration/1000000)?abs}ms ${after} before</span>
                     <span class="btn-group pull-right">
@@ -43,7 +43,7 @@
                          class="btn btn-primary btn-sm" role="button">${(build.commit.sha?substring(0, 7))!"c90978e"}</a>
                       <a href="${root}/builds/${build.id}" class="btn btn-primary btn-sm" role="button">More</a>
                     </span>
-                    <img class="pull-right" src="${user.avatarUrl}"
+                    <img class="pull-right" src="${(build.commit.committerAvatarUrl)!user.avatarUrl}"
                          style="margin-right: 5px; display: inline-block; background-size: cover; border-radius: 5px;"
                          width="30px" height="30px">
                   </h4>
@@ -82,8 +82,8 @@
             </select>
           </div>
           <div class="col-md-9 badge-val">
-            <textarea name="img" class="form-control">http://greem.io/repos/${project.account}/${project.name}/${branch.name}.svg</textarea>
-            <textarea name="markdown" class="form-control hidden">[![Build Status](http://greem.io/repos/${project.account}/${project.name}/${branch.name}.svg)](http://greem.io/repos/${project.account}/${project.name})</textarea>
+            <textarea name="img" class="form-control">http://jandy.io/repos/${project.account}/${project.name}/${branch.name}.svg</textarea>
+            <textarea name="markdown" class="form-control hidden">[![Build Status](http://jandy.io/repos/${project.account}/${project.name}/${branch.name}.svg)](http://greem.io/repos/${project.account}/${project.name})</textarea>
           </div>
         </div>
       </div>

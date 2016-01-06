@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -51,7 +52,7 @@ public class TravisClient {
   }
 
   public static class Result {
-    private Map<String, Object> build;
+    private Map<String, Object> build = new HashMap<>();
     private Commit commit;
 
     public Commit getCommit() {

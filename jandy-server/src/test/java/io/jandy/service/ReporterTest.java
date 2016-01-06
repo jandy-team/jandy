@@ -73,6 +73,6 @@ public class ReporterTest extends AbstractWebAppTestCase {
     Build current = new Build();
     current.setNumber(prev.getNumber() + 1L);
 
-    reporter.sendMail(user, -10L, current, prev);
+    reporter.sendMail(user, current);
   }
 }

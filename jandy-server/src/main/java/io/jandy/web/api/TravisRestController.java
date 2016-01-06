@@ -1,6 +1,7 @@
 package io.jandy.web.api;
 
 import com.google.common.io.Closer;
+import freemarker.template.TemplateException;
 import io.jandy.domain.*;
 import io.jandy.exception.IllegalBuildNumberException;
 import io.jandy.exception.ProjectNotRegisteredException;
@@ -9,6 +10,7 @@ import io.jandy.service.Reporter;
 import io.jandy.service.ProfContextBuilder;
 import io.jandy.thrift.java.ProfilingContext;
 import io.jandy.web.util.TravisClient;
+import org.apache.batik.transcoder.TranscoderException;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TJSONProtocol;
 import org.apache.thrift.transport.TIOStreamTransport;
@@ -78,6 +80,13 @@ public class TravisRestController {
       logger.info("add profiling dump to build: {}", build);
 
       postProf.addCallback(prof -> {
+        buildService.saveBuildInfo(buildId);
+
+        logger.info("Save build information, so on");
+
+      }, (e) -> logger.error(e.getMessage(), e));
+
+      postProf.addCallback(prof -> {
         try {
           Build currentBuild = prof.getBuild();
           Build prevBuild = buildService.getPrev(currentBuild);
@@ -85,23 +94,14 @@ public class TravisRestController {
 
           prof.setElapsedDuration(elapsedDuration);
           prof = profContextDumpRepository.save(prof);
+          currentBuild.setProfContextDump(prof);
 
-          reporter.sendMail(currentBuild.getBranch().getProject().getUser(),
-              elapsedDuration,
-              currentBuild,
-              prevBuild);
+          reporter.sendMail(currentBuild.getBranch().getProject().getUser(), currentBuild);
         } catch (IllegalBuildNumberException | MessagingException e) {
           logger.error(e.getMessage(), e);
         }
 
         logger.info("Calculate duration compared to prev build");
-
-      }, (e) -> logger.error(e.getMessage(), e));
-
-      postProf.addCallback(prof -> {
-        buildService.saveBuildInfo(buildId);
-
-        logger.info("Save build information, so on");
 
       }, (e) -> logger.error(e.getMessage(), e));
 

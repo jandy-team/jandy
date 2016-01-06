@@ -40,7 +40,7 @@ public class BuildService {
       boolean checked = false;
       while (!checked) {
         TravisClient.Result result = travisClient.getBuild(buildId);
-        String state = (String) result.getBuild().get("state");
+        String state = String.valueOf(result.getBuild().get("state"));
 
         if ("failed".equals(state) || "passed".equals(state)) {
           build = buildRepository.findByTravisBuildId(buildId);

@@ -7,17 +7,21 @@
       <img src="${root}/img/logo.png">
     </p>
     <div style="color: #fff;">
-      <h2>Performance Analysis Tool ZANDI</h2>
+      <h2>Performance Analytics Service - Jandy</h2>
       <p style="font-size: 17px;">
-        ZANDI Engine is performance analysis tool based on web services.<br>
-        This tool analyzes your application performance and provide hint of the performance improvement<br>
+        Jandy Engine is performance analysis service on Web.<br>
+        This service analyzes your application performance and provide overview and history of the them<br>
         for open-source developer using at Github.<br>
       </p>
     </div>
     <p>
-      <a class="btn btn-default btn-lg" href="#" role="button">
-        Getting Started
-      </a>
+      <form action="${root}/signin/github" method="POST">
+        <button type="submit" class="btn btn btn-lg">Sign in with GitHub</button>
+        <input type="hidden" name="scope" value="${github_scopes}" />
+      </form>
+      <#--<a class="btn btn-default btn-lg" href="#" role="button">-->
+        <#--Getting Started-->
+      <#--</a>-->
     </p>
   </div>
   <img class="color-short-line" src="${root}/img/index/color_shortline.gif">

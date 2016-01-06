@@ -1,7 +1,10 @@
 package io.jandy.web;
 
 import io.jandy.domain.*;
+import io.jandy.service.GitHubService;
 import io.jandy.util.SmallTime;
+import org.eclipse.egit.github.core.*;
+import org.eclipse.egit.github.core.User;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +23,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.DatatypeConverter;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -29,7 +33,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/repos")
 public class ProjectController {
-  private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
+  private final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
   @Autowired
   private ProjectRepository projectRepository;
@@ -43,6 +47,8 @@ public class ProjectController {
 
   @Autowired
   private FreeMarkerConfigurer configurer;
+  @Autowired
+  private GitHubService github;
 
   @RequestMapping(method = RequestMethod.GET)
   public ModelAndView index() throws Exception {
@@ -68,6 +74,15 @@ public class ProjectController {
     branch.getBuilds().stream().forEach(b -> {
       if (b.getFinishedAt() != null)
         b.setBuildAt(p.format(DatatypeConverter.parseDateTime(b.getFinishedAt())));
+      if (b.getCommit() != null) {
+        User user = null;
+        try {
+          user = github.getUser(b.getCommit().getCommitterName());
+          b.getCommit().setCommitterAvatarUrl(user.getAvatarUrl());
+        } catch (IOException e) {
+          logger.error(e.getMessage(), e);
+        }
+      }
     });
 
     return new ModelAndView("builds")

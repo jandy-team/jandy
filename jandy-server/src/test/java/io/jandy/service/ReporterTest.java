@@ -1,7 +1,6 @@
 package io.jandy.service;
 
-import io.jandy.domain.Build;
-import io.jandy.domain.User;
+import io.jandy.domain.*;
 import io.jandy.test.AbstractWebAppTestCase;
 import org.junit.After;
 import org.junit.Before;
@@ -67,11 +66,20 @@ public class ReporterTest extends AbstractWebAppTestCase {
     User user = new User();
     user.setEmail("bak723@gmail.com");
 
-    Build prev = new Build();
-    prev.setNumber(1L);
+    Project project = new Project();
+    project.setUser(user);
+    project.setAccount("jcooky");
+    project.setName("jandy");
+
+    Branch branch = new Branch();
+    branch.setId(221L);
+    branch.setProject(project);
 
     Build current = new Build();
-    current.setNumber(prev.getNumber() + 1L);
+    current.setNumber(1L);
+    current.setTravisBuildId(12L);
+    current.setBranch(branch);
+
 
     reporter.sendMail(user, current);
   }

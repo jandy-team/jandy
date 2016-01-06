@@ -22,10 +22,14 @@
         <div class="row">
           <h1>Builds</h1>
         </div>
+        <div class="row">
+          <div id="timeline" style="border: 1px solid #ddd;"></div>
+        </div>
+        <br>
         <#foreach build in builds>
           <#assign elapsedDuration = build.profContextDump.elapsedDuration!0>
           <#assign color = (elapsedDuration <= 0)?then("green", "red")>
-          <#assign buho = (elapsedDuration <= 0)?then("-", "+")>
+          <#assign after = (elapsedDuration <= 0)?then(" faster than", " slower than")>
           <div class="row">
             <div class="panel panel-default" style="border-left: 10px ${color} solid;">
               <div class="panel-heading clearfix">
@@ -33,7 +37,7 @@
                   <h4>
                 <span style="padding-right: 5px;"><a
                     href="https://travis-ci.org/${project.account}/${project.name}/builds/${build.travisBuildId}">#${build.number}</a></span>
-                    <span style="padding-left: 5px; color: ${color};">${buho}${(elapsedDuration/1000000)?abs}ms</span>
+                    <span style="padding-left: 5px; color: ${color};">${(elapsedDuration/1000000)?abs}ms ${after} before</span>
                     <span class="btn-group pull-right">
                       <a href="https://github.com/${project.account}/${project.name}/commit/${(build.commit.sha)!"25a362115243352598617072f435c606658f14f1"}"
                          class="btn btn-primary btn-sm" role="button">${(build.commit.sha?substring(0, 7))!"c90978e"}</a>
@@ -86,6 +90,7 @@
     </div>
   </div>
 </div>
+<script src="${root}/js/builds.js"></script>
 <script>
 $(function () {
   var $modal = $("#badge-modal"),
@@ -95,7 +100,10 @@ $(function () {
   $select.on('change', function () {
     $badges.find('*[name="'+$(this).val()+'"]').removeClass('hidden');
     $badges.find('*[name!="'+$(this).val()+'"]').addClass('hidden');
-  })
+  });
+
+  new jandy.TimelineGraph()
+      .start("${branch.id}");
 });
 </script>
 </@layoutFully>

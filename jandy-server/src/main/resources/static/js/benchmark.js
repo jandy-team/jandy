@@ -214,7 +214,7 @@
 
   })();
 
-  greem.Benchmark = Benchmark;
+  jandy.Benchmark = Benchmark;
 
 }).call(this);
 

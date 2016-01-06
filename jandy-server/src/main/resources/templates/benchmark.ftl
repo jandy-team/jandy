@@ -68,7 +68,7 @@
 </script>
 <script>
   $(function () {
-    var Benchmark = greem.Benchmark;
+    var Benchmark = jandy.Benchmark;
     new Benchmark({
       menus: _.template($("#tpl-menu").text()),
       summary: _.template($("#tpl-func-summary").text())

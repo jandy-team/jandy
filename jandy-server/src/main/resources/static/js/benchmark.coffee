@@ -174,6 +174,6 @@ class Benchmark
 
       makeRect(node.r.left, node.r.top, node.r.right - node.r.left, h, node.r.color)
 
-greem.Benchmark = Benchmark
+jandy.Benchmark = Benchmark
 
 

@@ -31,6 +31,6 @@ public class BranchRestController {
 
   @RequestMapping(value = "/{id}/builds", method = RequestMethod.GET)
   public Iterable<Build> getBuilds(@PathVariable long id) {
-    return buildRepository.findAll(QBuild.build.branch.id.eq(id), new QPageRequest(0, 10, QBuild.build.number.desc()));
+    return buildRepository.findAll(QBuild.build.branch.id.eq(id));
   }
 }

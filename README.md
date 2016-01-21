@@ -14,6 +14,7 @@ This project is made for opensource developers. The purpose of this project is a
 * Provides to report by E-Mail, Twitter
 
 # Architecture & Introduction Paper
+![Architecture](https://raw.github.com/jcooky/jandy/master/docs/img/arch.jpg)
 * Korean: [Slideshare](http://www.slideshare.net/ssuserea348e/jandy-introduction-paper)
 
 # How to build

@@ -82,7 +82,7 @@
           </div>
           <div class="col-md-9 badge-val">
             <textarea name="img" class="form-control">http://jandy.io/repos/${project.account}/${project.name}/${branch.name}.svg</textarea>
-            <textarea name="markdown" class="form-control hidden">[![Build Status](http://jandy.io/repos/${project.account}/${project.name}/${branch.name}.svg)](http://greem.io/repos/${project.account}/${project.name})</textarea>
+            <textarea name="markdown" class="form-control hidden">[![Performance Status](http://jandy.io/repos/${project.account}/${project.name}/${branch.name}.svg)](http://greem.io/repos/${project.account}/${project.name})</textarea>
           </div>
         </div>
       </div>

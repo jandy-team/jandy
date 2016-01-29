@@ -97,11 +97,11 @@ class Benchmark
         makeRect(left, node.r.top, node.r.right - left, h)
 
   start: (profId) ->
-    $.get(ROOT_URL+"/rest/prof/"+profId).done (prof) =>
-      @prof = prof;
-      this.draw(prof.root.children[0])
+    $.get(ROOT_URL+"/rest/prof/"+profId+"/root").done (root) =>
+      @root = root;
+      this.draw(root.children[0])
       $(window).on 'popstate', () =>
-        this.draw(prof.root.children[0])
+        this.draw(root.children[0])
 
   draw: (root) ->
     if (window.location.hash == null or window.location.hash == '')
@@ -113,7 +113,7 @@ class Benchmark
 
   drawSummary: (root) ->
     @$summary.html('');
-    parent = findById(@prof.root.children[0], root.parentId);
+    parent = findById(@root.children[0], root.parentId);
     @$summary.append(@templates.summary({
       func: manips.fullname(root)
       duration: manips.duration(root)

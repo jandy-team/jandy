@@ -1,9 +1,9 @@
 package io.jandy.web;
 
 import io.jandy.domain.*;
+import io.jandy.exception.ResourceNotFoundException;
 import io.jandy.service.GitHubService;
 import io.jandy.util.SmallTime;
-import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.User;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.slf4j.Logger;
@@ -12,12 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
@@ -94,18 +94,30 @@ public class ProjectController {
         ;
   }
 
-  @RequestMapping(value = "/{account}/{projectName}/{branchName}.svg", method = RequestMethod.GET, produces = "image/svg+xml")
-  @ResponseBody
-  public String getBadge(@PathVariable String account, @PathVariable String projectName, @PathVariable String branchName) throws Exception {
+  @RequestMapping(value = "/{account}/{projectName}/{branchName}.svg")
+  public ResponseEntity<String> getBadge(@PathVariable String account, @PathVariable String projectName, @PathVariable String branchName) throws Exception {
+
+
     QBuild b = QBuild.build;
     Page<Build> buildPage = buildRepository.findAll(b.branch.name.eq(branchName).and(b.branch.project.account.eq(account)).and(b.branch.project.name.eq(projectName)), new QPageRequest(0, 2, b.number.desc()));
+    if (buildPage.getTotalPages() == 0)
+      throw new ResourceNotFoundException(account+"/"+projectName+" is not built");
     Build latest = buildPage.getContent().get(0), old = buildPage.getContent().get(1);
 
     long durationInNanoSeconds = latest.getProfContextDump().getMaxTotalDuration() - old.getProfContextDump().getMaxTotalDuration();
     SmallTime t = SmallTime.format(Math.abs(durationInNanoSeconds));
 
-    return FreeMarkerTemplateUtils.processTemplateIntoString(configurer.getConfiguration().getTemplate(durationInNanoSeconds <= 0 ? "badge/green-badge.ftl" : "badge/red-badge.ftl"), t);
+    long current = System.currentTimeMillis();
+    HttpHeaders headers = new HttpHeaders(); // see #7
+    headers.setExpires(current);
+    headers.setDate(current);
+
+    return ResponseEntity
+        .ok()
+        .headers(headers)
+        .cacheControl(CacheControl.noCache())
+        .lastModified(current)
+        .eTag(Long.toString(latest.getId()))
+        .body(FreeMarkerTemplateUtils.processTemplateIntoString(configurer.getConfiguration().getTemplate(durationInNanoSeconds <= 0 ? "badge/green-badge.ftl" : "badge/red-badge.ftl"), t));
   }
-
-
 }

@@ -25,6 +25,7 @@ public class ProfContextDump implements Iterable<ProfTreeNode> {
   private List<ProfTreeNode> slowedNodes;
 
   @OneToOne
+  @JsonIgnore
   private ProfTreeNode root;
 
   @OneToOne

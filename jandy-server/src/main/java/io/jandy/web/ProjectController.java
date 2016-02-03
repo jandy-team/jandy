@@ -4,7 +4,7 @@ import io.jandy.domain.*;
 import io.jandy.exception.ResourceNotFoundException;
 import io.jandy.service.GitHubService;
 import io.jandy.util.SmallTime;
-import org.eclipse.egit.github.core.User;
+import org.kohsuke.github.GHUser;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +75,7 @@ public class ProjectController {
       if (b.getFinishedAt() != null)
         b.setBuildAt(p.format(DatatypeConverter.parseDateTime(b.getFinishedAt())));
       if (b.getCommit() != null) {
-        User user = null;
+        GHUser user = null;
         try {
           user = github.getUser(b.getCommit().getCommitterName());
           b.getCommit().setCommitterAvatarUrl(user.getAvatarUrl());

@@ -36,9 +36,11 @@
               <div class="panel-body">
                 <article class="container-fluid">
                   <#list repositories[ownerName] as repo>
-                    <div class="row" style="vertical-align: middle; height: 30px;" data-full-name="${repo.owner.login}/${repo.name}" data-github-id="${repo.id?c}">
+                    <div class="row" style="vertical-align: middle; height: 30px;" data-full-name="${repo.owner.login}/${repo.name}"
+                         data-github-id="${repo.id}">
                       <div class="col-md-12">
-                        <input type="checkbox" role="bootstrap-switch" data-size="small" data-on-color="success" <#if repo.imported>checked</#if>>
+                        <input type="checkbox" role="bootstrap-switch" data-size="small"
+                               data-on-color="success" ${imported?seq_contains(repo.id)?then("checked", "")}>
                         <span data-toggle="tooltip" data-placement="right" title="${repo.description}" style="font-size: 16px;">${repo.name}</span>
                       </div>
                     </div>
@@ -65,8 +67,8 @@
           type: "PUT",
           contentType: "application/json",
           data: JSON.stringify({
-                fullName: fullName
-              })
+            fullName: fullName
+          })
         }).fail(function () {
           $this.bootstrapSwitch('state', false, true);
         }).always(function () {

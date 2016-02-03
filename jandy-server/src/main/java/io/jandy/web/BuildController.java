@@ -6,7 +6,7 @@ import io.jandy.domain.ProfTreeNode;
 import io.jandy.domain.ProjectRepository;
 import io.jandy.exception.ResourceNotFoundException;
 import io.jandy.service.GitHubService;
-import org.eclipse.egit.github.core.User;
+import org.kohsuke.github.GHUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +38,7 @@ public class BuildController {
     Build build = buildRepository.findOne(id);
 //    build.getCommit().getCommitterName()
 
-    User user = null;
+    GHUser user = null;
     if (build.getCommit() != null)
       user = github.getUser(build.getCommit().getCommitterName());
 

@@ -121,7 +121,7 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>bootstrap</artifactId>
-      <version>3.3.5</version>
+      <version>3.3.6</version>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
@@ -165,9 +165,9 @@
       <version>1.6-1</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.mylyn.github</groupId>
-      <artifactId>org.eclipse.egit.github.core</artifactId>
-      <version>2.1.5</version>
+      <groupId>org.kohsuke</groupId>
+      <artifactId>github-api</artifactId>
+      <version>1.72</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -201,6 +201,11 @@
       <groupId>org.ocpsoft.prettytime</groupId>
       <artifactId>prettytime</artifactId>
       <version>4.0.1.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.okhttp</groupId>
+      <artifactId>okhttp-urlconnection</artifactId>
+      <version>2.7.2</version>
     </dependency>
   </dependencies>
 

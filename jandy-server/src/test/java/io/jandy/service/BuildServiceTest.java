@@ -2,15 +2,11 @@ package io.jandy.service;
 
 import com.google.common.collect.ImmutableMap;
 import io.jandy.domain.*;
-import io.jandy.test.AbstractWebAppTestCase;
-import io.jandy.web.util.TravisClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.util.concurrent.Future;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;

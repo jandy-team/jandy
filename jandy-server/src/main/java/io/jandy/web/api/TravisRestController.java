@@ -1,7 +1,6 @@
 package io.jandy.web.api;
 
 import com.google.common.io.Closer;
-import freemarker.template.TemplateException;
 import io.jandy.domain.*;
 import io.jandy.exception.IllegalBuildNumberException;
 import io.jandy.exception.ProjectNotRegisteredException;
@@ -9,15 +8,12 @@ import io.jandy.service.BuildService;
 import io.jandy.service.Reporter;
 import io.jandy.service.ProfContextBuilder;
 import io.jandy.thrift.java.ProfilingContext;
-import io.jandy.web.util.TravisClient;
-import org.apache.batik.transcoder.TranscoderException;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TJSONProtocol;
 import org.apache.thrift.transport.TIOStreamTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

@@ -1,13 +1,11 @@
 package io.jandy.web.util;
 
+import io.jandy.service.TravisClient;
 import org.junit.Test;
 import org.ocpsoft.prettytime.PrettyTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.DatatypeConverter;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 import static org.hamcrest.Matchers.is;

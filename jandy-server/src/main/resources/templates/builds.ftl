@@ -14,7 +14,7 @@
               class="fa fa-github"></i></a>
         </h1>
         <a href="#" data-toggle="modal" data-target="#badge-modal">
-          <img src="${root}/repos/${project.account}/${project.name}/${branch.name}.svg">
+          <img src="${root}/repos/${project.account}/${project.name}.svg">
         </a>
       </div>
       <br/>
@@ -81,8 +81,8 @@
             </select>
           </div>
           <div class="col-md-9 badge-val">
-            <textarea name="img" class="form-control">http://jandy.io/repos/${project.account}/${project.name}/${branch.name}.svg</textarea>
-            <textarea name="markdown" class="form-control hidden">[![Performance Status](http://jandy.io/repos/${project.account}/${project.name}/${branch.name}.svg)](http://greem.io/repos/${project.account}/${project.name})</textarea>
+            <textarea name="img" class="form-control">http://jandy.io/repos/${project.account}/${project.name}.svg</textarea>
+            <textarea name="markdown" class="form-control hidden">[![Performance Status](http://jandy.io/repos/${project.account}/${project.name}.svg)](http://greem.io/repos/${project.account}/${project.name})</textarea>
           </div>
         </div>
       </div>
@@ -102,7 +102,7 @@ $(function () {
   });
 
   new jandy.TimelineGraph()
-      .start("${branch.id}");
+      .start("${project.id}");
 });
 </script>
 </@layoutFully>

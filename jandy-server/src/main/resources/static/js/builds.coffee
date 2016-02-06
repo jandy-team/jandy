@@ -1,16 +1,14 @@
 class TimelineGraph
   constructor: () ->
 
-  start: (branchId) ->
+  start: (projectId) ->
     h = 140
     paper = Raphael("timeline", '100%', h)
     height = 110
     w = $("#timeline").width()
     width = $("#timeline").width() - 10
 
-    console.debug(width)
-
-    $.get ROOT_URL+"/rest/branches/"+branchId+"/builds", (builds) =>
+    $.get ROOT_URL+"/rest/projects/"+projectId+"/builds", (builds) =>
       dx = width/(builds.length - 1);
 
       mm = {min: Number.MAX_VALUE, max: Number.MIN_VALUE};

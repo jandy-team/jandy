@@ -24,13 +24,13 @@ import java.util.stream.StreamSupport;
  * @since 2015-07-22
  */
 @RestController
-@RequestMapping("/rest/branches")
-public class BranchRestController {
+@RequestMapping("/rest/projects")
+public class ProjectRestController {
   @Autowired
   private BuildRepository buildRepository;
 
   @RequestMapping(value = "/{id}/builds", method = RequestMethod.GET)
   public Iterable<Build> getBuilds(@PathVariable long id) {
-    return buildRepository.findAll(QBuild.build.branch.id.eq(id));
+    return buildRepository.findAll(QBuild.build.branch.project.id.eq(id));
   }
 }

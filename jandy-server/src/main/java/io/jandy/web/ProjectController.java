@@ -1,5 +1,6 @@
 package io.jandy.web;
 
+import freemarker.template.TemplateException;
 import io.jandy.domain.*;
 import io.jandy.exception.ResourceNotFoundException;
 import io.jandy.service.GitHubService;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
@@ -65,13 +67,13 @@ public class ProjectController {
   @RequestMapping(value = "/{account}/{name}", method = RequestMethod.GET)
   public ModelAndView getRepo(@PathVariable String account, @PathVariable String name) throws Exception {
     Project project = projectRepository.findByAccountAndName(account, name);
-    Branch branch = branchRepository.findByNameAndProject_Id("master", project.getId());
+    List<Build> builds = buildRepository.findByBranch_Project_Id(project.getId());
 
     String url = request.getRequestURL().toString();
     url = url.substring(0, url.indexOf(request.getServletPath()));
 
     PrettyTime p = new PrettyTime(Locale.ENGLISH);
-    branch.getBuilds().stream().forEach(b -> {
+    builds.stream().forEach(b -> {
       if (b.getFinishedAt() != null)
         b.setBuildAt(p.format(DatatypeConverter.parseDateTime(b.getFinishedAt())));
       if (b.getCommit() != null) {
@@ -88,16 +90,18 @@ public class ProjectController {
     return new ModelAndView("builds")
         .addObject("projects", projectRepository.findAll())
         .addObject("project", project)
-        .addObject("branch", branch)
         .addObject("url", url)
-        .addObject("builds", branch.getBuilds())
+        .addObject("builds", builds)
         ;
+  }
+
+  @RequestMapping(value = "/{account}/{projectName}.svg")
+  public ResponseEntity<String> getBadge(@PathVariable String account, @PathVariable String projectName) throws Exception {
+    return getBadge(account, projectName, "master");
   }
 
   @RequestMapping(value = "/{account}/{projectName}/{branchName}.svg")
   public ResponseEntity<String> getBadge(@PathVariable String account, @PathVariable String projectName, @PathVariable String branchName) throws Exception {
-
-
     QBuild b = QBuild.build;
     Page<Build> buildPage = buildRepository.findAll(b.branch.name.eq(branchName).and(b.branch.project.account.eq(account)).and(b.branch.project.name.eq(projectName)), new QPageRequest(0, 2, b.number.desc()));
     if (buildPage.getTotalPages() == 0)
@@ -119,5 +123,14 @@ public class ProjectController {
         .lastModified(current)
         .eTag(Long.toString(latest.getId()))
         .body(FreeMarkerTemplateUtils.processTemplateIntoString(configurer.getConfiguration().getTemplate(durationInNanoSeconds <= 0 ? "badge/green-badge.ftl" : "badge/red-badge.ftl"), t));
+  }
+
+  @ExceptionHandler(ResourceNotFoundException.class)
+  public ResponseEntity<String> getBadgeForUnknown() throws IOException, TemplateException {
+    return ResponseEntity
+        .ok()
+        .cacheControl(CacheControl.noCache())
+        .lastModified(System.currentTimeMillis())
+        .body(FreeMarkerTemplateUtils.processTemplateIntoString(configurer.getConfiguration().getTemplate("badge/unknown-badge.ftl"), null));
   }
 }

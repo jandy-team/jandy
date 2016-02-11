@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -49,12 +52,16 @@ public class ProfContextBuilder {
   }
 
   @Async
-  public ListenableFuture<ProfContextDump> buildForAsync(ProfilingContext context, Build build) {
-    return new AsyncResult<>(build(context, build));
+  public ListenableFuture<Map<String, ProfContextDump>> buildForAsync(Map<String, ProfilingContext> contexts) {
+    Map<String, ProfContextDump> r = new HashMap<>();
+    for (String id : contexts.keySet()) {
+      r.put(id, build(contexts.get(id)));
+    }
+    return new AsyncResult<>(r);
   }
 
   @Transactional
-  public ProfContextDump build(ProfilingContext context, Build build) {
+  public ProfContextDump build(ProfilingContext context) {
     Map<String, TreeNode> nodes = context.nodes.stream().collect(Collectors.toMap(TreeNode::getId, Function.identity()));
     Map<String, MethodObject> methods = context.methods.stream().collect(Collectors.toMap(MethodObject::getId, Function.identity()));
     Map<String, ClassObject> classes = context.classes.stream().collect(Collectors.toMap(ClassObject::getId, Function.identity()));
@@ -63,11 +70,7 @@ public class ProfContextBuilder {
     ProfContextDump dump = new ProfContextDump();
     dump.setRoot(buildTreeNode(new Context(nodes, methods, classes, exceptions), context.getRoot(), null));
     dump.setMaxTotalDuration(stream(dump.spliterator(), false).mapToLong(ProfTreeNode::getElapsedTime).max().getAsLong());
-    dump.setBuild(build);
-    dump = profContextDumpRepository.save(dump);
-    build.setProfContextDump(dump);
-
-    return dump;
+    return profContextDumpRepository.save(dump);
   }
 
   @Transactional

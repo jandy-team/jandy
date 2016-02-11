@@ -29,6 +29,9 @@ public class Project {
   @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "project")
   private List<Branch> branches = new ArrayList<>();
 
+  @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "project")
+  private List<Sample> samples = new ArrayList<>();
+
   public long getId() {
     return id;
   }

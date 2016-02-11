@@ -14,7 +14,6 @@ import io.jandy.exception.UserNotFoundException;
 import io.jandy.service.GitHubService;
 import io.jandy.service.UserService;
 import io.jandy.util.ColorUtils;
-import io.jandy.web.view.model.VmRepository;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.DynaBeanPropertyMapDecorator;
 import org.apache.commons.lang3.StringUtils;

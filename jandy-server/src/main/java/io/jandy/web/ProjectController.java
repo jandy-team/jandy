@@ -2,9 +2,11 @@ package io.jandy.web;
 
 import freemarker.template.TemplateException;
 import io.jandy.domain.*;
-import io.jandy.exception.ResourceNotFoundException;
+import io.jandy.exception.BadgeUnknownException;
+import io.jandy.exception.ProjectNotRegisteredException;
 import io.jandy.service.GitHubService;
-import io.jandy.util.SmallTime;
+import io.jandy.util.Color;
+import io.jandy.util.ColorUtils;
 import org.kohsuke.github.GHUser;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.slf4j.Logger;
@@ -12,10 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
@@ -60,14 +62,16 @@ public class ProjectController {
       logger.debug("Send redirect to /profile");
       return new ModelAndView("redirect:/profile");
     } else {
-      return new ModelAndView("redirect:/repos/"+projects.get(0).getAccount()+"/"+projects.get(0).getName());
+      return new ModelAndView("redirect:/repos/" + projects.get(0).getAccount() + "/" + projects.get(0).getName());
     }
   }
 
   @RequestMapping(value = "/{account}/{name}", method = RequestMethod.GET)
   public ModelAndView getRepo(@PathVariable String account, @PathVariable String name) throws Exception {
     Project project = projectRepository.findByAccountAndName(account, name);
-    List<Build> builds = buildRepository.findByBranch_Project_Id(project.getId());
+    if (project == null)
+      throw new ProjectNotRegisteredException();
+    List<Build> builds = buildRepository.findByBranch_Project_Id(project.getId(), new Sort(Sort.Direction.DESC, "number"));
 
     String url = request.getRequestURL().toString();
     url = url.substring(0, url.indexOf(request.getServletPath()));
@@ -88,7 +92,7 @@ public class ProjectController {
     });
 
     return new ModelAndView("builds")
-        .addObject("projects", projectRepository.findAll())
+        .addObject("projects", projectRepository.findByAccount(account))
         .addObject("project", project)
         .addObject("url", url)
         .addObject("builds", builds)
@@ -105,11 +109,8 @@ public class ProjectController {
     QBuild b = QBuild.build;
     Page<Build> buildPage = buildRepository.findAll(b.branch.name.eq(branchName).and(b.branch.project.account.eq(account)).and(b.branch.project.name.eq(projectName)), new QPageRequest(0, 2, b.number.desc()));
     if (buildPage.getTotalPages() == 0)
-      throw new ResourceNotFoundException(account+"/"+projectName+" is not built");
-    Build latest = buildPage.getContent().get(0), old = buildPage.getContent().get(1);
-
-    long durationInNanoSeconds = latest.getProfContextDump().getMaxTotalDuration() - old.getProfContextDump().getMaxTotalDuration();
-    SmallTime t = SmallTime.format(Math.abs(durationInNanoSeconds));
+      throw new BadgeUnknownException();
+    Build latest = buildPage.getContent().get(0);
 
     long current = System.currentTimeMillis();
     HttpHeaders headers = new HttpHeaders(); // see #7
@@ -122,10 +123,10 @@ public class ProjectController {
         .cacheControl(CacheControl.noCache())
         .lastModified(current)
         .eTag(Long.toString(latest.getId()))
-        .body(FreeMarkerTemplateUtils.processTemplateIntoString(configurer.getConfiguration().getTemplate(durationInNanoSeconds <= 0 ? "badge/green-badge.ftl" : "badge/red-badge.ftl"), t));
+        .body(FreeMarkerTemplateUtils.processTemplateIntoString(configurer.getConfiguration().getTemplate("badge/mybadge.ftl"), latest));
   }
 
-  @ExceptionHandler(ResourceNotFoundException.class)
+  @ExceptionHandler(BadgeUnknownException.class)
   public ResponseEntity<String> getBadgeForUnknown() throws IOException, TemplateException {
     return ResponseEntity
         .ok()

@@ -45,7 +45,7 @@ public class BuildServiceTest {
     build.setBranch(new Branch());
     build.setLanguage("java");
     build.setNumber(99);
-    build.setProfContextDump(null);
+    build.setSamples(null);
     build.setTravisBuildId(buildId);
     build.setDuration(2048L);
 
@@ -67,7 +67,7 @@ public class BuildServiceTest {
     result.setCommit(commit);
     when(travisClient.getBuild(buildId)).thenReturn(result);
 
-    Build b = buildService.saveBuildInfo(buildId);
+    Build b = buildService.setBuildInfo(build);
 
     assertThat(b.getCommit(), is(result.getCommit()));
 //    assertThat(b.get)

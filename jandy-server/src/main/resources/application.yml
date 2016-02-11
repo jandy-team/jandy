@@ -1,4 +1,6 @@
 spring:
+#  jpa:
+#    show-sql: true
   social.github:
     clientId: 5b6118bdbd4066c1ea7a
     clientSecret: 33e25aa49db0a3113ab222473b8e5483e5ec637d

@@ -7,5 +7,6 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
  * @author JCooky
  * @since 2015-07-08
  */
-public interface ProfContextDumpRepository extends JpaRepository<ProfContextDump, Long>, QueryDslPredicateExecutor<ProfContextDump> {
+public interface ProfContextDumpRepository extends ProfContextDumpRepositoryCustom, JpaRepository<ProfContextDump, Long>, QueryDslPredicateExecutor<ProfContextDump> {
+
 }

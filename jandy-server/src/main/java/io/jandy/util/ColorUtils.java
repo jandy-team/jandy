@@ -1,181 +1,211 @@
 package io.jandy.util;
 
+import com.google.common.base.CaseFormat;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Java Code to get a color name from rgb/hex value/awt color
- *
+ * <p/>
  * The part of looking up a color name from the rgb values is edited from
  * https://gist.github.com/nightlark/6482130#file-gistfile1-java (that has some errors) by Ryan Mast (nightlark)
  *
  * @author Xiaoxiao Li
- *
  */
 public class ColorUtils {
 
-  private static ArrayList<ColorName> COLOR_NAMES = new ArrayList<ColorName>();
+  private static class RGB {
+    public RGB() {
+
+    }
+
+    public RGB(double r, double g, double b) {
+      this.r = r;
+      this.g = g;
+      this.b = b;
+    }
+
+    public double r, g, b;
+  }
+
+  private static class HSV {
+    public HSV() {
+
+    }
+
+    public HSV(double h, double s, double v) {
+      this.h = h;
+      this.s = s;
+      this.v = v;
+    }
+
+    public double h, s, v;
+  }
+
+  private static ArrayList<Color> COLOR_NAMES = new ArrayList<Color>();
+
   /**
    * Initialize the color list that we have.
    */
   static {
-    COLOR_NAMES.add(new ColorName("AliceBlue", 0xF0, 0xF8, 0xFF));
-    COLOR_NAMES.add(new ColorName("AntiqueWhite", 0xFA, 0xEB, 0xD7));
-    COLOR_NAMES.add(new ColorName("Aqua", 0x00, 0xFF, 0xFF));
-    COLOR_NAMES.add(new ColorName("Aquamarine", 0x7F, 0xFF, 0xD4));
-    COLOR_NAMES.add(new ColorName("Azure", 0xF0, 0xFF, 0xFF));
-    COLOR_NAMES.add(new ColorName("Beige", 0xF5, 0xF5, 0xDC));
-    COLOR_NAMES.add(new ColorName("Bisque", 0xFF, 0xE4, 0xC4));
-    COLOR_NAMES.add(new ColorName("Black", 0x00, 0x00, 0x00));
-    COLOR_NAMES.add(new ColorName("BlanchedAlmond", 0xFF, 0xEB, 0xCD));
-    COLOR_NAMES.add(new ColorName("Blue", 0x00, 0x00, 0xFF));
-    COLOR_NAMES.add(new ColorName("BlueViolet", 0x8A, 0x2B, 0xE2));
-    COLOR_NAMES.add(new ColorName("Brown", 0xA5, 0x2A, 0x2A));
-    COLOR_NAMES.add(new ColorName("BurlyWood", 0xDE, 0xB8, 0x87));
-    COLOR_NAMES.add(new ColorName("CadetBlue", 0x5F, 0x9E, 0xA0));
-    COLOR_NAMES.add(new ColorName("Chartreuse", 0x7F, 0xFF, 0x00));
-    COLOR_NAMES.add(new ColorName("Chocolate", 0xD2, 0x69, 0x1E));
-    COLOR_NAMES.add(new ColorName("Coral", 0xFF, 0x7F, 0x50));
-    COLOR_NAMES.add(new ColorName("CornflowerBlue", 0x64, 0x95, 0xED));
-    COLOR_NAMES.add(new ColorName("Cornsilk", 0xFF, 0xF8, 0xDC));
-    COLOR_NAMES.add(new ColorName("Crimson", 0xDC, 0x14, 0x3C));
-    COLOR_NAMES.add(new ColorName("Cyan", 0x00, 0xFF, 0xFF));
-    COLOR_NAMES.add(new ColorName("DarkBlue", 0x00, 0x00, 0x8B));
-    COLOR_NAMES.add(new ColorName("DarkCyan", 0x00, 0x8B, 0x8B));
-    COLOR_NAMES.add(new ColorName("DarkGoldenRod", 0xB8, 0x86, 0x0B));
-    COLOR_NAMES.add(new ColorName("DarkGray", 0xA9, 0xA9, 0xA9));
-    COLOR_NAMES.add(new ColorName("DarkGreen", 0x00, 0x64, 0x00));
-    COLOR_NAMES.add(new ColorName("DarkKhaki", 0xBD, 0xB7, 0x6B));
-    COLOR_NAMES.add(new ColorName("DarkMagenta", 0x8B, 0x00, 0x8B));
-    COLOR_NAMES.add(new ColorName("DarkOliveGreen", 0x55, 0x6B, 0x2F));
-    COLOR_NAMES.add(new ColorName("DarkOrange", 0xFF, 0x8C, 0x00));
-    COLOR_NAMES.add(new ColorName("DarkOrchid", 0x99, 0x32, 0xCC));
-    COLOR_NAMES.add(new ColorName("DarkRed", 0x8B, 0x00, 0x00));
-    COLOR_NAMES.add(new ColorName("DarkSalmon", 0xE9, 0x96, 0x7A));
-    COLOR_NAMES.add(new ColorName("DarkSeaGreen", 0x8F, 0xBC, 0x8F));
-    COLOR_NAMES.add(new ColorName("DarkSlateBlue", 0x48, 0x3D, 0x8B));
-    COLOR_NAMES.add(new ColorName("DarkSlateGray", 0x2F, 0x4F, 0x4F));
-    COLOR_NAMES.add(new ColorName("DarkTurquoise", 0x00, 0xCE, 0xD1));
-    COLOR_NAMES.add(new ColorName("DarkViolet", 0x94, 0x00, 0xD3));
-    COLOR_NAMES.add(new ColorName("DeepPink", 0xFF, 0x14, 0x93));
-    COLOR_NAMES.add(new ColorName("DeepSkyBlue", 0x00, 0xBF, 0xFF));
-    COLOR_NAMES.add(new ColorName("DimGray", 0x69, 0x69, 0x69));
-    COLOR_NAMES.add(new ColorName("DodgerBlue", 0x1E, 0x90, 0xFF));
-    COLOR_NAMES.add(new ColorName("FireBrick", 0xB2, 0x22, 0x22));
-    COLOR_NAMES.add(new ColorName("FloralWhite", 0xFF, 0xFA, 0xF0));
-    COLOR_NAMES.add(new ColorName("ForestGreen", 0x22, 0x8B, 0x22));
-    COLOR_NAMES.add(new ColorName("Fuchsia", 0xFF, 0x00, 0xFF));
-    COLOR_NAMES.add(new ColorName("Gainsboro", 0xDC, 0xDC, 0xDC));
-    COLOR_NAMES.add(new ColorName("GhostWhite", 0xF8, 0xF8, 0xFF));
-    COLOR_NAMES.add(new ColorName("Gold", 0xFF, 0xD7, 0x00));
-    COLOR_NAMES.add(new ColorName("GoldenRod", 0xDA, 0xA5, 0x20));
-    COLOR_NAMES.add(new ColorName("Gray", 0x80, 0x80, 0x80));
-    COLOR_NAMES.add(new ColorName("Green", 0x00, 0x80, 0x00));
-    COLOR_NAMES.add(new ColorName("GreenYellow", 0xAD, 0xFF, 0x2F));
-    COLOR_NAMES.add(new ColorName("HoneyDew", 0xF0, 0xFF, 0xF0));
-    COLOR_NAMES.add(new ColorName("HotPink", 0xFF, 0x69, 0xB4));
-    COLOR_NAMES.add(new ColorName("IndianRed", 0xCD, 0x5C, 0x5C));
-    COLOR_NAMES.add(new ColorName("Indigo", 0x4B, 0x00, 0x82));
-    COLOR_NAMES.add(new ColorName("Ivory", 0xFF, 0xFF, 0xF0));
-    COLOR_NAMES.add(new ColorName("Khaki", 0xF0, 0xE6, 0x8C));
-    COLOR_NAMES.add(new ColorName("Lavender", 0xE6, 0xE6, 0xFA));
-    COLOR_NAMES.add(new ColorName("LavenderBlush", 0xFF, 0xF0, 0xF5));
-    COLOR_NAMES.add(new ColorName("LawnGreen", 0x7C, 0xFC, 0x00));
-    COLOR_NAMES.add(new ColorName("LemonChiffon", 0xFF, 0xFA, 0xCD));
-    COLOR_NAMES.add(new ColorName("LightBlue", 0xAD, 0xD8, 0xE6));
-    COLOR_NAMES.add(new ColorName("LightCoral", 0xF0, 0x80, 0x80));
-    COLOR_NAMES.add(new ColorName("LightCyan", 0xE0, 0xFF, 0xFF));
-    COLOR_NAMES.add(new ColorName("LightGoldenRodYellow", 0xFA, 0xFA, 0xD2));
-    COLOR_NAMES.add(new ColorName("LightGray", 0xD3, 0xD3, 0xD3));
-    COLOR_NAMES.add(new ColorName("LightGreen", 0x90, 0xEE, 0x90));
-    COLOR_NAMES.add(new ColorName("LightPink", 0xFF, 0xB6, 0xC1));
-    COLOR_NAMES.add(new ColorName("LightSalmon", 0xFF, 0xA0, 0x7A));
-    COLOR_NAMES.add(new ColorName("LightSeaGreen", 0x20, 0xB2, 0xAA));
-    COLOR_NAMES.add(new ColorName("LightSkyBlue", 0x87, 0xCE, 0xFA));
-    COLOR_NAMES.add(new ColorName("LightSlateGray", 0x77, 0x88, 0x99));
-    COLOR_NAMES.add(new ColorName("LightSteelBlue", 0xB0, 0xC4, 0xDE));
-    COLOR_NAMES.add(new ColorName("LightYellow", 0xFF, 0xFF, 0xE0));
-    COLOR_NAMES.add(new ColorName("Lime", 0x00, 0xFF, 0x00));
-    COLOR_NAMES.add(new ColorName("LimeGreen", 0x32, 0xCD, 0x32));
-    COLOR_NAMES.add(new ColorName("Linen", 0xFA, 0xF0, 0xE6));
-    COLOR_NAMES.add(new ColorName("Magenta", 0xFF, 0x00, 0xFF));
-    COLOR_NAMES.add(new ColorName("Maroon", 0x80, 0x00, 0x00));
-    COLOR_NAMES.add(new ColorName("MediumAquaMarine", 0x66, 0xCD, 0xAA));
-    COLOR_NAMES.add(new ColorName("MediumBlue", 0x00, 0x00, 0xCD));
-    COLOR_NAMES.add(new ColorName("MediumOrchid", 0xBA, 0x55, 0xD3));
-    COLOR_NAMES.add(new ColorName("MediumPurple", 0x93, 0x70, 0xDB));
-    COLOR_NAMES.add(new ColorName("MediumSeaGreen", 0x3C, 0xB3, 0x71));
-    COLOR_NAMES.add(new ColorName("MediumSlateBlue", 0x7B, 0x68, 0xEE));
-    COLOR_NAMES.add(new ColorName("MediumSpringGreen", 0x00, 0xFA, 0x9A));
-    COLOR_NAMES.add(new ColorName("MediumTurquoise", 0x48, 0xD1, 0xCC));
-    COLOR_NAMES.add(new ColorName("MediumVioletRed", 0xC7, 0x15, 0x85));
-    COLOR_NAMES.add(new ColorName("MidnightBlue", 0x19, 0x19, 0x70));
-    COLOR_NAMES.add(new ColorName("MintCream", 0xF5, 0xFF, 0xFA));
-    COLOR_NAMES.add(new ColorName("MistyRose", 0xFF, 0xE4, 0xE1));
-    COLOR_NAMES.add(new ColorName("Moccasin", 0xFF, 0xE4, 0xB5));
-    COLOR_NAMES.add(new ColorName("NavajoWhite", 0xFF, 0xDE, 0xAD));
-    COLOR_NAMES.add(new ColorName("Navy", 0x00, 0x00, 0x80));
-    COLOR_NAMES.add(new ColorName("OldLace", 0xFD, 0xF5, 0xE6));
-    COLOR_NAMES.add(new ColorName("Olive", 0x80, 0x80, 0x00));
-    COLOR_NAMES.add(new ColorName("OliveDrab", 0x6B, 0x8E, 0x23));
-    COLOR_NAMES.add(new ColorName("Orange", 0xFF, 0xA5, 0x00));
-    COLOR_NAMES.add(new ColorName("OrangeRed", 0xFF, 0x45, 0x00));
-    COLOR_NAMES.add(new ColorName("Orchid", 0xDA, 0x70, 0xD6));
-    COLOR_NAMES.add(new ColorName("PaleGoldenRod", 0xEE, 0xE8, 0xAA));
-    COLOR_NAMES.add(new ColorName("PaleGreen", 0x98, 0xFB, 0x98));
-    COLOR_NAMES.add(new ColorName("PaleTurquoise", 0xAF, 0xEE, 0xEE));
-    COLOR_NAMES.add(new ColorName("PaleVioletRed", 0xDB, 0x70, 0x93));
-    COLOR_NAMES.add(new ColorName("PapayaWhip", 0xFF, 0xEF, 0xD5));
-    COLOR_NAMES.add(new ColorName("PeachPuff", 0xFF, 0xDA, 0xB9));
-    COLOR_NAMES.add(new ColorName("Peru", 0xCD, 0x85, 0x3F));
-    COLOR_NAMES.add(new ColorName("Pink", 0xFF, 0xC0, 0xCB));
-    COLOR_NAMES.add(new ColorName("Plum", 0xDD, 0xA0, 0xDD));
-    COLOR_NAMES.add(new ColorName("PowderBlue", 0xB0, 0xE0, 0xE6));
-    COLOR_NAMES.add(new ColorName("Purple", 0x80, 0x00, 0x80));
-    COLOR_NAMES.add(new ColorName("Red", 0xFF, 0x00, 0x00));
-    COLOR_NAMES.add(new ColorName("RosyBrown", 0xBC, 0x8F, 0x8F));
-    COLOR_NAMES.add(new ColorName("RoyalBlue", 0x41, 0x69, 0xE1));
-    COLOR_NAMES.add(new ColorName("SaddleBrown", 0x8B, 0x45, 0x13));
-    COLOR_NAMES.add(new ColorName("Salmon", 0xFA, 0x80, 0x72));
-    COLOR_NAMES.add(new ColorName("SandyBrown", 0xF4, 0xA4, 0x60));
-    COLOR_NAMES.add(new ColorName("SeaGreen", 0x2E, 0x8B, 0x57));
-    COLOR_NAMES.add(new ColorName("SeaShell", 0xFF, 0xF5, 0xEE));
-    COLOR_NAMES.add(new ColorName("Sienna", 0xA0, 0x52, 0x2D));
-    COLOR_NAMES.add(new ColorName("Silver", 0xC0, 0xC0, 0xC0));
-    COLOR_NAMES.add(new ColorName("SkyBlue", 0x87, 0xCE, 0xEB));
-    COLOR_NAMES.add(new ColorName("SlateBlue", 0x6A, 0x5A, 0xCD));
-    COLOR_NAMES.add(new ColorName("SlateGray", 0x70, 0x80, 0x90));
-    COLOR_NAMES.add(new ColorName("Snow", 0xFF, 0xFA, 0xFA));
-    COLOR_NAMES.add(new ColorName("SpringGreen", 0x00, 0xFF, 0x7F));
-    COLOR_NAMES.add(new ColorName("SteelBlue", 0x46, 0x82, 0xB4));
-    COLOR_NAMES.add(new ColorName("Tan", 0xD2, 0xB4, 0x8C));
-    COLOR_NAMES.add(new ColorName("Teal", 0x00, 0x80, 0x80));
-    COLOR_NAMES.add(new ColorName("Thistle", 0xD8, 0xBF, 0xD8));
-    COLOR_NAMES.add(new ColorName("Tomato", 0xFF, 0x63, 0x47));
-    COLOR_NAMES.add(new ColorName("Turquoise", 0x40, 0xE0, 0xD0));
-    COLOR_NAMES.add(new ColorName("Violet", 0xEE, 0x82, 0xEE));
-    COLOR_NAMES.add(new ColorName("Wheat", 0xF5, 0xDE, 0xB3));
-    COLOR_NAMES.add(new ColorName("White", 0xFF, 0xFF, 0xFF));
-    COLOR_NAMES.add(new ColorName("WhiteSmoke", 0xF5, 0xF5, 0xF5));
-    COLOR_NAMES.add(new ColorName("Yellow", 0xFF, 0xFF, 0x00));
-    COLOR_NAMES.add(new ColorName("YellowGreen", 0x9A, 0xCD, 0x32));
+    COLOR_NAMES.add(Color.ALICE_BLUE);
+    COLOR_NAMES.add(Color.ANTIQUE_WHITE);
+    COLOR_NAMES.add(Color.AQUA);
+    COLOR_NAMES.add(Color.AQUAMARINE);
+    COLOR_NAMES.add(Color.AZURE);
+    COLOR_NAMES.add(Color.BEIGE);
+    COLOR_NAMES.add(Color.BISQUE);
+    COLOR_NAMES.add(Color.BLACK);
+    COLOR_NAMES.add(Color.BLANCHED_ALMOND);
+    COLOR_NAMES.add(Color.BLUE);
+    COLOR_NAMES.add(Color.BLUE_VIOLET);
+    COLOR_NAMES.add(Color.BROWN);
+    COLOR_NAMES.add(Color.BURLY_WOOD);
+    COLOR_NAMES.add(Color.CADET_BLUE);
+    COLOR_NAMES.add(Color.CHARTREUSE);
+    COLOR_NAMES.add(Color.CHOCOLATE);
+    COLOR_NAMES.add(Color.CORAL);
+    COLOR_NAMES.add(Color.CORNFLOWER_BLUE);
+    COLOR_NAMES.add(Color.CORNSILK);
+    COLOR_NAMES.add(Color.CRIMSON);
+    COLOR_NAMES.add(Color.CYAN);
+    COLOR_NAMES.add(Color.DARK_BLUE);
+    COLOR_NAMES.add(Color.DARK_CYAN);
+    COLOR_NAMES.add(Color.DARK_GOLDEN_ROD);
+    COLOR_NAMES.add(Color.DARK_GRAY);
+    COLOR_NAMES.add(Color.DARK_GREEN);
+    COLOR_NAMES.add(Color.DARK_KHAKI);
+    COLOR_NAMES.add(Color.DARK_MAGENTA);
+    COLOR_NAMES.add(Color.DARK_OLIVE_GREEN);
+    COLOR_NAMES.add(Color.DARK_ORANGE);
+    COLOR_NAMES.add(Color.DARK_ORCHID);
+    COLOR_NAMES.add(Color.DARK_RED);
+    COLOR_NAMES.add(Color.DARK_SALMON);
+    COLOR_NAMES.add(Color.DARK_SEA_GREEN);
+    COLOR_NAMES.add(Color.DARK_SLATE_BLUE);
+    COLOR_NAMES.add(Color.DARK_SLATE_GRAY);
+    COLOR_NAMES.add(Color.DARK_TURQUOISE);
+    COLOR_NAMES.add(Color.DARK_VIOLET);
+    COLOR_NAMES.add(Color.DEEP_PINK);
+    COLOR_NAMES.add(Color.DEEP_SKY_BLUE);
+    COLOR_NAMES.add(Color.DIM_GRAY);
+    COLOR_NAMES.add(Color.DODGER_BLUE);
+    COLOR_NAMES.add(Color.FIRE_BRICK);
+    COLOR_NAMES.add(Color.FLORAL_WHITE);
+    COLOR_NAMES.add(Color.FOREST_GREEN);
+    COLOR_NAMES.add(Color.FUCHSIA);
+    COLOR_NAMES.add(Color.GAINSBORO);
+    COLOR_NAMES.add(Color.GHOST_WHITE);
+    COLOR_NAMES.add(Color.GOLD);
+    COLOR_NAMES.add(Color.GOLDEN_ROD);
+    COLOR_NAMES.add(Color.GRAY);
+    COLOR_NAMES.add(Color.GREEN);
+    COLOR_NAMES.add(Color.GREEN_YELLOW);
+    COLOR_NAMES.add(Color.HONEY_DEW);
+    COLOR_NAMES.add(Color.HOT_PINK);
+    COLOR_NAMES.add(Color.INDIAN_RED);
+    COLOR_NAMES.add(Color.INDIGO);
+    COLOR_NAMES.add(Color.IVORY);
+    COLOR_NAMES.add(Color.KHAKI);
+    COLOR_NAMES.add(Color.LAVENDER);
+    COLOR_NAMES.add(Color.LAVENDER_BLUSH);
+    COLOR_NAMES.add(Color.LAWN_GREEN);
+    COLOR_NAMES.add(Color.LEMON_CHIFFON);
+    COLOR_NAMES.add(Color.LIGHT_BLUE);
+    COLOR_NAMES.add(Color.LIGHT_CORAL);
+    COLOR_NAMES.add(Color.LIGHT_CYAN);
+    COLOR_NAMES.add(Color.LIGHT_GOLDEN_ROD_YELLOW);
+    COLOR_NAMES.add(Color.LIGHT_GRAY);
+    COLOR_NAMES.add(Color.LIGHT_GREEN);
+    COLOR_NAMES.add(Color.LIGHT_PINK);
+    COLOR_NAMES.add(Color.LIGHT_SALMON);
+    COLOR_NAMES.add(Color.LIGHT_SEA_GREEN);
+    COLOR_NAMES.add(Color.LIGHT_SKY_BLUE);
+    COLOR_NAMES.add(Color.LIGHT_SLATE_GRAY);
+    COLOR_NAMES.add(Color.LIGHT_STEEL_BLUE);
+    COLOR_NAMES.add(Color.LIGHT_YELLOW);
+    COLOR_NAMES.add(Color.LIME);
+    COLOR_NAMES.add(Color.LIME_GREEN);
+    COLOR_NAMES.add(Color.LINEN);
+    COLOR_NAMES.add(Color.MAGENTA);
+    COLOR_NAMES.add(Color.MAROON);
+    COLOR_NAMES.add(Color.MEDIUM_AQUA_MARINE);
+    COLOR_NAMES.add(Color.MEDIUM_BLUE);
+    COLOR_NAMES.add(Color.MEDIUM_ORCHID);
+    COLOR_NAMES.add(Color.MEDIUM_PURPLE);
+    COLOR_NAMES.add(Color.MEDIUM_SEA_GREEN);
+    COLOR_NAMES.add(Color.MEDIUM_SLATE_BLUE);
+    COLOR_NAMES.add(Color.MEDIUM_SPRING_GREEN);
+    COLOR_NAMES.add(Color.MEDIUM_TURQUOISE);
+    COLOR_NAMES.add(Color.MEDIUM_VIOLET_RED);
+    COLOR_NAMES.add(Color.MIDNIGHT_BLUE);
+    COLOR_NAMES.add(Color.MINT_CREAM);
+    COLOR_NAMES.add(Color.MISTY_ROSE);
+    COLOR_NAMES.add(Color.MOCCASIN);
+    COLOR_NAMES.add(Color.NAVAJO_WHITE);
+    COLOR_NAMES.add(Color.NAVY);
+    COLOR_NAMES.add(Color.OLD_LACE);
+    COLOR_NAMES.add(Color.OLIVE);
+    COLOR_NAMES.add(Color.OLIVE_DRAB);
+    COLOR_NAMES.add(Color.ORANGE);
+    COLOR_NAMES.add(Color.ORANGE_RED);
+    COLOR_NAMES.add(Color.ORCHID);
+    COLOR_NAMES.add(Color.PALE_GOLDEN_ROD);
+    COLOR_NAMES.add(Color.PALE_GREEN);
+    COLOR_NAMES.add(Color.PALE_TURQUOISE);
+    COLOR_NAMES.add(Color.PALE_VIOLET_RED);
+    COLOR_NAMES.add(Color.PAPAYA_WHIP);
+    COLOR_NAMES.add(Color.PEACH_PUFF);
+    COLOR_NAMES.add(Color.PERU);
+    COLOR_NAMES.add(Color.PINK);
+    COLOR_NAMES.add(Color.PLUM);
+    COLOR_NAMES.add(Color.POWDER_BLUE);
+    COLOR_NAMES.add(Color.PURPLE);
+    COLOR_NAMES.add(Color.RED);
+    COLOR_NAMES.add(Color.ROSY_BROWN);
+    COLOR_NAMES.add(Color.ROYAL_BLUE);
+    COLOR_NAMES.add(Color.SADDLE_BROWN);
+    COLOR_NAMES.add(Color.SALMON);
+    COLOR_NAMES.add(Color.SANDY_BROWN);
+    COLOR_NAMES.add(Color.SEA_GREEN);
+    COLOR_NAMES.add(Color.SEA_SHELL);
+    COLOR_NAMES.add(Color.SIENNA);
+    COLOR_NAMES.add(Color.SILVER);
+    COLOR_NAMES.add(Color.SKY_BLUE);
+    COLOR_NAMES.add(Color.SLATE_BLUE);
+    COLOR_NAMES.add(Color.SLATE_GRAY);
+    COLOR_NAMES.add(Color.SNOW);
+    COLOR_NAMES.add(Color.SPRING_GREEN);
+    COLOR_NAMES.add(Color.STEEL_BLUE);
+    COLOR_NAMES.add(Color.TAN);
+    COLOR_NAMES.add(Color.TEAL);
+    COLOR_NAMES.add(Color.THISTLE);
+    COLOR_NAMES.add(Color.TOMATO);
+    COLOR_NAMES.add(Color.TURQUOISE);
+    COLOR_NAMES.add(Color.VIOLET);
+    COLOR_NAMES.add(Color.WHEAT);
+    COLOR_NAMES.add(Color.WHITE);
+    COLOR_NAMES.add(Color.WHITE_SMOKE);
+    COLOR_NAMES.add(Color.YELLOW);
+    COLOR_NAMES.add(Color.YELLOW_GREEN);
   }
 
   public static String getRandomColor() {
-    ColorName colorName = COLOR_NAMES.get(RandomUtils.nextInt(0, COLOR_NAMES.size()));
-    return String.format("rgb(%d, %d, %d)", colorName.r, colorName.g, colorName.b);
+    Color color = COLOR_NAMES.get(RandomUtils.nextInt(0, COLOR_NAMES.size()));
+    return String.format("rgb(%d, %d, %d)", color.r, color.g, color.b);
   }
 
   public static List<String> getRandomColors(int count) {
     if (count > COLOR_NAMES.size())
-      throw new IllegalArgumentException("count is more than list's size: "+COLOR_NAMES.size());
+      throw new IllegalArgumentException("count is more than list's size: " + COLOR_NAMES.size());
 
     List<String> colors = new ArrayList<>(count);
-    for (int i = 0 ; i < count ; ++i) {
+    for (int i = 0; i < count; ++i) {
       String color = getRandomColor();
-      if (i == 0 || !color.equals(colors.get(i-1))) {
+      if (i == 0 || !color.equals(colors.get(i - 1))) {
         colors.add(color);
       } else {
         --i;
@@ -184,4 +214,121 @@ public class ColorUtils {
 
     return colors;
   }
+
+  public static Color interpolate(Color start, Color end, double interp) {
+    double inv = 1 - interp;
+    RGB rgb0 = new RGB(start.r, start.g, start.b),
+        rgb1 = new RGB(end.r, end.g, end.b),
+        rgb;
+
+    HSV hsv0 = rgb2hsv(rgb0), hsv1 = rgb2hsv(rgb1), hsv = new HSV();
+
+    hsv.h = hsv0.h * interp + hsv1.h * inv;
+    hsv.s = hsv0.s * interp + hsv1.s * inv;
+    hsv.v = hsv0.v * interp + hsv1.v * inv;
+
+    rgb = hsv2rgb(hsv);
+
+    return new Color((int)rgb.r, (int)rgb.g, (int)rgb.b);
+  }
+
+  public static HSV rgb2hsv(RGB in) {
+    HSV out = new HSV();
+    double min, max, delta;
+
+    min = in.r < in.g ? in.r : in.g;
+    min = min < in.b ? min : in.b;
+
+    max = in.r > in.g ? in.r : in.g;
+    max = max > in.b ? max : in.b;
+
+    out.v = max;                                // v
+    delta = max - min;
+    if (delta < 0.00001) {
+      out.s = 0;
+      out.h = 0; // undefined, maybe nan?
+      return out;
+    }
+    if (max > 0.0) { // NOTE: if Max is == 0, this divide would cause a crash
+      out.s = (delta / max);                  // s
+    } else {
+      // if max is 0, then r = g = b = 0
+      // s = 0, v is undefined
+      out.s = 0.0;
+      out.h = Double.NaN;                            // its now undefined
+      return out;
+    }
+    if (in.r >= max)                           // > is bogus, just keeps compilor happy
+      out.h = (in.g - in.b) / delta;        // between yellow & magenta
+    else if (in.g >= max)
+      out.h = 2.0 + (in.b - in.r) / delta;  // between cyan & yellow
+    else
+      out.h = 4.0 + (in.r - in.g) / delta;  // between magenta & cyan
+
+    out.h *= 60.0;                              // degrees
+
+    if (out.h < 0.0)
+      out.h += 360.0;
+
+    return out;
+  }
+
+
+  public static RGB hsv2rgb(HSV in) {
+    double hh, p, q, t, ff;
+    int i;
+    RGB out = new RGB();
+
+    if (in.s <= 0.0) {       // < is bogus, just shuts up warnings
+      out.r = in.v;
+      out.g = in.v;
+      out.b = in.v;
+      return out;
+    }
+    hh = in.h;
+    if (hh >= 360.0) hh = 0.0;
+    hh /= 60.0;
+    i = (int) hh;
+    ff = hh - i;
+    p = in.v * (1.0 - in.s);
+    q = in.v * (1.0 - (in.s * ff));
+    t = in.v * (1.0 - (in.s * (1.0 - ff)));
+
+    switch (i) {
+      case 0:
+        out.r = in.v;
+        out.g = t;
+        out.b = p;
+        break;
+      case 1:
+        out.r = q;
+        out.g = in.v;
+        out.b = p;
+        break;
+      case 2:
+        out.r = p;
+        out.g = in.v;
+        out.b = t;
+        break;
+
+      case 3:
+        out.r = p;
+        out.g = q;
+        out.b = in.v;
+        break;
+      case 4:
+        out.r = t;
+        out.g = p;
+        out.b = in.v;
+        break;
+      case 5:
+      default:
+        out.r = in.v;
+        out.g = p;
+        out.b = q;
+        break;
+    }
+    return out;
+  }
+
 }

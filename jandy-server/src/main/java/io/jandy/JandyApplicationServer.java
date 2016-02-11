@@ -38,20 +38,9 @@ import java.util.concurrent.Executor;
  * Created by JCooky on 15. 6. 29..
  */
 @SpringBootApplication
-@Controller
 @EnableAsync
 @EnableSocial
 public class JandyApplicationServer {
-
-  @RequestMapping(value = "/", method = RequestMethod.GET)
-  public String index(HttpServletRequest request) {
-    UserCookieGenerator userCookieGenerator = new UserCookieGenerator();
-    if (!StringUtils.isEmpty(userCookieGenerator.readCookieValue(request))) {
-      return "forward:/repos";
-    } else {
-      return "index";
-    }
-  }
 
   @Bean
   public JPAQueryFactory jpaQueryFactory(Provider<EntityManager> em) {

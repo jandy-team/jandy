@@ -2,7 +2,6 @@
 import json
 import os
 import subprocess
-import urllib2
 import shutil
 
 import requests
@@ -28,12 +27,9 @@ buildNum = os.getenv('TRAVIS_BUILD_NUMBER')
 def wget(url, filename):
     if travis == 'true' and os.path.exists(filename):
         return
-
-
-def wget(url, filename):
     with open(filename, 'wb') as dest:
-        response = urllib2.urlopen(url)
-        dest.write(response.read())
+        response = requests.get(url)
+        dest.write(response.content)
         response.close()
 
 
@@ -76,9 +72,7 @@ if __name__ == '__main__':
                 files.append(('samples', open(sampleId+'.jandy')))
 
             r = requests.post(URL + "/rest/travis", data=params, files=files)
-            if r.status_code != 200:
-                c = json.loads(r.content, encoding=r.encoding)
-                raise RuntimeError(c[u'message'])
+            r.raise_for_status()
         finally:
             for tuple in files:
                 tuple[1].close()

@@ -57,3 +57,10 @@ This project is licensed by [GPLv3](https://github.com/jcooky/jandy/blob/master/
 * slf4j - http://slf4j.org/
 * PyYAML - http://pyyaml.org/
 * poster - http://atlee.ca/software/poster/
+
+# Maintainer
+* @JCooky
+
+# Thanks for contributing
+* @edanprof - Director & Designer
+* @syjsmk - Developer

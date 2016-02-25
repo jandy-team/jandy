@@ -1,12 +1,10 @@
 package io.jandy.config;
 
-import io.jandy.service.UserService;
 import io.jandy.web.interceptor.SpringEnvironmentsAttributeInterceptor;
 import io.jandy.web.interceptor.UserCheckingInterceptor;
 import io.jandy.web.interceptor.UserInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -31,7 +29,7 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addWebRequestInterceptor(springEnvironmentsAttributeInterceptor);
     registry.addInterceptor(userInterceptor)
-        .excludePathPatterns("/error", "/", "/builds/**", "/repos/**", "/rest/**");
+        .excludePathPatterns("/error", "/", "/prof/**", "/repos/**", "/rest/**");
     registry.addInterceptor(userCheckingInterceptor);
   }
 

@@ -4,8 +4,8 @@ import io.jandy.domain.Project;
 import io.jandy.domain.ProjectRepository;
 import io.jandy.domain.User;
 import io.jandy.domain.UserRepository;
-import io.jandy.test.AbstractWebAppTestCase;
 import io.jandy.service.TravisClient;
+import io.jandy.test.AbstractWebAppTestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +43,6 @@ public class TravisRestControllerTest extends AbstractWebAppTestCase {
     user = userRepository.save(user);
 
     Project project = new Project();
-    project.setUser(null);
     project.setName("jandy");
     project.setAccount("jcooky");
     project.setUser(user);
@@ -60,7 +59,7 @@ public class TravisRestControllerTest extends AbstractWebAppTestCase {
   public void testPutResultsForJava() throws Exception {
 //    when(travisClient.getBuild(anyLong())).thenReturn()
 
-    MockMultipartFile multipartFile = new MockMultipartFile("results", "java-profiler-result.jandy",
+    MockMultipartFile multipartFile = new MockMultipartFile("samples", "java-profiler-result.jandy",
         MediaType.APPLICATION_OCTET_STREAM_VALUE, ClassLoader.getSystemResourceAsStream("java-profiler-result.jandy"));
 
     MockMvcBuilders.standaloneSetup(controller).build()
@@ -73,7 +72,8 @@ public class TravisRestControllerTest extends AbstractWebAppTestCase {
                 .param("branchName", "master")
                 .param("buildNum", "1")
                 .param("language", "java")
-        ).andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+        )
+        .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
         .andDo(MockMvcResultHandlers.print());
   }
 
@@ -89,7 +89,7 @@ public class TravisRestControllerTest extends AbstractWebAppTestCase {
 //    project.setUser(user);
 //    project = projectRepository.save(project);
 
-    MockMultipartFile multipartFile = new MockMultipartFile("results", "python-profiler-result.jandy",
+    MockMultipartFile multipartFile = new MockMultipartFile("samples", "python-profiler-result.jandy",
         MediaType.APPLICATION_OCTET_STREAM_VALUE, ClassLoader.getSystemResourceAsStream("python-profiler-result.jandy"));
 
     MockMvcBuilders.standaloneSetup(controller).build()

@@ -5,12 +5,9 @@ import io.jandy.exception.IllegalBuildNumberException;
 import io.jandy.exception.ProjectNotRegisteredException;
 import io.jandy.exception.ResourceNotFoundException;
 import io.jandy.service.BuildService;
-import io.jandy.service.Reporter;
 import io.jandy.service.ProfContextBuilder;
+import io.jandy.service.Reporter;
 import io.jandy.thrift.java.ProfilingContext;
-import io.jandy.util.Color;
-import io.jandy.util.ColorUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TJSONProtocol;
 import org.apache.thrift.transport.TIOStreamTransport;
@@ -19,7 +16,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
@@ -29,9 +29,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import static java.util.stream.StreamSupport.stream;
 
 /**
  * @author JCooky
@@ -138,7 +135,9 @@ public class TravisRestController {
       logger.info("Save build information, so on");
 
       return null;
-    }), (e) -> logger.error(e.getMessage(), e));
+    }), (e) -> {
+      throw new RuntimeException(e);
+    });
 
     post.addCallback(profiles -> {
       try {
@@ -146,12 +145,14 @@ public class TravisRestController {
 
         reporter.sendMail(currentBuild.getBranch().getProject().getUser(), currentBuild);
       } catch (IllegalBuildNumberException | MessagingException e) {
-        logger.error(e.getMessage(), e);
+        throw new RuntimeException(e);
       }
 
       logger.info("Calculate duration compared to prev build");
 
-    }, (e) -> logger.error(e.getMessage(), e));
+    }, (e) -> {
+      throw new RuntimeException(e);
+    });
 
     logger.info("FINISH");
   }

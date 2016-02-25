@@ -10,7 +10,7 @@
     </div>
     <div class="col-xs-offset-1 col-md-7 col-xs-10">
       <div class="row">
-        <h2>Build <a href="https://travis-ci.org/${project.account}/${project.name}/builds/${build.travisBuildId?c}">#${build.number?c}</a></h2>
+        <h2>${prof.sample.name} in <a href="https://travis-ci.org/${project.account}/${project.name}/builds/${build.travisBuildId?c}">Build#${build.number?c}</a></h2>
         <p>
           Max Total Duration: ${prof.maxTotalDuration/1000000}ms<br>
           Message: ${(build.commit.message)!"Merge pull-request"}<br>

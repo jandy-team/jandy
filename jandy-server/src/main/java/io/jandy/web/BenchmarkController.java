@@ -20,15 +20,10 @@ import java.io.IOException;
 public class BenchmarkController {
 
   @Autowired
-  private ProfContextDumpRepository profRepository;
-  @Autowired
   private GitHubService github;
-  @Autowired
-  private ProjectRepository projectRepository;
 
   @RequestMapping("/{id:\\d+}")
   public ModelAndView getProf(@PathVariable("id") ProfContextDump prof) throws IOException {
-    String account = prof.getBuild().getBranch().getProject().getAccount();
     Build build = prof.getBuild();
 
     GHUser user = null;
@@ -36,7 +31,6 @@ public class BenchmarkController {
       user = github.getUser(build.getCommit().getCommitterName());
 
     return new ModelAndView("benchmark")
-        .addObject("projects", projectRepository.findByAccount(account))
         .addObject("build", build)
         .addObject("prof", prof)
         .addObject("committerAvatarUrl", user == null ? null : user.getAvatarUrl());

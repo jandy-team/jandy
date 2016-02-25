@@ -1,8 +1,8 @@
 package io.jandy.web.interceptor;
 
 import io.jandy.config.social.SecurityContext;
+import io.jandy.domain.User;
 import io.jandy.exception.NotSignedInException;
-import io.jandy.exception.UserNotFoundException;
 import io.jandy.service.UserService;
 import io.jandy.web.util.UserCookieGenerator;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +28,16 @@ public class UserCheckingInterceptor implements HandlerInterceptor {
 
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    String userId = userCookieGenerator.readCookieValue(request);
+    try {
+      if (!StringUtils.isEmpty(userId)) {
+        User user = userService.getUser(Long.parseLong(userId));
+        if (!SecurityContext.userSignedIn())
+          SecurityContext.setCurrentUser(user);
+
+      }
+    } catch(NotSignedInException e) {
+    }
     return true;
   }
 
@@ -35,9 +45,11 @@ public class UserCheckingInterceptor implements HandlerInterceptor {
   public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView mav) throws Exception {
     String userId = userCookieGenerator.readCookieValue(request);
     try {
-      if (!StringUtils.isEmpty(userId)
-          && (mav != null && !mav.getModelMap().containsAttribute("user"))) {
-        mav.addObject("user", userService.getUser(Long.parseLong(userId)));
+      if (!StringUtils.isEmpty(userId)) {
+        User user = userService.getUser(Long.parseLong(userId));
+        if (mav != null && !mav.getModelMap().containsAttribute("user")) {
+          mav.addObject("user", user);
+        }
       }
     } catch(NotSignedInException e) {
     }
@@ -45,6 +57,5 @@ public class UserCheckingInterceptor implements HandlerInterceptor {
 
   @Override
   public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-
   }
 }

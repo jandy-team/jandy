@@ -5,6 +5,7 @@ import io.jandy.domain.*;
 import io.jandy.exception.BadgeUnknownException;
 import io.jandy.exception.ProjectNotRegisteredException;
 import io.jandy.service.GitHubService;
+import io.jandy.service.UserService;
 import org.kohsuke.github.GHUser;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.slf4j.Logger;
@@ -56,9 +57,12 @@ public class ProjectController {
   @Autowired
   private GitHubService github;
 
+  @Autowired
+  private UserService userService;
+
   @RequestMapping(method = RequestMethod.GET)
   public ModelAndView index() throws Exception {
-    List<Project> projects = projectRepository.findAll(new PageRequest(0, 1)).getContent();
+    List<Project> projects = userService.getSelf().getProjects();
 
     if (projects.isEmpty()) {
       logger.debug("Send redirect to /profile");
@@ -94,7 +98,6 @@ public class ProjectController {
     });
 
     return new ModelAndView("builds")
-        .addObject("projects", projectRepository.findByAccount(account))
         .addObject("project", project)
         .addObject("url", url)
         .addObject("builds", builds)

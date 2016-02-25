@@ -5,7 +5,7 @@
 <div class="container-fluid">
   <div class="row">
     <nav class="col-md-3 hidden-xs hidden-sm" role="navigation">
-      <@drawProjectList projects project.id/>
+      <@drawProjectList project.id/>
     </nav>
     <div class="col-xs-offset-1 col-md-7 col-xs-10">
       <div class="row">

@@ -6,7 +6,7 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-md-3 hidden-xs hidden-sm">
-      <@drawProjectList projects project.id/>
+      <@drawProjectList project.id/>
     </div>
     <div class="col-xs-offset-1 col-md-7 col-xs-10">
       <div class="row">

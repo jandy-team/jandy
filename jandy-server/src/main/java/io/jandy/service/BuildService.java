@@ -3,17 +3,13 @@ package io.jandy.service;
 import io.jandy.domain.*;
 import io.jandy.exception.IllegalBuildNumberException;
 import io.jandy.exception.ProjectNotRegisteredException;
-import io.jandy.web.util.TravisClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.util.concurrent.Future;
 
 /**
  * @author JCooky

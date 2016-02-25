@@ -14,7 +14,7 @@
               class="fa fa-github"></i></a>
         </h1>
         <a href="#" data-toggle="modal" data-target="#badge-modal">
-          <img src="${root}/repos/${project.account}/${project.name}/${branch.name}.svg">
+          <img src="${root}/repos/${project.account}/${project.name}.svg">
         </a>
       </div>
       <br/>
@@ -35,7 +35,7 @@
               <div class="panel-heading clearfix">
                 <div class="panel-title">
                   <h4>
-                    <span style="padding-right: 5px;"><a href="https://travis-ci.org/${project.account}/${project.name}/builds/${build.travisBuildId?c}">#${build.number?c}</a></span>
+                    <span style="padding-right: 5px;"><a name="buildNumber${build.travisBuildId?c}" href="https://travis-ci.org/${project.account}/${project.name}/builds/${build.travisBuildId?c}">#${build.number?c}</a></span>
                     <span style="padding-left: 5px; color: ${color};">${(elapsedDuration/1000000)?abs}ms ${faster} before</span>
                     <span class="btn-group pull-right">
                       <a href="https://github.com/${project.account}/${project.name}/commit/${(build.commit.sha)!"25a362115243352598617072f435c606658f14f1"}"
@@ -81,8 +81,8 @@
             </select>
           </div>
           <div class="col-md-9 badge-val">
-            <textarea name="img" class="form-control">http://jandy.io/repos/${project.account}/${project.name}/${branch.name}.svg</textarea>
-            <textarea name="markdown" class="form-control hidden">[![Performance Status](http://jandy.io/repos/${project.account}/${project.name}/${branch.name}.svg)](http://greem.io/repos/${project.account}/${project.name})</textarea>
+            <textarea name="img" class="form-control">http://jandy.io/repos/${project.account}/${project.name}.svg</textarea>
+            <textarea name="markdown" class="form-control hidden">[![Performance Status](http://jandy.io/repos/${project.account}/${project.name}.svg)](http://greem.io/repos/${project.account}/${project.name})</textarea>
           </div>
         </div>
       </div>
@@ -102,7 +102,7 @@ $(function () {
   });
 
   new jandy.TimelineGraph()
-      .start("${branch.id}");
+      .start("${project.id}");
 });
 </script>
 </@layoutFully>

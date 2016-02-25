@@ -5,7 +5,7 @@ import io.jandy.domain.ProjectRepository;
 import io.jandy.domain.User;
 import io.jandy.domain.UserRepository;
 import io.jandy.test.AbstractWebAppTestCase;
-import io.jandy.web.util.TravisClient;
+import io.jandy.service.TravisClient;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,9 +18,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.when;
 
 /**
  * @author JCooky

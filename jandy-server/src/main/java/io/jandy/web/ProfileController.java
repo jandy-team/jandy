@@ -1,5 +1,6 @@
 package io.jandy.web;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -17,8 +18,9 @@ import io.jandy.web.view.model.VmRepository;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.DynaBeanPropertyMapDecorator;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.service.RepositoryService;
+import org.kohsuke.github.GHOrganization;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,8 @@ import org.springframework.web.servlet.ModelAndView;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static org.apache.commons.lang3.StringUtils.lowerCase;
 
@@ -59,25 +63,29 @@ public class ProfileController {
 
     logger.debug("calling page 'index' ");
 
-    List<Map<String, Object>> organizations = Lists.newArrayList(Iterables.transform(gitHubService.getOrganizationService().getOrganizations(login), org -> {
-          return ImmutableMap.<String, Object>builder()
-              .put("login", org.getLogin())
-              .put("publicRepos", org.getPublicRepos())
-              .build();
-        }
-    ));
+    GHUser ghUser = gitHubService.getGitHub().getUser(login);
+    List<Map<String, Object>> organizations = Lists.newArrayList(ghUser.getOrganizations().stream().map(org -> {
+      try {
+        return ImmutableMap.<String, Object>builder()
+            .put("login", org.getLogin())
+            .put("publicRepos", org.getPublicRepoCount())
+            .build();
+      } catch (IOException e) {
+        logger.error(e.getMessage(), e);
+        throw new RuntimeException(e);
+      }
+    }).collect(Collectors.toList()));
     logger.trace("fetch from github, data: {}", organizations);
 
     User user = userService.getUser(login);
     logger.trace("get user");
 
-    RepositoryService repositoryService = gitHubService.getRepositoryService();
-    Map<String, List<Repository>> repositories = new LinkedHashMap<>();
-    repositories.put(login, Lists.newArrayList(transformFromRepositories(repositoryService.getRepositories(login))));
-    for (Map<String, Object> org : organizations) {
-      repositories.put((String) org.get("login"), Lists.newArrayList(transformFromRepositories(repositoryService.getOrgRepositories((String) org.get("login")))));
+    Map<String, List<GHRepository>> repositories = new LinkedHashMap<>();
+    repositories.put(login, Lists.newArrayList(ghUser.getRepositories().values()));
+    for (GHOrganization org : ghUser.getOrganizations()) {
+      repositories.put(org.getLogin(), Lists.newArrayList(org.getRepositories().values()));
     }
-    logger.trace("get repositories");
+    logger.trace("get repositories: {}", repositories);
 
     List<String> randomColors = ColorUtils.getRandomColors(organizations.size() + 1);
     Map<String, Object> colors = new HashMap<>();
@@ -85,27 +93,31 @@ public class ProfileController {
       colors.put(lowerCase((String) organizations.get(i).get("login")), randomColors.get(i));
     }
 
-
     colors.put(lowerCase(login), Iterables.getLast(randomColors));
     logger.trace("make random colors: {}", colors);
+
+    Set<String> imported = user.getProjects().stream().map((p) -> Long.toString(p.getGitHubId()))
+        .collect(Collectors.toSet());
+    logger.trace("imported: {}", imported);
 
     return new ModelAndView("profile")
         .addObject("colors", colors)
         .addObject("user", user)
         .addObject("organizations", organizations)
         .addObject("repositories", repositories)
+        .addObject("imported", imported)
         ;
   }
 
   @RequestMapping(value = "/project", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
   public void importProject(@RequestBody Map<String, ?> req) throws IOException, NotSignedInException, UserNotFoundException {
-    String []strs = StringUtils.split((String) req.get("fullName"), '/');
+    String[] strs = StringUtils.split((String) req.get("fullName"), '/');
     String account = strs[0].trim(), name = strs[1].trim();
 
     Project project = projectRepository.findByAccountAndName(account, name);
     if (project == null) {
-      Repository repository = gitHubService.getRepositoryService().getRepository(account, name);
+      GHRepository repository = gitHubService.getGitHub().getRepository(account + "/" + name);
       project = new Project();
       project.setAccount(account);
       project.setGitHubId(repository.getId());
@@ -128,19 +140,4 @@ public class ProfileController {
     projectRepository.save(project);
   }
 
-  private Iterable<VmRepository> transformFromRepositories(Iterable<Repository> repository) throws IOException, UserNotFoundException {
-    final User user = userService.getSelf();
-    return Iterables.transform(repository, repo -> {
-      try {
-        VmRepository vmRepo = new VmRepository(repo);
-        Project project = this.projectRepository.findByGitHubId(vmRepo.getId());
-        if (project != null && user.getProjects().contains(project)) {
-          vmRepo.setImported(true);
-        }
-        return vmRepo;
-      } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-        throw new RuntimeException(e);
-      }
-    });
-  }
 }

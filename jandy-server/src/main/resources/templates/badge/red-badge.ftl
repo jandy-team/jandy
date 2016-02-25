@@ -10,7 +10,7 @@
   <g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
     <text x="19.5" y="15" fill="#010101" fill-opacity=".3">perf</text>
     <text x="19.5" y="14">perf</text>
-    <text x="58" y="15" fill="#010101" fill-opacity=".3">${value}${unit}</text>
-    <text x="58" y="14">${value}${unit}</text>
+    <text x="58" y="15" fill="#010101" fill-opacity=".3">+${value}${unit}</text>
+    <text x="58" y="14">+${value}${unit}</text>
   </g>
 </svg>

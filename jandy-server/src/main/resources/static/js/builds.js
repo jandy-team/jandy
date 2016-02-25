@@ -5,15 +5,14 @@
   TimelineGraph = (function() {
     function TimelineGraph() {}
 
-    TimelineGraph.prototype.start = function(branchId) {
+    TimelineGraph.prototype.start = function(projectId) {
       var h, height, paper, w, width;
       h = 140;
       paper = Raphael("timeline", '100%', h);
       height = 110;
       w = $("#timeline").width();
       width = $("#timeline").width() - 10;
-      console.debug(width);
-      return $.get(ROOT_URL + "/rest/branches/" + branchId + "/builds", (function(_this) {
+      return $.get(ROOT_URL + "/rest/projects/" + projectId + "/builds", (function(_this) {
         return function(builds) {
           var build, duration, dx, i, mm, p, prev, x, y, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m;
           dx = width / (builds.length - 1);

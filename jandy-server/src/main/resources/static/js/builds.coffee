@@ -31,12 +31,9 @@ class TimelineGraph
         build.r.y = y
         build.r.color = if (build.profContextDump.elapsedDuration <= 0) then "green" else "red"
 
-#        https://github.com/syjsmk/recursivesample/commit/25a362115243352598617072f435c606658f14f1
-#        btn-group pull-right
-#        "###########"+build.number
         $('.btn btn-primary btn-sm').href
         console.log($('.btn btn-primary btn-sm').href)
-        paper.text(x, h - 5, $('.btn btn-primary btn-sm').href).attr('href', ROOT_URL)
+        paper.text(x, h - 5, "#"+build.number).attr('href', "#buildNumber"+build.number)
         paper.path("M"+x+","+(h - 19)+"L"+x+","+(h - 11)+"Z")
 
       prev = null

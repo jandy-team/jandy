@@ -77,7 +77,8 @@ line-height: 19.8px
 margin-bottom: 10px
 margin-top: 10px">
         <span style="padding-right: 5px;"><a
-            href="https://travis-ci.org/${project.account}/${project.name}/builds/${build.travisBuildId}">#${build.number}</a></span>
+                id="#buildNumber#${build.number}"
+            href="https://travis-.org/${project.account}/${project.name}/builds/${build.travisBuildId}">#${build.number}</a></span>
         <span style="padding-left: 5px; color: ${color};">${(elapsedDuration/1000000)?abs}ms ${after} before</span>
         <span style="box-sizing: border-box;
 color: rgb(51, 51, 51);

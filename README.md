@@ -27,8 +27,9 @@ This project is made for opensource developers. The purpose of this project is a
 ## Build
 * #mvn -DskipTests=true clean package
   * The jandy-server is packaged named by “jandy-server-#VERSION.jar” in jandy-server/target location
-  * executing method is “java -jar jandy-server-#VERSION.jar”
-  * profiling method is "jandy java -jar <project>.jar"
+  * Executing method is “java -jar jandy-server-#VERSION.jar”
+    * Access <code>http://localhost:3000</code> for verifying installation
+  * Profiling method is "jandy java -jar <project>.jar"
 * ex) https://github.com/jcooky/jasypt-test
 
 # License
@@ -56,3 +57,10 @@ This project is licensed by [GPLv3](https://github.com/jcooky/jandy/blob/master/
 * slf4j - http://slf4j.org/
 * PyYAML - http://pyyaml.org/
 * poster - http://atlee.ca/software/poster/
+
+# Maintainer
+* @JCooky
+
+# Thanks for contributing
+* @edanprof - Director & Designer
+* @syjsmk - Developer

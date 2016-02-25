@@ -32,9 +32,8 @@
               <div class="panel-heading clearfix" style="border-left: 10px ${build.color.cssValue} solid;">
                 <div class="panel-title">
                   <h4>
-                    <span style="padding-right: 5px;"><a
-                        href="https://travis-ci.org/${project.account}/${project.name}/builds/${build.travisBuildId?c}">#${build.number?c}</a></span>
-                    <span style="padding-left: 5px; color: ${build.color.cssValue};">${build.numSucceededSamples}/${build.numSamples} samples more faster than before</span>
+                    <span style="padding-right: 5px;"><a name="buildNumber${build.travisBuildId?c}" href="https://travis-ci.org/${project.account}/${project.name}/builds/${build.travisBuildId?c}">#${build.number?c}</a></span>
+                    <span style="padding-left: 5px; color: ${color};">${(elapsedDuration/1000000)?abs}ms ${faster} before</span>
                     <span class="btn-group pull-right">
                       <a href="https://github.com/${project.account}/${project.name}/commit/${(build.commit.sha)!"25a362115243352598617072f435c606658f14f1"}"
                          class="btn btn-primary btn-sm"

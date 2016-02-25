@@ -30,7 +30,10 @@ class TimelineGraph
         build.r.x = x
         build.r.y = y
         build.r.color = if (build.profContextDump.elapsedDuration <= 0) then "green" else "red"
-        paper.text(x, h - 5, "#"+build.number)
+
+        $('.btn btn-primary btn-sm').href
+        console.log($('.btn btn-primary btn-sm').href)
+        paper.text(x, h - 5, "#"+build.number).attr('href', "#buildNumber"+build.number)
         paper.path("M"+x+","+(h - 19)+"L"+x+","+(h - 11)+"Z")
 
       prev = null

@@ -1,16 +1,13 @@
-package io.jandy.web.util;
+package io.jandy.service;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import io.jandy.domain.Commit;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
@@ -18,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +37,7 @@ public class TravisClient {
         .execute(RequestBuilder.get()
                 .setUri(TRAVIS_URI + "/builds/" + buildId)
                 .setHeader("Accept", "application/vnd.travis-ci.2+json")
-                .setHeader("User-Agent", "MyClient/1.0.0")
+                .setHeader("User-Agent", "Jandy")
                 .build()
         )) {
       HttpEntity entity = response.getEntity();

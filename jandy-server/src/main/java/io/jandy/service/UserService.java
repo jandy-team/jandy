@@ -4,6 +4,7 @@ import io.jandy.domain.User;
 import io.jandy.domain.UserRepository;
 import io.jandy.exception.NotSignedInException;
 import io.jandy.exception.UserNotFoundException;
+import org.kohsuke.github.GHUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.github.api.GitHub;
@@ -27,7 +28,7 @@ public class UserService {
   private GitHubService gitHubService;
 
   @Transactional
-  public User getUser(org.eclipse.egit.github.core.User ghUser) throws IOException {
+  public User getUser(GHUser ghUser) throws IOException {
     User user = userRepository.findByGitHubId(ghUser.getId());
     if (user == null) {
       user = new User();
@@ -36,7 +37,7 @@ public class UserService {
 
     user.setAvatarUrl(ghUser.getAvatarUrl());
     user.setLogin(ghUser.getLogin());
-    user.setPublicRepos(ghUser.getPublicRepos());
+    user.setPublicRepos(ghUser.getPublicRepoCount());
     user.setEmail(ghUser.getEmail());
     return userRepository.save(user);
   }

@@ -1,33 +1,34 @@
 package io.jandy.web.api;
 
-import com.google.common.io.Closer;
-import freemarker.template.TemplateException;
 import io.jandy.domain.*;
 import io.jandy.exception.IllegalBuildNumberException;
 import io.jandy.exception.ProjectNotRegisteredException;
+import io.jandy.exception.ResourceNotFoundException;
 import io.jandy.service.BuildService;
-import io.jandy.service.Reporter;
 import io.jandy.service.ProfContextBuilder;
+import io.jandy.service.Reporter;
 import io.jandy.thrift.java.ProfilingContext;
-import io.jandy.web.util.TravisClient;
-import org.apache.batik.transcoder.TranscoderException;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TJSONProtocol;
 import org.apache.thrift.transport.TIOStreamTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
-
-import static java.util.stream.StreamSupport.stream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author JCooky
@@ -39,11 +40,16 @@ public class TravisRestController {
   private static final Logger logger = LoggerFactory.getLogger(TravisRestController.class);
 
   @Autowired
+  private TransactionTemplate tt;
+
+  @Autowired
   private ProfContextBuilder profContextBuilder;
   @Autowired
   private BuildService buildService;
   @Autowired
   private BuildRepository buildRepository;
+  @Autowired
+  private SampleRepository sampleRepository;
   @Autowired
   private ProfContextDumpRepository profContextDumpRepository;
   @Autowired
@@ -59,60 +65,95 @@ public class TravisRestController {
                          @RequestParam Long buildId,
                          @RequestParam Long buildNum,
                          @RequestParam String language,
-                         @RequestParam("results") MultipartFile results) throws IOException, ClassNotFoundException, ProjectNotRegisteredException, TException, MessagingException {
-    logger.debug("request /travis/java with ownerName: {}, repoName: {}, branchName: {}", ownerName, repoName, branchName);
+                         @RequestParam("samples") List<MultipartFile> samples) throws IOException, ClassNotFoundException, ProjectNotRegisteredException, TException, MessagingException {
+    logger.debug("request /rest/travis with ownerName: {}, repoName: {}, branchName: {}", ownerName, repoName, branchName);
 
-    try (Closer closer = Closer.create()) {
-      InputStream ois = closer.register(results.getInputStream());
-      ProfilingContext context = new ProfilingContext();
-      context.read(new TJSONProtocol(new TIOStreamTransport(ois)));
+    Project project = projectRepository.findByAccountAndName(ownerName, repoName);
+    if (project == null)
+      throw new ResourceNotFoundException("project(name='"+ownerName+"/"+repoName+"') is not found");
 
-      Build build = buildService.getBuildForTravis(buildId);
+    Map<String, ProfilingContext> contexts = new HashMap<>();
+    for (MultipartFile file : samples) {
+      try (InputStream is = file.getInputStream()) {
+        ProfilingContext context = new ProfilingContext();
+        context.read(new TJSONProtocol(new TIOStreamTransport(is)));
+
+        contexts.put(file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf(".jandy")), context);
+      }
+    }
+
+    ListenableFuture<Map<String, ProfContextDump>> post = profContextBuilder.buildForAsync(contexts);
+
+    post.addCallback(profiles -> tt.execute((status) -> {
+      Build build = buildRepository.findByTravisBuildId(buildId);
+      Branch branch = buildService.getBranch(ownerName, repoName, branchName);
       if (build == null) {
-        build = buildService.createBuild(ownerName, repoName, branchName, buildId, language, buildNum);
-        logger.trace("create the build: {}", build);
+        build = new Build();
+        build.setBranch(branch);
+        build.setTravisBuildId(buildId);
+        build.setLanguage(language);
+        build.setNumber(buildNum);
+        build = buildRepository.save(build);
+      }
+      for (String sampleName : profiles.keySet()) {
+        Sample sample = sampleRepository.findByNameAndProject_Id(sampleName, project.getId());
+        ProfContextDump prof = profiles.get(sampleName),
+            prevProf = profContextDumpRepository.findLastProfile(branch.getId(), sampleName);
+        long elapsedDuration = 0L;
+
+        if (sample == null) {
+          sample = new Sample()
+              .setProject(project)
+              .setName(sampleName);
+        } else {
+          if (prevProf != null)
+            elapsedDuration = prof.getMaxTotalDuration() - prevProf.getMaxTotalDuration();
+        }
+        sample.getBuilds().add(build);
+        sample.getProfiles().add(prof);
+        sample = sampleRepository.save(sample);
+        build.getSamples().add(sample);
+
+        prof
+            .setBuild(build)
+            .setSample(sample)
+            .setElapsedDuration(elapsedDuration);
+        prof = profContextDumpRepository.save(prof);
+        build.getProfiles().add(prof);
       }
 
-      if (build.getProfContextDump() != null) profContextDumpRepository.delete(build.getProfContextDump());
+      buildService.setBuildInfo(build);
+      int cnt = build.getProfiles().size(),
+          s = build.getProfiles().stream().map((p) -> p.getElapsedDuration() <= 0 ? 1 : 0).reduce((i1, i2) -> i1+i2).get();
+      build.setNumSamples(cnt);
+      build.setNumSucceededSamples(s);
+      build = buildRepository.save(build);
 
-      ListenableFuture<ProfContextDump> postProf = profContextBuilder.buildForAsync(context, build);
+      project.setCurrentBuild(build);
+      projectRepository.save(project);
 
-      logger.info("add profiling dump to build: {}", build);
+      logger.info("Save build information, so on");
 
-      postProf.addCallback(prof -> {
-        buildService.saveBuildInfo(buildId);
+      return null;
+    }), (e) -> {
+      throw new RuntimeException(e);
+    });
 
-        logger.info("Save build information, so on");
+    post.addCallback(profiles -> {
+      try {
+        Build currentBuild = project.getCurrentBuild();
 
-      }, (e) -> logger.error(e.getMessage(), e));
+        reporter.sendMail(currentBuild.getBranch().getProject().getUser(), currentBuild);
+      } catch (IllegalBuildNumberException | MessagingException e) {
+        throw new RuntimeException(e);
+      }
 
-      postProf.addCallback(prof -> {
-        try {
-          Build currentBuild = prof.getBuild();
-          Build prevBuild = buildService.getPrev(currentBuild);
-          long elapsedDuration = prof.getMaxTotalDuration() - prevBuild.getProfContextDump().getMaxTotalDuration();
+      logger.info("Calculate duration compared to prev build");
 
-          prof.setElapsedDuration(elapsedDuration);
-          prof = profContextDumpRepository.save(prof);
-          currentBuild.setProfContextDump(prof);
+    }, (e) -> {
+      throw new RuntimeException(e);
+    });
 
-          reporter.sendMail(currentBuild.getBranch().getProject().getUser(), currentBuild);
-        } catch (IllegalBuildNumberException | MessagingException e) {
-          logger.error(e.getMessage(), e);
-        }
-
-        logger.info("Calculate duration compared to prev build");
-
-      }, (e) -> logger.error(e.getMessage(), e));
-
-      postProf.addCallback(prof -> {
-        Project project = prof.getBuild().getBranch().getProject();
-        project.setCurrentBuild(prof.getBuild());
-
-        projectRepository.save(project);
-      }, (e) -> logger.error(e.getMessage(), e));
-
-      logger.info("FINISH", build);
-    }
+    logger.info("FINISH");
   }
 }

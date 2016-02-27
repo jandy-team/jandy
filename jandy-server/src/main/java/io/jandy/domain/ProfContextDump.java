@@ -2,6 +2,7 @@ package io.jandy.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
 import java.util.*;
@@ -28,7 +29,11 @@ public class ProfContextDump implements Iterable<ProfTreeNode> {
   @JsonIgnore
   private ProfTreeNode root;
 
-  @OneToOne
+  @ManyToOne
+  @JsonIgnore
+  private Sample sample;
+
+  @ManyToOne
   @JsonIgnore
   private Build build;
 
@@ -50,13 +55,13 @@ public class ProfContextDump implements Iterable<ProfTreeNode> {
     return this;
   }
 
-  public ProfContextDump setBuild(Build build) {
-    this.build = build;
+  public ProfContextDump setSample(Sample sample) {
+    this.sample = sample;
     return this;
   }
 
-  public Build getBuild() {
-    return build;
+  public Sample getSample() {
+    return sample;
   }
 
   public long getMaxTotalDuration() {
@@ -90,6 +95,15 @@ public class ProfContextDump implements Iterable<ProfTreeNode> {
     return elapsedDuration;
   }
 
+  public Build getBuild() {
+    return build;
+  }
+
+  public ProfContextDump setBuild(Build build) {
+    this.build = build;
+    return this;
+  }
+
   private class JavaTreeNodeIterator implements Iterator<ProfTreeNode> {
 
     private Deque<ProfTreeNode> nodes = new LinkedList<>();
@@ -111,5 +125,17 @@ public class ProfContextDump implements Iterable<ProfTreeNode> {
 
       return node;
     }
+  }
+
+  @Override
+  public String toString() {
+    return new ToStringBuilder(this)
+        .append("id", id)
+        .append("maxTotalDuration", maxTotalDuration)
+        .append("elapsedDuration", elapsedDuration)
+        .append("slowedNodes", slowedNodes)
+        .append("build_id", build.getId())
+        .append("sample_id", sample.getId())
+        .toString();
   }
 }

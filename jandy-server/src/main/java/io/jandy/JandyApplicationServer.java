@@ -1,61 +1,34 @@
 package io.jandy;
 
-import com.google.common.collect.Lists;
 import com.mysema.query.jpa.impl.JPAQueryFactory;
-import io.jandy.domain.Project;
-import io.jandy.web.util.UserCookieGenerator;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.system.ApplicationPidFileWriter;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.scheduling.annotation.AsyncConfigurer;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.data.repository.support.DomainClassConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.social.config.annotation.EnableSocial;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import javax.annotation.Resource;
 import javax.inject.Provider;
 import javax.persistence.EntityManager;
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.concurrent.Executor;
 
 /**
  * Created by JCooky on 15. 6. 29..
  */
 @SpringBootApplication
-@Controller
 @EnableAsync
 @EnableSocial
 public class JandyApplicationServer {
 
-  @RequestMapping(value = "/", method = RequestMethod.GET)
-  public String index(HttpServletRequest request) {
-    UserCookieGenerator userCookieGenerator = new UserCookieGenerator();
-    if (!StringUtils.isEmpty(userCookieGenerator.readCookieValue(request))) {
-      return "forward:/repos";
-    } else {
-      return "index";
-    }
-  }
-
   @Bean
   public JPAQueryFactory jpaQueryFactory(Provider<EntityManager> em) {
     return new JPAQueryFactory(em);
+  }
+
+  @Bean
+  public DomainClassConverter domainClassConverter(ConversionService conversionService) {
+    return new DomainClassConverter(conversionService);
   }
 
   public static void main(String[] args) {

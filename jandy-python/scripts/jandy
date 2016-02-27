@@ -1,19 +1,19 @@
 #!/usr/bin/python
-
+import json
 import os
 import subprocess
-import sys
-import urllib2
+import shutil
 
+import requests
 import yaml
-from poster.encode import multipart_encode
-from poster.streaminghttp import register_openers
 
 travis = os.getenv('TRAVIS')
 ci = os.getenv('CI')
 
 if travis == 'true' and ci == 'true':
     URL = "http://jandy.io"
+elif os.getenv('DEV') == 'true':
+    URL = "http://dev.jandy.io"
 else:
     URL = "http://localhost:3000"
 JAVA_PROFILER_URL = URL + "/jandy-java-profiler.jar"
@@ -25,52 +25,54 @@ buildId = os.getenv('TRAVIS_BUILD_ID')
 buildNum = os.getenv('TRAVIS_BUILD_NUMBER')
 
 def wget(url, filename):
+    if travis == 'true' and os.path.exists(filename):
+        return
     with open(filename, 'wb') as dest:
-        response = urllib2.urlopen(url)
-        dest.write(response.read())
+        response = requests.get(url)
+        dest.write(response.content)
         response.close()
 
 
-register_openers()
-with open(".travis.yml", "r") as stream:
-    doc = yaml.load(stream)
-    if doc['language'] == 'java':
+def do_profile(language, id, argv):
+    wget(JAVA_PROFILER_URL, 'jandy-java-profiler.jar')
+    if language == 'java':
         wget(JAVA_PROFILER_URL, 'jandy-java-profiler.jar')
-        args = sys.argv[1:]
+        args = argv[0:]
         args.insert(1, '-javaagent:jandy-java-profiler.jar')
         subprocess.call(args)
-        with open('java-profiler-result.jandy', 'rb') as java_results:
-            params = {
-                'results': java_results,
-                'name': 'java-profiler-result.jandy',
-                'ownerName': ownerName,
-                'repoName': repoName,
-                'branchName': branchName,
-                'buildId': buildId,
-                'buildNum': buildNum,
-                'language': 'java'
-            }
-            datagen, headers = multipart_encode(params)
-            request = urllib2.Request(URL + "/rest/travis", datagen, headers)
-            response = urllib2.urlopen(request)
-            print(response.read())
-    if doc['language'] == 'python':
-        args = sys.argv[1:]
+        shutil.move('java-profiler-result.jandy', id + '.jandy'),
+
+    if language == 'python':
+        args = argv[0:]
         args.insert(1, '-m')
         args.insert(2, 'jandy')
         subprocess.call(args)
-        with open('python-profiler-result.jandy', 'rb') as python_results:
-            params = {
-                'results': python_results,
-                'name': 'python-profiler-result.jandy',
-                'ownerName': ownerName,
-                'repoName': repoName,
-                'branchName': branchName,
-                'buildId': buildId,
-                'buildNum': buildNum,
-                'language': 'python'
-            }
-            datagen, headers = multipart_encode(params)
-            request = urllib2.Request(URL + '/rest/travis', datagen, headers)
-            response = urllib2.urlopen(request)
-            print(response.read())
+        shutil.move('python-profiler-result.jandy', id + '.jandy'),
+
+
+if __name__ == '__main__':
+    with open('.jandy.yml', 'rb') as conf:
+        yml = yaml.load(conf)
+        params = {
+            'ownerName': ownerName,
+            'repoName': repoName,
+            'branchName': branchName,
+            'buildId': buildId,
+            'buildNum': buildNum,
+            'language': yml['language'].lower()
+        }
+
+        files = []
+        try:
+            for sample in yml['samples']:
+                sampleId = sample['id']
+                argv = sample['script'].split()
+                do_profile(yml['language'].lower(), sampleId, argv)
+
+                files.append(('samples', open(sampleId+'.jandy')))
+
+            r = requests.post(URL + "/rest/travis", data=params, files=files)
+            r.raise_for_status()
+        finally:
+            for tuple in files:
+                tuple[1].close()

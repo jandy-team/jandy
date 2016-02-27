@@ -5,6 +5,7 @@ import io.jandy.domain.Build;
 import io.jandy.domain.ProjectRepository;
 import io.jandy.domain.User;
 import io.jandy.util.SmallTime;
+import org.kohsuke.github.GHUser;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -36,7 +37,7 @@ public class Reporter {
   @Async
   public void sendMail(User user, Build current) throws MessagingException {
     mailSender.send(msg -> {
-      org.eclipse.egit.github.core.User ghUser = null;
+      GHUser ghUser = null;
       if (current.getCommit() != null)
         ghUser = github.getUser(current.getCommit().getCommitterName());
 

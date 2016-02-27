@@ -1,16 +1,14 @@
 class TimelineGraph
   constructor: () ->
 
-  start: (branchId) ->
+  start: (projectId) ->
     h = 140
     paper = Raphael("timeline", '100%', h)
     height = 110
     w = $("#timeline").width()
     width = $("#timeline").width() - 10
 
-    console.debug(width)
-
-    $.get ROOT_URL+"/rest/branches/"+branchId+"/builds", (builds) =>
+    $.get ROOT_URL+"/rest/projects/"+projectId+"/builds", (builds) =>
       dx = width/(builds.length - 1);
 
       mm = {min: Number.MAX_VALUE, max: Number.MIN_VALUE};
@@ -32,7 +30,10 @@ class TimelineGraph
         build.r.x = x
         build.r.y = y
         build.r.color = if (build.profContextDump.elapsedDuration <= 0) then "green" else "red"
-        paper.text(x, h - 5, "#"+build.number)
+
+        $('.btn btn-primary btn-sm').href
+        console.log($('.btn btn-primary btn-sm').href)
+        paper.text(x, h - 5, "#"+build.number).attr('href', "#buildNumber"+build.number)
         paper.path("M"+x+","+(h - 19)+"L"+x+","+(h - 11)+"Z")
 
       prev = null

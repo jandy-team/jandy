@@ -1,8 +1,12 @@
 package io.jandy.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.jandy.util.Color;
+import io.jandy.util.ColorUtils;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author JCooky
@@ -19,7 +23,9 @@ public class Build {
   private String language;
   private long travisBuildId;
   private long number;
-  private BuildState state = BuildState.PROGRESSING;
+  private BuildState state = BuildState.UNKNOWN;
+
+  private int numSamples, numSucceededSamples;
 
   @Transient
   private String buildAt;
@@ -31,8 +37,12 @@ public class Build {
   @JsonIgnore
   private Branch branch;
 
-  @OneToOne(mappedBy = "build", cascade = CascadeType.REMOVE)
-  private ProfContextDump profContextDump;
+  @ManyToMany
+  @JsonIgnore
+  private List<Sample> samples = new ArrayList<>();
+
+  @OneToMany(mappedBy = "build", cascade = CascadeType.REMOVE)
+  private List<ProfContextDump> profiles = new ArrayList<>();
 
   public long getId() {
     return id;
@@ -74,12 +84,12 @@ public class Build {
     this.branch = branch;
   }
 
-  public ProfContextDump getProfContextDump() {
-    return profContextDump;
+  public List<Sample> getSamples() {
+    return samples;
   }
 
-  public void setProfContextDump(ProfContextDump profContextDump) {
-    this.profContextDump = profContextDump;
+  public void setSamples(List<Sample> samples) {
+    this.samples = samples;
   }
 
   @Override
@@ -144,5 +154,37 @@ public class Build {
   public Build setBuildAt(String buildAt) {
     this.buildAt = buildAt;
     return this;
+  }
+
+  public List<ProfContextDump> getProfiles() {
+    return profiles;
+  }
+
+  public Build setProfiles(List<ProfContextDump> profiles) {
+    this.profiles = profiles;
+    return this;
+  }
+
+  public int getNumSamples() {
+    return numSamples;
+  }
+
+  public Build setNumSamples(int numSamples) {
+    this.numSamples = numSamples;
+    return this;
+  }
+
+  public int getNumSucceededSamples() {
+    return numSucceededSamples;
+  }
+
+  public Build setNumSucceededSamples(int numSucceededSamples) {
+    this.numSucceededSamples = numSucceededSamples;
+    return this;
+  }
+
+  public Color getColor() {
+    double interp = (double) this.getNumSucceededSamples() / (double) this.getNumSamples();
+    return ColorUtils.interpolate(Color.FAILURE, Color.SUCCESS, interp);
   }
 }

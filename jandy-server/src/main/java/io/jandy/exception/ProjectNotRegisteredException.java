@@ -4,5 +4,5 @@ package io.jandy.exception;
  * @author JCooky
  * @since 2015-07-08
  */
-public class ProjectNotRegisteredException extends Exception {
+public class ProjectNotRegisteredException extends ResourceNotFoundException {
 }

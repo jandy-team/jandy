@@ -1,5 +1,7 @@
 package io.jandy.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,7 @@ public class Sample {
 
   @ManyToMany
   @OrderBy("number DESC")
+  @JsonIgnore
   private List<Build> builds = new ArrayList<>();
 
   @OneToMany(mappedBy = "sample", cascade = CascadeType.REMOVE)

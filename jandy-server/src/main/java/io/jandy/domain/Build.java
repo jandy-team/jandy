@@ -38,6 +38,7 @@ public class Build {
   private Branch branch;
 
   @ManyToMany
+  @JsonIgnore
   private List<Sample> samples = new ArrayList<>();
 
   @OneToMany(mappedBy = "build", cascade = CascadeType.REMOVE)

@@ -1,4 +1,7 @@
 import threading
+import traceback
+
+import math
 import sys
 from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 from thrift.protocol.TJSONProtocol import TJSONProtocol
@@ -18,10 +21,11 @@ class MethodHandler(object):
         self.root = self.current
 
     def enter(self, frame):
-        try:
-            n = treeNode(frame)
-        except JandyClassError:
+        if '__package__' in frame.f_globals.keys() and frame.f_globals['__package__'] == 'jandy':
             return
+
+        # print('---- ENTER')
+        n = treeNode(frame)
 
         n.acc.t_startTime = time.time()
         n.acc.concurThreadName = threading.current_thread().name
@@ -32,11 +36,15 @@ class MethodHandler(object):
         # print('ENTER - '+str(self.current))
 
     def exit(self, frame, arg, excepted):
+        if '__package__' in frame.f_globals.keys() and frame.f_globals['__package__'] == 'jandy':
+            return
+
+        # print('---- EXIT: '+str(frame.f_globals))
         startTime = self.current.acc.t_startTime
         elapsedTime = time.time() - startTime
 
-        self.current.acc.startTime = long(startTime * 1000.0 * 1000.0 * 1000.0)
-        self.current.acc.elapsedTime = long(elapsedTime * 1000.0 * 1000.0 * 1000.0)
+        self.current.acc.startTime = math.floor(startTime * 1000.0 * 1000.0 * 1000.0)
+        self.current.acc.elapsedTime = math.floor(elapsedTime * 1000.0 * 1000.0 * 1000.0)
         if excepted:
             (exception, value, traceback) = arg
             self.current.acc.exceptionId = exceptionObject(exception, value, traceback).id
@@ -72,8 +80,7 @@ class Profiler(object):
     def done(self):
         self.stop()
         context = profilingContext(self.context.roots)
-        # print(context.methods)
-        with open("python-profiler-result.jandy", "w") as f:
+        with open("python-profiler-result.jandy", "wb") as f:
             tp = TFileObjectTransport(f)
             context.write(TJSONProtocol(tp))
             tp.flush()

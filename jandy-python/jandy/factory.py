@@ -53,16 +53,17 @@ def classObject(name=None, packageName=None, frame=None):
         _self = frame.f_locals.get('self')
         if _self is not None:
             cls = getattr(_self, '__class__')
-            return classObject(name=cls.__name__, packageName=cls.__module__)
+            pkg = cls.__module__
+            if pkg is None:
+                pkg = frame.f_globals['__package__']
+            return classObject(name=cls.__name__, packageName=pkg)
         else:
-            # if not '__name__' in frame.f_globals.keys():
-            #     print(frame.f_globals)
             moduleName = frame.f_globals['__package__'] if '__package__' in frame.f_globals.keys() else ''
             name = frame.f_globals['__name__']
             return classObject(name=name, packageName=moduleName)
     else:
-        if packageName is not None and packageName.startswith('jandy'):
-            raise JandyClassError()
+        if packageName is None:
+            packageName = ""
         classes_lock.acquire()
         try:
             if (name, packageName) in classes.keys():

@@ -23,8 +23,8 @@ def main():
             '__name__': '__main__',
             '__package__': None
         }
-        sub_locals = None
+        sub_locals = {}
         try:
-            exec(code) in sub_globals, sub_locals
+            exec(code, sub_globals, sub_locals) in sub_globals, sub_locals
         finally:
             pr.done()

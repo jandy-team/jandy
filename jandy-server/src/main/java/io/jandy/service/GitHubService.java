@@ -49,7 +49,10 @@ public class GitHubService {
   }
 
   public GHMyself getUser() throws NotSignedInException, IOException {
-    return getGitHub().getMyself();
+    GitHub github = getGitHub();
+    if (github.isAnonymous())
+      return null;
+    return github.getMyself();
   }
 
   public GHUser getUser(String login) throws NotSignedInException, IOException {

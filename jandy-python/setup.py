@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='jandy-python',
-    version='0.3.1-SNAPSHOT',
+    version='0.4.0-SNAPSHOT',
     url='https://github.com/jcooky/jandy/jandy-python',
     license='GPL',
     author='JCooky',

@@ -90,7 +90,7 @@
         <br>
         <div class="row">
           <div class="col-md-3">
-            <select class="form-control">
+            <select id="badge-modal" class="form-control">
               <option value="img" selected>Image URL</option>
               <option value="markdown">Markdown</option>
             </select>
@@ -121,7 +121,7 @@
 /*
   new jandy.TimelineGraph()
       .start("${project.id}");
-  });
 */
+  });
 </script>
 </@layoutFully>

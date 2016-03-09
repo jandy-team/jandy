@@ -26,7 +26,14 @@ Access local page of jandy:
 
     http://localhost:3000
 
-Running profiles on local machine instaed of Travis-CI:
+Push to your fork and submit a pull request.<br>
+Some things that will increase the chance that your pull request is accepted:
+
+- Write tests.
+- Follow [Google style guide](https://google.github.io/styleguide/javaguide.html).
+- Write a [good commit message](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
+
+## Running profiles on local machine instaed of Travis-CI
 
 1. Access <code>localhost:3000</code>, and then sign in jandy by GitHub OAuth.
 2. Write <code>.jandy.yml</code> in target repository.
@@ -45,14 +52,8 @@ Running profiles on local machine instaed of Travis-CI:
 7. See <code>http://localhost:3000/repos/{account}/{repo}</code>
 8. Enjoy!!
 
-Push to your fork and submit a pull request.<br>
-Some things that will increase the chance that your pull request is accepted:
 
-- Write tests.
-- Follow [Google style guide](https://google.github.io/styleguide/javaguide.html).
-- Write a [good commit message](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
-
-# Use optional parameters for execution jandy-server
+## Use optional parameters for execution jandy-server
 Jandy-server uses spring-boot. Then, the configuration of spring-boot is used to configure jandy-server<br>
 Example:
 

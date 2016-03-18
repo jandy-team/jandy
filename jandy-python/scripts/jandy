@@ -11,10 +11,10 @@ import yaml
 travis = os.getenv('TRAVIS')
 ci = os.getenv('CI')
 
-if travis == 'true' and ci == 'true':
-    URL = "http://jandy.io"
-elif os.getenv('DEV') == 'true':
+if os.getenv('DEV') == 'true':
     URL = "http://dev.jandy.io"
+elif travis == 'true' and ci == 'true':
+    URL = "http://jandy.io"
 else:
     URL = "http://localhost:3000"
 JAVA_PROFILER_URL = URL + "/jandy-java-profiler.jar"

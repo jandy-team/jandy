@@ -1,11 +1,16 @@
 package io.jandy.web.api;
 
+import com.google.gson.*;
 import io.jandy.domain.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
+
 
 /**
  * @author JCooky
@@ -15,17 +20,30 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/rest/prof")
 public class BuildRestController {
 
-  @Autowired
-  private ProfContextDumpRepository profContextDumpRepository;
-
   @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-  public ProfContextDump getProfContextDump(@PathVariable long id) throws Exception {
-
-    return profContextDumpRepository.findOne(id);
+  public ProfContextDump getProfContextDump(@PathVariable("id") ProfContextDump dump) throws Exception {
+    return dump;
   }
 
   @RequestMapping(value = "/{id}/root", method = RequestMethod.GET)
-  public ProfTreeNode getRoot(@PathVariable long id) throws Exception {
-    return profContextDumpRepository.findOne(id).getRoot();
+  public ProfTreeNode getRoot(@PathVariable("id") ProfContextDump dump) throws Exception {
+    return getNode(dump.getRoot());
+  }
+
+  @RequestMapping(value = "/node/{id}", method = RequestMethod.GET)
+  public ProfTreeNode getNode(@PathVariable("id") ProfTreeNode root) throws Exception {
+    detach(root, 0);
+
+    return root;
+  }
+
+  private void detach(ProfTreeNode node, int depth) {
+    if (depth == 20)
+      node.setChildren(new ArrayList<>());
+    else {
+      for (ProfTreeNode child : node.getChildren()) {
+        detach(child, depth + 1);
+      }
+    }
   }
 }

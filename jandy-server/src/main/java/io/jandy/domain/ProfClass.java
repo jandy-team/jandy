@@ -1,5 +1,6 @@
 package io.jandy.domain;
 
+import com.google.gson.annotations.Expose;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
@@ -12,13 +13,13 @@ import java.util.List;
 @Entity
 public class ProfClass {
   @Id
-  @GeneratedValue
-  private long id;
+  private String id;
 
   private String packageName = "";
   private String name = "";
 
   @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "owner")
+  @Expose
   private List<ProfMethod> methods;
 
   public void setName(String name) {
@@ -37,11 +38,11 @@ public class ProfClass {
     return packageName;
   }
 
-  public long getId() {
+  public String getId() {
     return id;
   }
 
-  public void setId(long id) {
+  public void setId(String id) {
     this.id = id;
   }
 

@@ -16,25 +16,6 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.thrift.tools</groupId>
-        <artifactId>maven-thrift-plugin</artifactId>
-        <version>0.1.11</version>
-        <executions>
-          <execution>
-            <id>thrift-py-sources</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <thriftExecutable>${thrift.program}</thriftExecutable>
-          <generator>py</generator>
-          <thriftSourceRoot>${project.basedir}/../jandy-thrift</thriftSourceRoot>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>1.4.0</version>
@@ -86,24 +67,6 @@
                 <delete includeEmptyDirs="true">
                   <fileset dir="${project.basedir}" includes="*.egg-info/**"/>
                 </delete>
-              </target>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-thrift-py</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <target>
-                <mkdir dir="build/lib/jandy"/>
-                <copy todir="${project.basedir}/jandy" overwrite="true">
-                  <fileset dir="target/generated-sources/thrift/jandy">
-                    <exclude name="__init__.py"/>
-                    <include name="**/*.py"/>
-                  </fileset>
-                </copy>
               </target>
             </configuration>
           </execution>

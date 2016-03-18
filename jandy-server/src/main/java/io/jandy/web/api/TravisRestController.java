@@ -1,16 +1,15 @@
 package io.jandy.web.api;
 
+import com.google.gson.Gson;
 import io.jandy.domain.*;
 import io.jandy.exception.IllegalBuildNumberException;
 import io.jandy.exception.ProjectNotRegisteredException;
 import io.jandy.exception.ResourceNotFoundException;
+import io.jandy.java.data.ProfilingContext;
 import io.jandy.service.BuildService;
 import io.jandy.service.ProfContextBuilder;
 import io.jandy.service.Reporter;
-import io.jandy.thrift.java.ProfilingContext;
-import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TJSONProtocol;
-import org.apache.thrift.transport.TIOStreamTransport;
+import org.apache.commons.io.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +25,12 @@ import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author JCooky
@@ -65,7 +67,7 @@ public class TravisRestController {
                          @RequestParam Long buildId,
                          @RequestParam Long buildNum,
                          @RequestParam String language,
-                         @RequestParam("samples") List<MultipartFile> samples) throws IOException, ClassNotFoundException, ProjectNotRegisteredException, TException, MessagingException {
+                         @RequestParam("samples") List<MultipartFile> samples) throws IOException, ClassNotFoundException, ProjectNotRegisteredException, MessagingException, ExecutionException {
     logger.debug("request /rest/travis with ownerName: {}, repoName: {}, branchName: {}", ownerName, repoName, branchName);
 
     Project project = projectRepository.findByAccountAndName(ownerName, repoName);
@@ -74,10 +76,8 @@ public class TravisRestController {
 
     Map<String, ProfilingContext> contexts = new HashMap<>();
     for (MultipartFile file : samples) {
-      try (InputStream is = file.getInputStream()) {
-        ProfilingContext context = new ProfilingContext();
-        context.read(new TJSONProtocol(new TIOStreamTransport(is)));
-
+      try (InputStreamReader reader = new InputStreamReader(file.getInputStream(), Charsets.UTF_8)) {
+        ProfilingContext context = new Gson().fromJson(reader, ProfilingContext.class);
         contexts.put(file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf(".jandy")), context);
       }
     }

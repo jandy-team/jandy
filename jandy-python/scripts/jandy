@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import base64
 import json
 import os
 import subprocess
@@ -40,6 +41,7 @@ def do_profile(language, id, argv):
         args = argv[0:]
         args.insert(1, '-javaagent:jandy-java-profiler.jar')
         subprocess.call(args)
+        # base64.encode('java-profiler-result.jandy', id + '.jandy')
         shutil.move('java-profiler-result.jandy', id + '.jandy'),
 
     if language == 'python':
@@ -47,6 +49,9 @@ def do_profile(language, id, argv):
         args.insert(1, '-m')
         args.insert(2, 'jandy')
         subprocess.call(args)
+        # with open('python-profiler-result.jandy', 'rb') as input:
+        #     with open(id+'.jandy', 'wb') as output:
+        #         base64.encode(input, output)
         shutil.move('python-profiler-result.jandy', id + '.jandy'),
 
 
@@ -69,7 +74,7 @@ if __name__ == '__main__':
                 argv = sample['script'].split()
                 do_profile(yml['language'].lower(), sampleId, argv)
 
-                files.append(('samples', open(sampleId+'.jandy')))
+                files.append(('samples', open(sampleId+'.jandy', "rb")))
 
             r = requests.post(URL + "/rest/travis", data=params, files=files)
             r.raise_for_status()

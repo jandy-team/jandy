@@ -10,5 +10,5 @@ setup(
     description='Jandy Profiler for the Python',
     packages=['jandy'],
     scripts=['scripts/jandy'],
-    install_requires=['wheel', 'thrift', 'PyYAML', 'requests']
+    install_requires=['wheel', 'PyYAML', 'requests']
 )

@@ -1,6 +1,4 @@
 import threading
-from jandy.exceptions import JandyClassError
-from jandy.ttypes import TreeNode, MethodObject, ClassObject, ExceptionObject, ProfilingContext, Accumulator
 import uuid
 
 nodes_lock = threading.Lock()
@@ -13,13 +11,15 @@ methods = {}
 classes = {}
 exceptions = []
 
+
 def treeNode(frame=None):
-    n = TreeNode()
-    n.id = str(uuid.uuid4())
-    n.acc = Accumulator()
-    n.methodId = methodObject(frame=frame).id
-    n.childrenIds = []
-    n.root = False
+    n = {
+        'id': str(uuid.uuid4()),
+        'acc': {},
+        'methodId': methodObject(frame=frame)['id'],
+        'childrenIds': [],
+        'root': False
+    }
 
     nodes_lock.acquire()
     try:
@@ -29,6 +29,7 @@ def treeNode(frame=None):
 
     return n
 
+
 def methodObject(name=None, owner=None, frame=None):
     if frame is not None:
         co = frame.f_code
@@ -37,16 +38,18 @@ def methodObject(name=None, owner=None, frame=None):
     else:
         methods_lock.acquire()
         try:
-            if (name, owner) in methods.keys():
-                return methods[(name, owner)]
-            mk = MethodObject()
-            mk.id = str(uuid.uuid4())
-            mk.name = name
-            mk.ownerId = owner.id if owner is not None else None
-            methods[(name, owner)] = mk
+            if (name, owner['id']) in methods.keys():
+                return methods[(name, owner['id'])]
+            mk = {
+                'id': str(uuid.uuid4()),
+                'name': name,
+                'ownerId': owner['id'] if owner is not None else None
+            }
+            methods[(name, owner['id'])] = mk
             return mk
         finally:
             methods_lock.release()
+
 
 def classObject(name=None, packageName=None, frame=None):
     if frame is not None:
@@ -68,22 +71,24 @@ def classObject(name=None, packageName=None, frame=None):
         try:
             if (name, packageName) in classes.keys():
                 return classes[(name, packageName)]
-            ck = ClassObject()
-            ck.id = str(uuid.uuid4())
-            ck.name = name
-            ck.packageName = packageName
-
+            ck = {
+                'id': str(uuid.uuid4()),
+                'name': name,
+                'packageName': packageName
+            }
             classes[(name, packageName)] = ck
             return ck
         finally:
             classes_lock.release()
 
+
 def exceptionObject(exception, value, traceback):
     #print('name='+exception.__name__+', module='+exception.__module__+', value='+str(value))
-    e = ExceptionObject()
-    e.id = str(uuid.uuid4())
-    e.message = str(value)
-    e.classId = classObject(name=exception.__name__, packageName=exception.__module__).id
+    e = {
+        'id': str(uuid.uuid4()),
+        'message': str(value),
+        'classId': classObject(name=exception.__name__, packageName=exception.__module__)['id'],
+    }
     exceptions_lock.acquire()
     try:
         exceptions.append(e)
@@ -91,16 +96,21 @@ def exceptionObject(exception, value, traceback):
         exceptions_lock.release()
     return e
 
-def profilingContext(roots):
-    context = ProfilingContext()
-    context.nodes = nodes
-    context.methods = methods.values()
-    context.classes = classes.values()
-    context.exceptions = exceptions
 
-    context.root = TreeNode(id=str(uuid.uuid4()), childrenIds=[], root=True)
+def profilingContext(roots):
+    context = {
+        'nodes': nodes,
+        'methods': list(methods.values()),
+        'classes': list(classes.values()),
+        'exceptions': exceptions,
+        'root': {
+            'id': str(uuid.uuid4()),
+            'childrenIds': [],
+            'root': True
+        }
+    }
 
     for n in roots:
-        if n.childrenIds is not None and len(n.childrenIds) > 0:
-            context.root.childrenIds.append(n.childrenIds[0])
+        if n['childrenIds'] is not None and len(n['childrenIds']) > 0:
+            context['root']['childrenIds'].append(n['childrenIds'][0])
     return context

@@ -33,7 +33,7 @@ class TestJandyProfiler(unittest.TestCase):
             context = json.load(file)
 
         print(context)
-        self.assertIsNotNone(context.root)
+        self.assertIsNotNone(context['root'])
 
 
 if __name__ == '__main__':

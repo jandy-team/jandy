@@ -2,17 +2,15 @@ package io.jandy.java;
 
 import com.github.jcooky.jaal.common.profile.ClassType;
 import com.github.jcooky.jaal.common.profile.MethodType;
+import io.jandy.com.google.gson.Gson;
+import io.jandy.java.data.*;
 import io.jandy.java.key.ClassKey;
 import io.jandy.java.key.MethodKey;
 import io.jandy.java.profiler.MethodHandler;
-import io.jandy.org.apache.thrift.TException;
-import io.jandy.org.apache.thrift.protocol.TCompactProtocol;
-import io.jandy.org.apache.thrift.protocol.TJSONProtocol;
-import io.jandy.org.apache.thrift.protocol.TProtocol;
-import io.jandy.org.apache.thrift.transport.TSimpleFileTransport;
-import io.jandy.org.apache.thrift.transport.TTransport;
-import io.jandy.thrift.java.*;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -34,10 +32,10 @@ public class JavaProfilingContextImpl extends ThreadLocal<MethodHandler> impleme
 
   public TreeNode getTreeNode(ClassType classType, MethodType methodType) {
     TreeNode n = new TreeNode();
-    n.id = UUID.randomUUID().toString();
-    n.methodId = getMethodObject(classType, methodType).getId();
-    n.acc = new Accumulator();
-    n.root = false;
+    n.setId(UUID.randomUUID().toString());
+    n.setMethodId(getMethodObject(classType, methodType).getId());
+    n.setAcc(new Accumulator());
+    n.setRoot(false);
     synchronized(nodes) {
       nodes.add(n);
     }
@@ -52,11 +50,11 @@ public class JavaProfilingContextImpl extends ThreadLocal<MethodHandler> impleme
 
       if (m == null) {
         m = new MethodObject();
-        m.id = UUID.randomUUID().toString();
-        m.ownerId = getClassObject(classType).getId();
-        m.name = methodType.getName();
-        m.access = methodType.getAccess();
-        m.descriptor = methodType.getDescriptor();
+        m.setId(UUID.randomUUID().toString());
+        m.setOwnerId(getClassObject(classType).getId());
+        m.setName(methodType.getName());
+        m.setAccess(methodType.getAccess());
+        m.setDescriptor(methodType.getDescriptor());
         methods.put(key, m);
       }
 
@@ -70,9 +68,9 @@ public class JavaProfilingContextImpl extends ThreadLocal<MethodHandler> impleme
       ClassObject c = classes.get(key);
       if (c == null) {
         c = new ClassObject();
-        c.id = UUID.randomUUID().toString();
-        c.name = classType.getName();
-        c.packageName = classType.getPackageName();
+        c.setId(UUID.randomUUID().toString());
+        c.setName(classType.getName());
+        c.setPackageName(classType.getPackageName());
         classes.put(key, c);
       }
 
@@ -82,9 +80,9 @@ public class JavaProfilingContextImpl extends ThreadLocal<MethodHandler> impleme
 
   public ExceptionObject getExceptionObject(Throwable throwable) {
     ExceptionObject e = new ExceptionObject();
-    e.id = UUID.randomUUID().toString();
-    e.classId = getClassObject(throwable.getClass().getName()).getId();
-    e.message = throwable.getMessage();
+    e.setId(UUID.randomUUID().toString());
+    e.setClassId(getClassObject(throwable.getClass().getName()).getId());
+    e.setMessage(throwable.getMessage());
     synchronized(exceptions) {
       exceptions.add(e);
     }
@@ -102,9 +100,9 @@ public class JavaProfilingContextImpl extends ThreadLocal<MethodHandler> impleme
       ClassObject c = classes.get(key);
       if (c == null) {
         c = new ClassObject();
-        c.id = UUID.randomUUID().toString();
-        c.packageName = packageName;
-        c.name = name;
+        c.setId(UUID.randomUUID().toString());
+        c.setPackageName(packageName);
+        c.setName(name);
         classes.put(key, c);
       }
 
@@ -115,18 +113,18 @@ public class JavaProfilingContextImpl extends ThreadLocal<MethodHandler> impleme
   private ProfilingContext getProfilingContext() {
     ProfilingContext m = new ProfilingContext();
 
-    m.nodes = nodes;
-    m.methods = new ArrayList<MethodObject>();
-    m.methods.addAll(methods.values());
-    m.classes = new ArrayList<ClassObject>();
-    m.classes.addAll(classes.values());
-    m.exceptions = exceptions;
+    m.setNodes(nodes);
+    m.setMethods(new ArrayList<MethodObject>());
+    m.getMethods().addAll(methods.values());
+    m.setClasses(new ArrayList<ClassObject>());
+    m.getClasses().addAll(classes.values());
+    m.setExceptions(exceptions);
 
-    m.root = new TreeNode();
-    m.root.root = true;
+    m.setRoot(new TreeNode());
+    m.getRoot().setRoot(true);
     for (TreeNode n : roots) {
       if (n.getChildrenIds() != null && !n.getChildrenIds().isEmpty()) {
-        m.getRoot().addToChildrenIds(n.getChildrenIds().get(0));
+        m.getRoot().getChildrenIds().add(n.getChildrenIds().get(0));
       }
     }
 
@@ -134,17 +132,16 @@ public class JavaProfilingContextImpl extends ThreadLocal<MethodHandler> impleme
   }
 
   @Override
-  public void write(TProtocol protocol) {
-    TTransport transport = null;
+  public void write() {
+    BufferedWriter writer = null;
     try {
-      transport = new TSimpleFileTransport("java-profiler-result.jandy", false, true);
-      getProfilingContext().write(new TJSONProtocol(transport));
-      transport.flush();
-    } catch (TException e) {
+      writer = new BufferedWriter(new FileWriter("java-profiler-result.jandy"));
+      new Gson().toJson(getProfilingContext(), writer);
+    } catch (IOException e) {
       e.printStackTrace();
     } finally {
-      if (transport != null)
-        transport.close();
+      if (writer != null)
+        try { writer.close(); } catch (IOException ignored) {}
     }
   }
 

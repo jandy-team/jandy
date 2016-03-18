@@ -1,23 +1,18 @@
+import json
 import threading
 import traceback
 
 import math
 import sys
-from thrift.protocol.TBinaryProtocol import TBinaryProtocol
-from thrift.protocol.TJSONProtocol import TJSONProtocol
-from jandy.exceptions import JandyClassError
 
 from jandy.factory import treeNode, profilingContext, exceptionObject
-from jandy.transport import TFileObjectTransport
 import time
-from thrift.protocol.TCompactProtocol import TCompactProtocol
-from jandy.ttypes import TreeNode
 
 
 class MethodHandler(object):
     def __init__(self):
         self.nodes = []
-        self.current = TreeNode(childrenIds=[])
+        self.current = {'childrenIds': list()}
         self.root = self.current
 
     def enter(self, frame):
@@ -27,9 +22,9 @@ class MethodHandler(object):
         # print('---- ENTER')
         n = treeNode(frame)
 
-        n.acc.t_startTime = time.time()
-        n.acc.concurThreadName = threading.current_thread().name
-        self.current.childrenIds.append(n.id)
+        n['acc']['t_startTime'] = time.time()
+        n['acc']['concurThreadName'] = threading.current_thread().name
+        self.current['childrenIds'].append(n['id'])
 
         self.nodes.append(self.current)
         self.current = n
@@ -40,14 +35,14 @@ class MethodHandler(object):
             return
 
         # print('---- EXIT: '+str(frame.f_globals))
-        startTime = self.current.acc.t_startTime
+        startTime = self.current['acc']['t_startTime']
         elapsedTime = time.time() - startTime
 
-        self.current.acc.startTime = math.floor(startTime * 1000.0 * 1000.0 * 1000.0)
-        self.current.acc.elapsedTime = math.floor(elapsedTime * 1000.0 * 1000.0 * 1000.0)
+        self.current['acc']['startTime'] = math.floor(startTime * 1000.0 * 1000.0 * 1000.0)
+        self.current['acc']['elapsedTime'] = math.floor(elapsedTime * 1000.0 * 1000.0 * 1000.0)
         if excepted:
             (exception, value, traceback) = arg
-            self.current.acc.exceptionId = exceptionObject(exception, value, traceback).id
+            self.current['acc']['exceptionId'] = exceptionObject(exception, value, traceback)['id']
 
         # print('EXIT - '+str(self.current))
         if not excepted:
@@ -80,10 +75,8 @@ class Profiler(object):
     def done(self):
         self.stop()
         context = profilingContext(self.context.roots)
-        with open("python-profiler-result.jandy", "wb") as f:
-            tp = TFileObjectTransport(f)
-            context.write(TJSONProtocol(tp))
-            tp.flush()
+        with open("python-profiler-result.jandy", "wt") as f:
+            json.dump(context, f)
 
     def trace(self, frame, event, arg):
         if event == 'call':

@@ -5,10 +5,6 @@ import com.github.jcooky.jaal.common.profile.MethodType;
 import com.github.jcooky.jaal.common.profile.Profiler;
 import io.jandy.java.JavaProfilingContext;
 import io.jandy.java.JavaProfilingContextImpl;
-import io.jandy.org.apache.thrift.TException;
-import io.jandy.org.apache.thrift.protocol.TCompactProtocol;
-import io.jandy.org.apache.thrift.transport.TSimpleFileTransport;
-import io.jandy.org.apache.thrift.transport.TTransport;
 
 /**
  * @author JCooky
@@ -20,17 +16,7 @@ public class JandyProfiler implements Profiler {
   public JandyProfiler() {
     Runtime.getRuntime().addShutdownHook(new Thread() {
       public void run() {
-        TTransport transport = null;
-        try {
-          transport = new TSimpleFileTransport("java-profiler-result.jandy", false, true);
-          context.write(new TCompactProtocol(transport));
-          transport.flush();
-        } catch (TException e) {
-          e.printStackTrace();
-        } finally {
-          if (transport != null)
-            transport.close();
-        }
+        context.write();
       }
     });
   }

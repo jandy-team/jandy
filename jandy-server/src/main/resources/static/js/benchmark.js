@@ -131,12 +131,18 @@
     };
 
     Benchmark.prototype.draw = function(root) {
+      var nodeId;
       if (window.location.hash === null || window.location.hash === '') {
         this.drawTraceTrees(root);
         return this.drawSummary(root);
       } else {
-        this.drawTraceTrees(findById(root, window.location.hash.replace('#', '')));
-        return this.drawSummary(findById(root, window.location.hash.replace('#', '')));
+        nodeId = window.location.hash.replace('#', '');
+        return $.get(ROOT_URL + "/rest/prof/node/" + nodeId).done((function(_this) {
+          return function(node) {
+            _this.drawTraceTrees(node);
+            return _this.drawSummary(node);
+          };
+        })(this));
       }
     };
 

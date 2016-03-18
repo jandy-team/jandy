@@ -108,8 +108,10 @@ class Benchmark
       this.drawTraceTrees(root)
       this.drawSummary(root)
     else
-      this.drawTraceTrees(findById(root, window.location.hash.replace('#', '')))
-      this.drawSummary(findById(root, window.location.hash.replace('#', '')))
+      nodeId = window.location.hash.replace('#', '')
+      $.get(ROOT_URL+"/rest/prof/node/"+nodeId).done (node) =>
+        this.drawTraceTrees(node)
+        this.drawSummary(node)
 
   drawSummary: (root) ->
     @$summary.html('');

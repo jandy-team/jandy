@@ -2,9 +2,11 @@ package io.jandy.java;
 
 import com.github.jcooky.jaal.common.profile.ClassType;
 import com.github.jcooky.jaal.common.profile.MethodType;
+import io.jandy.java.data.ClassObject;
+import io.jandy.java.data.ExceptionObject;
+import io.jandy.java.data.MethodObject;
+import io.jandy.java.data.TreeNode;
 import io.jandy.java.profiler.MethodHandler;
-import io.jandy.org.apache.thrift.protocol.TProtocol;
-import io.jandy.thrift.java.*;
 
 /**
  * @author JCooky
@@ -19,5 +21,5 @@ public interface JavaProfilingContext {
 
   MethodHandler get();
 
-  void write(TProtocol protocol);
+  void write();
 }

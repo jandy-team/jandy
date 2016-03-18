@@ -3,7 +3,7 @@ package io.jandy.java.profiler;
 import com.github.jcooky.jaal.common.profile.ClassType;
 import com.github.jcooky.jaal.common.profile.MethodType;
 import io.jandy.java.JavaProfilingContext;
-import io.jandy.thrift.java.TreeNode;
+import io.jandy.java.data.TreeNode;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -24,7 +24,7 @@ public class MethodHandler {
   public void enter(ClassType owner, MethodType method) {
     treeNodes.push(latest);
     latest = this.context.getTreeNode(owner, method);
-    latest.acc.setConcurThreadName(Thread.currentThread().getName());
+    latest.getAcc().setConcurThreadName(Thread.currentThread().getName());
   }
 
   public void exit(ClassType owner, MethodType method, long startTime, Throwable throwable, long elapsedTime) {
@@ -34,13 +34,13 @@ public class MethodHandler {
 //    assert(latest.method.getOwner().getName().equals(owner.getName()));
 //    assert(latest.method.getOwner().getPackageName().equals(owner.getPackageName()));
 
-    latest.acc.setStartTime(startTime);
-    latest.acc.setElapsedTime(elapsedTime);
+    latest.getAcc().setStartTime(startTime);
+    latest.getAcc().setElapsedTime(elapsedTime);
     if (throwable != null)
-      latest.acc.setExceptionId(context.getExceptionObject(throwable).getId());
+      latest.getAcc().setExceptionId(context.getExceptionObject(throwable).getId());
 
     TreeNode parent = treeNodes.pop();
-    parent.addToChildrenIds(latest.getId());
+    parent.getChildrenIds().add(latest.getId());
     latest = parent;
   }
 

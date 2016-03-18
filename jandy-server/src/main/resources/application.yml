@@ -31,5 +31,4 @@ multipart:
   max-request-size: 1024MB
 
 logging.level:
-  org.hibernate.jdbc.AbstractBatcher: DEBUG
   io.jandy: TRACE

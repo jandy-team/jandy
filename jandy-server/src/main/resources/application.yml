@@ -1,10 +1,4 @@
 spring:
-  jpa:
-#    show-sql: true
-    properties.hibernate:
-      jdbc.batch_size: 50
-      order_inserts: true
-      order_updates: true
   social.github:
     clientId: 5b6118bdbd4066c1ea7a
     clientSecret: 33e25aa49db0a3113ab222473b8e5483e5ec637d
@@ -32,3 +26,5 @@ multipart:
 
 logging.level:
   io.jandy: TRACE
+#  org.hibernate.SQL: debug
+#  org.hibernate.type: trace

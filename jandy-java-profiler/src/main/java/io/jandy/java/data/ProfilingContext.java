@@ -9,10 +9,10 @@ import java.util.List;
  */
 public class ProfilingContext {
   private List<TreeNode> nodes;
-  private ArrayList<MethodObject> methods;
-  private ArrayList<ClassObject> classes;
+  private List<MethodObject> methods;
+  private List<ClassObject> classes;
   private List<ExceptionObject> exceptions;
-  private TreeNode root;
+  private String rootId;
 
   public void setNodes(List<TreeNode> nodes) {
     this.nodes = nodes;
@@ -26,7 +26,7 @@ public class ProfilingContext {
     this.methods = methods;
   }
 
-  public ArrayList<MethodObject> getMethods() {
+  public List<MethodObject> getMethods() {
     return methods;
   }
 
@@ -34,7 +34,7 @@ public class ProfilingContext {
     this.classes = classes;
   }
 
-  public ArrayList<ClassObject> getClasses() {
+  public List<ClassObject> getClasses() {
     return classes;
   }
 
@@ -46,11 +46,11 @@ public class ProfilingContext {
     return exceptions;
   }
 
-  public void setRoot(TreeNode root) {
-    this.root = root;
+  public void setRootId(String rootId) {
+    this.rootId = rootId;
   }
 
-  public TreeNode getRoot() {
-    return root;
+  public String getRootId() {
+    return rootId;
   }
 }

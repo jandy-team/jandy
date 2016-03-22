@@ -8,11 +8,11 @@ import java.util.List;
  * @since 2016-03-16
  */
 public class TreeNode {
-  private String id;
+  private String id = null;
   private boolean root;
-  private List<String> childrenIds = new ArrayList<String>();
   private String methodId;
   private Accumulator acc;
+  private String parentId;
 
   public void setId(String id) {
     this.id = id;
@@ -30,14 +30,6 @@ public class TreeNode {
     return root;
   }
 
-  public List<String> getChildrenIds() {
-    return childrenIds;
-  }
-
-  public void setChildrenIds(List<String> childrenIds) {
-    this.childrenIds = childrenIds;
-  }
-
   public void setMethodId(String methodId) {
     this.methodId = methodId;
   }
@@ -52,5 +44,13 @@ public class TreeNode {
 
   public Accumulator getAcc() {
     return acc;
+  }
+
+  public String getParentId() {
+    return parentId;
+  }
+
+  public void setParentId(String parentId) {
+    this.parentId = parentId;
   }
 }

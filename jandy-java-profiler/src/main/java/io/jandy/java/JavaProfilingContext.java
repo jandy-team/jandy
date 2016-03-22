@@ -13,7 +13,7 @@ import io.jandy.java.profiler.MethodHandler;
  * @since 2015-09-20
  */
 public interface JavaProfilingContext {
-  TreeNode getTreeNode(ClassType classType, MethodType methodType);
+  TreeNode getTreeNode(ClassType classType, MethodType methodType, String parentId);
   MethodObject getMethodObject(ClassType classType, MethodType methodType);
   ClassObject getClassObject(ClassType classType);
   ExceptionObject getExceptionObject(Throwable throwable);

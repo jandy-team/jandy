@@ -13,6 +13,7 @@ public class TreeNode {
   private List<String> childrenIds = new ArrayList<String>();
   private String methodId;
   private Accumulator acc;
+  private String parentId;
 
   public void setId(String id) {
     this.id = id;
@@ -52,5 +53,13 @@ public class TreeNode {
 
   public Accumulator getAcc() {
     return acc;
+  }
+
+  public String getParentId() {
+    return parentId;
+  }
+
+  public void setParentId(String parentId) {
+    this.parentId = parentId;
   }
 }

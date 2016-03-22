@@ -12,7 +12,7 @@ public class ProfilingContext {
   private ArrayList<MethodObject> methods;
   private ArrayList<ClassObject> classes;
   private List<ExceptionObject> exceptions;
-  private TreeNode root;
+  private String rootId;
 
   public void setNodes(List<TreeNode> nodes) {
     this.nodes = nodes;
@@ -46,11 +46,11 @@ public class ProfilingContext {
     return exceptions;
   }
 
-  public void setRoot(TreeNode root) {
-    this.root = root;
+  public String getRootId() {
+    return rootId;
   }
 
-  public TreeNode getRoot() {
-    return root;
+  public void setRootId(String rootId) {
+    this.rootId = rootId;
   }
 }

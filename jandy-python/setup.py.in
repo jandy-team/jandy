@@ -10,5 +10,6 @@ setup(
     description='Jandy Profiler for the Python',
     packages=['jandy'],
     scripts=['scripts/jandy'],
+    test_suite='tests',
     install_requires=['wheel', 'PyYAML', 'requests']
 )

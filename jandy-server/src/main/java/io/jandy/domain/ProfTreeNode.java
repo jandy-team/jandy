@@ -23,8 +23,7 @@ import java.util.List;
 @Entity
 public class ProfTreeNode {
   @Id
-  @GeneratedValue
-  private long id;
+  private String id;
 
   private long elapsedTime;
   private long startTime;
@@ -42,11 +41,11 @@ public class ProfTreeNode {
   @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "parent")
   private List<ProfTreeNode> children = new ArrayList<ProfTreeNode>();
 
-  public long getId() {
+  public String getId() {
     return id;
   }
 
-  public void setId(long id) {
+  public void setId(String id) {
     this.id = id;
   }
 
@@ -62,7 +61,7 @@ public class ProfTreeNode {
     return method;
   }
 
-  public Long getParentId() { return this.parent == null ? null : this.parent.id; }
+  public String getParentId() { return this.parent == null ? null : this.parent.id; }
 
   public void setMethod(ProfMethod method) {
     this.method = method;

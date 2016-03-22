@@ -2,7 +2,7 @@ spring:
   jpa.hibernate:
     ddl-auto: update
   datasource:
-    url: jdbc:mysql://localhost/jandy?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useServerPrepStmts=true
+    url: jdbc:mysql://localhost/jandy?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true
     username: root
     password:
     driver-class-name: com.mysql.jdbc.Driver

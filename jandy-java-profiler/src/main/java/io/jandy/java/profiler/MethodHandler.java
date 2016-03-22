@@ -14,7 +14,7 @@ import java.util.LinkedList;
  */
 public class MethodHandler {
   private final JavaProfilingContext context;
-  private TreeNode root = new TreeNode(), latest = root;
+  private TreeNode latest = new TreeNode(), root = null;
   private Deque<TreeNode> treeNodes = new LinkedList<TreeNode>();
 
   public MethodHandler(JavaProfilingContext context) {
@@ -23,7 +23,11 @@ public class MethodHandler {
 
   public void enter(ClassType owner, MethodType method) {
     treeNodes.push(latest);
-    latest = this.context.getTreeNode(owner, method);
+
+    latest = this.context.getTreeNode(owner, method, latest.getId());
+    if (root == null)
+      root = latest;
+
     latest.getAcc().setConcurThreadName(Thread.currentThread().getName());
   }
 
@@ -39,9 +43,7 @@ public class MethodHandler {
     if (throwable != null)
       latest.getAcc().setExceptionId(context.getExceptionObject(throwable).getId());
 
-    TreeNode parent = treeNodes.pop();
-    parent.getChildrenIds().add(latest.getId());
-    latest = parent;
+    latest = treeNodes.pop();
   }
 
   public TreeNode getRoot() {

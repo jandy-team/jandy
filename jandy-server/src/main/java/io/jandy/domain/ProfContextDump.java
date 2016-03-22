@@ -3,6 +3,7 @@ package io.jandy.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.util.*;
@@ -74,6 +75,7 @@ public class ProfContextDump implements Iterable<ProfTreeNode> {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Iterator<ProfTreeNode> iterator() {
     return new JavaTreeNodeIterator(root);
   }
@@ -104,6 +106,7 @@ public class ProfContextDump implements Iterable<ProfTreeNode> {
     return this;
   }
 
+  @Transactional(readOnly = true)
   private class JavaTreeNodeIterator implements Iterator<ProfTreeNode> {
 
     private Deque<ProfTreeNode> nodes = new LinkedList<>();

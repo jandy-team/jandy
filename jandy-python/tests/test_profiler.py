@@ -5,6 +5,7 @@ import json
 
 from jandy.profiler import Profiler
 
+
 class Tester1(object):
     def t1(self):
         print('t1')
@@ -16,7 +17,7 @@ class Tester1(object):
 
     def t2(self):
         print('t2')
-        raise RuntimeError("test exception")
+        # raise RuntimeError("test exception")
 
 
 class TestJandyProfiler(unittest.TestCase):
@@ -33,8 +34,10 @@ class TestJandyProfiler(unittest.TestCase):
             context = json.load(file)
 
         print(context)
-        self.assertIsNotNone(context['root'])
+        self.assertIsNotNone(context['rootId'])
+        self.assertEquals(len(context['nodes']), 3)
 
+        self.assertEquals(len([n for n in context['nodes'] if n['parentId'] is not None]), 2)
 
 if __name__ == '__main__':
     unittest.main()

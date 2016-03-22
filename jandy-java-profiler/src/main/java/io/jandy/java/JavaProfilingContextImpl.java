@@ -19,7 +19,7 @@ import java.util.*;
  */
 public class JavaProfilingContextImpl extends ThreadLocal<MethodHandler> implements JavaProfilingContext {
 
-  private final List<TreeNode> roots = new ArrayList<TreeNode>();
+  private final List<MethodHandler> methodHandlers = new ArrayList<MethodHandler>();
 
   private final List<TreeNode> nodes = new ArrayList<TreeNode>();
   private final Map<MethodKey, MethodObject> methods = new HashMap<MethodKey, MethodObject>();
@@ -30,12 +30,13 @@ public class JavaProfilingContextImpl extends ThreadLocal<MethodHandler> impleme
     super();
   }
 
-  public TreeNode getTreeNode(ClassType classType, MethodType methodType) {
+  public TreeNode getTreeNode(ClassType classType, MethodType methodType, String parentId) {
     TreeNode n = new TreeNode();
     n.setId(UUID.randomUUID().toString());
     n.setMethodId(getMethodObject(classType, methodType).getId());
     n.setAcc(new Accumulator());
     n.setRoot(false);
+    n.setParentId(parentId);
     synchronized(nodes) {
       nodes.add(n);
     }
@@ -111,22 +112,24 @@ public class JavaProfilingContextImpl extends ThreadLocal<MethodHandler> impleme
   }
 
   private ProfilingContext getProfilingContext() {
-    ProfilingContext m = new ProfilingContext();
-
-    m.setNodes(nodes);
-    m.setMethods(new ArrayList<MethodObject>());
-    m.getMethods().addAll(methods.values());
-    m.setClasses(new ArrayList<ClassObject>());
-    m.getClasses().addAll(classes.values());
-    m.setExceptions(exceptions);
-
-    m.setRoot(new TreeNode());
-    m.getRoot().setRoot(true);
-    for (TreeNode n : roots) {
-      if (n.getChildrenIds() != null && !n.getChildrenIds().isEmpty()) {
-        m.getRoot().getChildrenIds().add(n.getChildrenIds().get(0));
+    TreeNode root = new TreeNode();
+    root.setId(UUID.randomUUID().toString());
+    root.setRoot(true);
+    for (MethodHandler h : methodHandlers) {
+      if (h.getRoot() != null) {
+        h.getRoot().setParentId(root.getId());
       }
     }
+
+    nodes.add(0, root);
+
+    ProfilingContext m = new ProfilingContext();
+    m.setNodes(nodes);
+    m.setMethods(new ArrayList<MethodObject>(methods.values()));
+    m.setClasses(new ArrayList<ClassObject>(classes.values()));
+    m.setExceptions(exceptions);
+
+    m.setRootId(root.getId());
 
     return m;
   }
@@ -148,7 +151,7 @@ public class JavaProfilingContextImpl extends ThreadLocal<MethodHandler> impleme
   @Override
   protected MethodHandler initialValue() {
     MethodHandler handler = new MethodHandler(this);
-    roots.add(handler.getRoot());
+    methodHandlers.add(handler);
     return handler;
   }
 }

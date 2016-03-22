@@ -12,15 +12,17 @@ import time
 class MethodHandler(object):
     def __init__(self):
         self.nodes = []
-        self.current = {'childrenIds': list()}
-        self.root = self.current
+        self.current = {'id': None, 'childrenIds': list()}
+        self.root = None
 
     def enter(self, frame):
         if '__package__' in frame.f_globals.keys() and frame.f_globals['__package__'] == 'jandy':
             return
 
         # print('---- ENTER')
-        n = treeNode(frame)
+        n = treeNode(frame, self.current['id'])
+        if self.root is None:
+            self.root = n
 
         n['acc']['t_startTime'] = time.time()
         n['acc']['concurThreadName'] = threading.current_thread().name
@@ -51,15 +53,17 @@ class MethodHandler(object):
 
 class MethodHandlerContext(object):
     def __init__(self):
-        self.roots = []
+        self.methodHandlers = []
         self.local = threading.local()
 
     def get(self):
         if hasattr(self.local, 'methodHandler') is not True:
             self.local.methodHandler = MethodHandler()
-            self.roots.append(self.local.methodHandler.root)
+            self.methodHandlers.append(self.local.methodHandler)
         return self.local.methodHandler
 
+    def roots(self):
+        return [m.root for m in self.methodHandlers]
 
 class Profiler(object):
 
@@ -74,7 +78,7 @@ class Profiler(object):
 
     def done(self):
         self.stop()
-        context = profilingContext(self.context.roots)
+        context = profilingContext(self.context.roots())
         with open("python-profiler-result.jandy", "wt") as f:
             json.dump(context, f)
 

@@ -12,12 +12,13 @@ classes = {}
 exceptions = []
 
 
-def treeNode(frame=None):
+def treeNode(frame=None, parentId=None):
     n = {
         'id': str(uuid.uuid4()),
         'acc': {},
         'methodId': methodObject(frame=frame)['id'],
         'childrenIds': [],
+        'parentId': parentId,
         'root': False
     }
 
@@ -98,19 +99,22 @@ def exceptionObject(exception, value, traceback):
 
 
 def profilingContext(roots):
+    root = {
+        'id': str(uuid.uuid4()),
+        'childrenIds': [],
+        'parentId': None,
+        'root': True
+    }
     context = {
-        'nodes': nodes,
+        'nodes': [root] + nodes,
         'methods': list(methods.values()),
         'classes': list(classes.values()),
         'exceptions': exceptions,
-        'root': {
-            'id': str(uuid.uuid4()),
-            'childrenIds': [],
-            'root': True
-        }
+        'rootId': root['id']
     }
 
     for n in roots:
-        if n['childrenIds'] is not None and len(n['childrenIds']) > 0:
-            context['root']['childrenIds'].append(n['childrenIds'][0])
+        if n is not None:
+            root['childrenIds'].append(n['id'])
+            n['parentId'] = root['id']
     return context

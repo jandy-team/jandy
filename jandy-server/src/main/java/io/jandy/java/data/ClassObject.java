@@ -1,5 +1,7 @@
 package io.jandy.java.data;
 
+import java.util.Objects;
+
 /**
  * @author JCooky
  * @since 2016-03-16
@@ -31,5 +33,20 @@ public class ClassObject {
 
   public String getPackageName() {
     return packageName;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    ClassObject that = (ClassObject) o;
+    return
+        Objects.equals(name, that.name) &&
+        Objects.equals(packageName, that.packageName);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, packageName);
   }
 }

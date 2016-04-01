@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/jcooky/jandy.svg?branch=master)](https://travis-ci.org/jcooky/jandy)
+[![Build Status](https://travis-ci.org/jcooky/jandy.svg?branch=v0.3.2)](https://travis-ci.org/jcooky/jandy)
 
 [![Youtube](http://img.youtube.com/vi/egQPHdQj-UU/0.jpg)](http://www.youtube.com/watch?v=egQPHdQj-UU)
 # Jandy 
@@ -14,7 +14,7 @@ This project is made for opensource developers. The purpose of this project is a
 * Provides to report by E-Mail, Twitter
 
 # Architecture & Introduction Paper
-![Architecture](https://raw.github.com/jcooky/jandy/master/docs/img/arch.jpg "Jandy Service Flow")
+![Architecture](https://raw.github.com/jcooky/jandy/v0.3.2/docs/img/arch.jpg "Jandy Service Flow")
 * Korean: [Slideshare](http://www.slideshare.net/ssuserea348e/jandy-introduction-paper)
 
 # How to build
@@ -33,7 +33,7 @@ This project is made for opensource developers. The purpose of this project is a
 * ex) https://github.com/jcooky/jasypt-test
 
 # License
-This project is licensed by [GPLv3](https://github.com/jcooky/jandy/blob/master/LICENSE)
+This project is licensed by [GPLv3](https://github.com/jcooky/jandy/blob/v0.3.2/LICENSE)
 
 # ThirdParty Libraries
 * Spring Boot - http://projects.spring.io/spring-boot/

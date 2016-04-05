@@ -4,7 +4,7 @@
 <header class="jumbotron">
   <div class="container-fluid">
     <p>
-      <img src="${root}/img/logo.png">
+      <img src="${root}/images/logo.png">
     </p>
     <div style="color: #fff;">
       <h2>Performance Analytics Service - Jandy</h2>
@@ -14,40 +14,34 @@
         for open-source developer using at Github.<br>
       </p>
     </div>
-    <p>
-      <form action="${root}/signin/github" method="POST">
-        <button type="submit" class="btn btn btn-lg">Sign in with GitHub</button>
-        <input type="hidden" name="scope" value="${github_scopes}" />
-      </form>
-      <#--<a class="btn btn-default btn-lg" href="#" role="button">-->
-        <#--Getting Started-->
-      <#--</a>-->
-    </p>
+
+    <a href="${root}/login" role="button" class="btn btn btn-lg">Sign in with GitHub</a>
+
   </div>
-  <img class="color-short-line" src="${root}/img/index/color_shortline.gif">
+  <img class="color-short-line" src="${root}/images/index/color_shortline.gif">
 </header>
 <div id="features" class="container-fluid">
   <section class="row">
     <div class="col-lg-3 features-item">
-      <img src="${root}/img/index/feature01.gif">
+      <img src="${root}/images/index/feature01.gif">
       <h5>
         To integrate with Github and Travis-CI
       </h5>
     </div>
     <div class="col-lg-3 features-item">
-      <img src="${root}/img/index/feature02.png">
+      <img src="${root}/images/index/feature02.png">
       <h5>
         Automatically performance analysis
       </h5>
     </div>
     <div class="col-lg-3 features-item">
-      <img src="${root}/img/index/feature03.png">
+      <img src="${root}/images/index/feature03.png">
       <h5>
         Support for ruby, python, java and another languages
       </h5>
     </div>
     <div class="col-lg-3 features-item">
-      <img src="${root}/img/index/feature04.png">
+      <img src="${root}/images/index/feature04.png">
       <h5>
         Efficient, Intuitive and Intelligent data visualization
       </h5>
@@ -68,7 +62,7 @@
           </ul>
         </div>
         <div class="col-lg-5 desc-aside">
-          <img src="${root}/img/index/big-feature01.png">
+          <img src="${root}/images/index/big-feature01.png">
         </div>
       </div>
     </div>
@@ -88,7 +82,7 @@
           </ul>
         </div>
         <div class="col-lg-5 desc-aside">
-          <img src="${root}/img/index/big-feature02.png">
+          <img src="${root}/images/index/big-feature02.png">
         </div>
       </div>
     </div>
@@ -106,7 +100,7 @@
           </ul>
         </div>
         <div class="col-lg-5 desc-aside">
-          <img src="${root}/img/index/big-feature03.png">
+          <img src="${root}/images/index/big-feature03.png">
         </div>
       </div>
     </div>
@@ -121,7 +115,7 @@
           <br>
         </div>
         <div class="col-lg-5 desc-aside">
-          <img src="${root}/img/index/big-feature04.png">
+          <img src="${root}/images/index/big-feature04.png">
         </div>
       </div>
     </div>

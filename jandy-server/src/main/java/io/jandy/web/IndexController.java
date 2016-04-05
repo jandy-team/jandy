@@ -1,8 +1,12 @@
 package io.jandy.web;
 
-import io.jandy.config.social.SecurityContext;
+import io.jandy.service.GitHubService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.io.IOException;
 
 /**
  * @author JCooky
@@ -10,10 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 public class IndexController {
-  @RequestMapping(value = "/")
-  public String index() {
+  @Autowired
+  private GitHubService gitHubService;
 
-    if (SecurityContext.userSignedIn()) {
+  @RequestMapping(value = "/")
+  public String index() throws IOException {
+
+    if (!gitHubService.getGitHub().isAnonymous()) {
       return "forward:/repos";
     } else {
       return "index";

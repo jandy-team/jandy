@@ -40,27 +40,28 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="navbar-nav nav">
-            <li><a href="${root}/repos">Repositories</a></li>
+            <#if self??>
+              <li><a href="${root}/repos">Repositories</a></li>
+            </#if>
           </ul>
           <ul class="navbar-nav nav navbar-right">
-            <#if user??>
+            <#if self??>
               <li class="dropdown">
                 <a href="#" style="padding-top: 0;" class="navbar-brand" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <span style="display: inline-block; margin-top: 15px;">${user.login}</span>
+                  <span style="display: inline-block; margin-top: 15px;">${self.login}</span>
                   <#--<div style="display:inline-block; background-image: url('${user.avatarUrl}'); background-size: cover; width: 30px; height: 30px; padding-top: -10px; border-radius: 5px;">&nbsp;</div>-->
-                  <img src="${user.avatarUrl}" style="display: inline-block; background-size: cover; border-radius: 5px;" width="40px" height="40px">
+                  <img src="${self.avatarUrl}" style="display: inline-block; background-size: cover; border-radius: 5px;" width="40px" height="40px">
                   <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
                   <li><a href="${root}/profile">Profile</a></li>
-                  <li><a href="${root}/signout">Sign out</a></li>
+                  <li><a href="${root}/logout">Sign out</a></li>
                 </ul>
               </li>
             <#else>
               <li>
-                <form action="${root}/signin/github" method="POST">
-                  <button type="submit" class="navbar-btn btn btn-default">Sign in with GitHub</button>
-                  <input type="hidden" name="scope" value="${github_scopes}" />
+                <form>
+                  <a href="${root}/login" role="button" class="navbar-btn btn btn-default">Sign in with GitHub</a>
                 </form>
               </li>
             </#if>

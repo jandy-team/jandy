@@ -1,21 +1,15 @@
 package io.jandy.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import io.jandy.domain.Project;
 import io.jandy.domain.ProjectRepository;
 import io.jandy.domain.User;
-import io.jandy.domain.UserRepository;
-import io.jandy.exception.NotSignedInException;
 import io.jandy.exception.UserNotFoundException;
 import io.jandy.service.GitHubService;
 import io.jandy.service.UserService;
 import io.jandy.util.ColorUtils;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.DynaBeanPropertyMapDecorator;
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.github.GHOrganization;
 import org.kohsuke.github.GHRepository;
@@ -32,7 +26,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static org.apache.commons.lang3.StringUtils.lowerCase;
 
@@ -53,12 +46,12 @@ public class ProfileController {
   private ProjectRepository projectRepository;
 
   @RequestMapping(method = RequestMethod.GET)
-  public ModelAndView index() throws IOException, UserNotFoundException, NotSignedInException, InvocationTargetException, IllegalAccessException {
-    return index(gitHubService.getUser().getLogin());
+  public ModelAndView index() throws IOException, UserNotFoundException, InvocationTargetException, IllegalAccessException {
+    return index(gitHubService.getSelf().getLogin());
   }
 
   @RequestMapping(value = "/{login}", method = RequestMethod.GET)
-  public ModelAndView index(@PathVariable String login) throws IOException, UserNotFoundException, NotSignedInException, InvocationTargetException, IllegalAccessException {
+  public ModelAndView index(@PathVariable String login) throws IOException, UserNotFoundException, InvocationTargetException, IllegalAccessException {
 
     logger.debug("calling page 'index' ");
 
@@ -110,7 +103,7 @@ public class ProfileController {
 
   @RequestMapping(value = "/project", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
-  public void importProject(@RequestBody Map<String, ?> req) throws IOException, NotSignedInException, UserNotFoundException {
+  public void importProject(@RequestBody Map<String, ?> req) throws IOException, UserNotFoundException {
     String[] strs = StringUtils.split((String) req.get("fullName"), '/');
     String account = strs[0].trim(), name = strs[1].trim();
 

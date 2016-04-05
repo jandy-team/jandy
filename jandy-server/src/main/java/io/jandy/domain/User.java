@@ -25,7 +25,7 @@ public class User {
   @Transient
   private String color;
 
-  @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "user")
+  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, mappedBy = "user")
   private List<Project> projects = new ArrayList<>();
 
 

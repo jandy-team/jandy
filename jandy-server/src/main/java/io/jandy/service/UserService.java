@@ -2,19 +2,14 @@ package io.jandy.service;
 
 import io.jandy.domain.User;
 import io.jandy.domain.UserRepository;
-import io.jandy.exception.NotSignedInException;
 import io.jandy.exception.UserNotFoundException;
+import org.kohsuke.github.GHMyself;
 import org.kohsuke.github.GHUser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.social.connect.Connection;
-import org.springframework.social.github.api.GitHub;
-import org.springframework.social.github.api.GitHubUserProfile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.security.cert.Extension;
 
 /**
  * @author user1
@@ -28,7 +23,7 @@ public class UserService {
   private GitHubService gitHubService;
 
   @Transactional
-  public User getUser(GHUser ghUser) throws IOException {
+  private User getUser(GHUser ghUser) throws IOException {
     User user = userRepository.findByGitHubId(ghUser.getId());
     if (user == null) {
       user = new User();
@@ -42,41 +37,17 @@ public class UserService {
     return userRepository.save(user);
   }
 
-  public User getUser(long id) {
-    return userRepository.findOne(id);
-  }
-
   public User getUser(String login) throws IOException, UserNotFoundException {
-    try {
-      return getUser(gitHubService.getUser(login));
-    } catch (NotSignedInException e) {
-      throw new UserNotFoundException(e);
-    }
+    GHUser ghUser = gitHubService.getUser(login);
+    if (ghUser == null)
+      throw new UserNotFoundException();
+    return getUser(ghUser);
   }
 
-  public User getSelf() throws IOException, NotSignedInException {
-    return getUser(gitHubService.getUser());
-  }
-
-  @Transactional
-  public User signIn(long userId, Connection<? extends GitHub> connection) {
-    GitHubUserProfile profile = connection.getApi().userOperations().getUserProfile();
-    User user = userRepository.findOne(userId);
-    user.setLogin(profile.getLogin());
-    user.setGitHubId(profile.getId());
-    user.setAvatarUrl(profile.getAvatarUrl());
-
-    return userRepository.save(user);
-  }
-
-  @Transactional
-  public User signUp(Connection<? extends GitHub> connection) {
-    GitHubUserProfile profile = connection.getApi().userOperations().getUserProfile();
-    User user = new User();
-    user.setLogin(profile.getLogin());
-    user.setGitHubId(profile.getId());
-    user.setAvatarUrl(profile.getAvatarUrl());
-
-    return userRepository.save(user);
+  public User getSelf() throws IOException {
+    GHMyself self = gitHubService.getSelf();
+    if (self == null)
+      return null;
+    return getUser(self);
   }
 }

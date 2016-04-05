@@ -39,7 +39,7 @@
                          class="btn btn-primary btn-sm"
                          role="button">${(build.commit.sha?substring(0, 7))!"c90978e"}</a>
                     </span>
-                    <img class="pull-right" src="${(build.commit.committerAvatarUrl)!user.avatarUrl}"
+                    <img class="pull-right" src="${(build.commit.committerAvatarUrl)!"https://avatars.githubusercontent.com/u/1345314?v=3"}"
                          style="margin-right: 5px; display: inline-block; background-size: cover; border-radius: 5px;"
                          width="30px" height="30px">
                   </h4>

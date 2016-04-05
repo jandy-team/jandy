@@ -1,8 +1,4 @@
 spring:
-  social.github:
-    clientId: 5b6118bdbd4066c1ea7a
-    clientSecret: 33e25aa49db0a3113ab222473b8e5483e5ec637d
-    scope: email, public_repo, user
   application.name: jandy
   freemarker:
     requestContextAttribute: rc
@@ -16,8 +12,18 @@ spring:
       mail.smtp.starttls.enable: true
       mail.smtp.ssl.trust: smtp.gmail.com
 security:
-  ignored: true
   basic.enabled: false
+  oauth2:
+    client:
+      clientId: 5b6118bdbd4066c1ea7a
+      clientSecret: 33e25aa49db0a3113ab222473b8e5483e5ec637d
+      scope: email, public_repo, user
+      accessTokenUri: https://github.com/login/oauth/access_token
+      userAuthorizationUri: https://github.com/login/oauth/authorize
+      clientAuthenticationScheme: form
+    resource:
+      userInfoUri: https://api.github.com/user
+      preferTokenInfo: false
 server.port: 3000
 multipart:
   enabled: true

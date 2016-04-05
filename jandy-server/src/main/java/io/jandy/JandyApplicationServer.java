@@ -1,14 +1,15 @@
 package io.jandy;
 
 import com.mysema.query.jpa.impl.JPAQueryFactory;
+import io.jandy.config.WebSecurityConfig;
 import org.springframework.boot.actuate.system.ApplicationPidFileWriter;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.repository.support.DomainClassConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.social.config.annotation.EnableSocial;
 
 import javax.inject.Provider;
 import javax.persistence.EntityManager;
@@ -18,7 +19,6 @@ import javax.persistence.EntityManager;
  */
 @SpringBootApplication
 @EnableAsync
-@EnableSocial
 public class JandyApplicationServer {
 
   @Bean

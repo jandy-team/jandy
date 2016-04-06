@@ -58,7 +58,7 @@ This project is licensed by [GPLv3](https://github.com/jcooky/jandy/blob/master/
 * prettytime - http://www.ocpsoft.org/prettytime/
 * slf4j - http://slf4j.org/
 * PyYAML - http://pyyaml.org/
-* poster - http://atlee.ca/software/poster/
+* requests - http://docs.python-requests.org/
 
 # Maintainer
 * @JCooky

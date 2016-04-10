@@ -1,6 +1,5 @@
 package io.jandy.web;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import io.jandy.domain.Project;
@@ -9,11 +8,11 @@ import io.jandy.domain.User;
 import io.jandy.exception.UserNotFoundException;
 import io.jandy.service.GitHubService;
 import io.jandy.service.UserService;
+import io.jandy.service.data.GHOrg;
+import io.jandy.service.data.GHRepo;
+import io.jandy.service.data.GHUser;
 import io.jandy.util.ColorUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.kohsuke.github.GHOrganization;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GHUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,48 +46,40 @@ public class ProfileController {
 
   @RequestMapping(method = RequestMethod.GET)
   public ModelAndView index() throws IOException, UserNotFoundException, InvocationTargetException, IllegalAccessException {
-    return index(gitHubService.getSelf().getLogin());
-  }
 
-  @RequestMapping(value = "/{login}", method = RequestMethod.GET)
-  public ModelAndView index(@PathVariable String login) throws IOException, UserNotFoundException, InvocationTargetException, IllegalAccessException {
+    if (userService.isAnonymous())
+      return new ModelAndView("redirect:/");
 
     logger.debug("calling page 'index' ");
 
-    GHUser ghUser = gitHubService.getGitHub().getUser(login);
-    List<Map<String, Object>> organizations = Lists.newArrayList(ghUser.getOrganizations().stream().map(org -> {
-      try {
-        return ImmutableMap.<String, Object>builder()
-            .put("login", org.getLogin())
-            .put("publicRepos", org.getPublicRepoCount())
-            .build();
-      } catch (IOException e) {
-        logger.error(e.getMessage(), e);
-        throw new RuntimeException(e);
-      }
-    }).collect(Collectors.toList()));
+    GHUser ghUser = gitHubService.getUser();
+    List<GHOrg> organizations = gitHubService.getUserOrgs(ghUser.getLogin()).stream()
+        .map(org -> gitHubService.getOrg((String) org.getLogin()))
+        .collect(Collectors.toList());
     logger.trace("fetch from github, data: {}", organizations);
 
-    User user = userService.getUser(login);
-    logger.trace("get user");
 
-    Map<String, List<GHRepository>> repositories = new LinkedHashMap<>();
-    repositories.put(login, Lists.newArrayList(ghUser.getRepositories().values()));
-    for (GHOrganization org : ghUser.getOrganizations()) {
-      repositories.put(org.getLogin(), Lists.newArrayList(org.getRepositories().values()));
+    Map<String, List<GHRepo>> repositories = new LinkedHashMap<>();
+    repositories.put(ghUser.getLogin(), gitHubService.getUserRepos(ghUser.getLogin()));
+    for (GHOrg org : gitHubService.getUserOrgs(ghUser.getLogin())) {
+      repositories.put(org.getLogin(), gitHubService.getOrgRepos(org.getLogin()));
     }
     logger.trace("get repositories: {}", repositories);
 
     List<String> randomColors = ColorUtils.getRandomColors(organizations.size() + 1);
     Map<String, Object> colors = new HashMap<>();
     for (int i = 0; i < organizations.size(); ++i) {
-      colors.put(lowerCase((String) organizations.get(i).get("login")), randomColors.get(i));
+      colors.put(lowerCase(organizations.get(i).getLogin()), randomColors.get(i));
     }
 
-    colors.put(lowerCase(login), Iterables.getLast(randomColors));
+    User user = userService.getSelf();
+    logger.trace("get user");
+
+    colors.put(lowerCase(ghUser.getLogin()), Iterables.getLast(randomColors));
     logger.trace("make random colors: {}", colors);
 
-    Set<String> imported = user.getProjects().stream().map((p) -> Long.toString(p.getGitHubId()))
+    Set<Long> imported = user.getProjects().stream()
+        .map(Project::getGitHubId)
         .collect(Collectors.toSet());
     logger.trace("imported: {}", imported);
 
@@ -109,7 +100,7 @@ public class ProfileController {
 
     Project project = projectRepository.findByAccountAndName(account, name);
     if (project == null) {
-      GHRepository repository = gitHubService.getGitHub().getRepository(account + "/" + name);
+      GHRepo repository = gitHubService.getRepo(account, name);
       project = new Project();
       project.setAccount(account);
       project.setGitHubId(repository.getId());

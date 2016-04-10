@@ -16,10 +16,10 @@
               </div>
             </a>
             <#foreach org in organizations>
-              <a href="#repos-${org['login']?lower_case}" class="list-group-item" style="border-left: 5px solid ${colors[org['login']?lower_case]};">
+              <a href="#repos-${org.login?lower_case}" class="list-group-item" style="border-left: 5px solid ${colors[org['login']?lower_case]};">
                 <div class="row">
-                  <span class="col-md-9">${org['login']}</span>
-                  <span class="col-md-3" style="text-align: center; border-left: 1px #dddddd solid;">${org['publicRepos']}</span>
+                  <span class="col-md-9">${org.login}</span>
+                  <span class="col-md-3" style="text-align: center; border-left: 1px #dddddd solid;">${org.publicRepos}</span>
                 </div>
               </a>
             </#foreach>
@@ -36,8 +36,8 @@
               <div class="panel-body">
                 <article class="container-fluid">
                   <#list repositories[ownerName] as repo>
-                    <div class="row" style="vertical-align: middle; height: 30px;" data-full-name="${repo.owner.login}/${repo.name}"
-                         data-github-id="${repo.id}">
+                    <div class="row" style="vertical-align: middle; height: 30px;" data-full-name="${repo.fullName}"
+                         data-github-id="${repo.id?c}">
                       <div class="col-md-12">
                         <input type="checkbox" role="bootstrap-switch" data-size="small"
                                data-on-color="success" ${imported?seq_contains(repo.id)?then("checked", "")}>

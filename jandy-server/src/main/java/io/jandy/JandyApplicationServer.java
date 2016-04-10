@@ -1,6 +1,10 @@
 package io.jandy;
 
 import com.mysema.query.jpa.impl.JPAQueryFactory;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.actuate.system.ApplicationPidFileWriter;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -17,7 +21,8 @@ import javax.persistence.EntityManager;
  */
 @SpringBootApplication
 @EnableAsync
-public class JandyApplicationServer {
+public class JandyApplicationServer implements CommandLineRunner {
+  private final Logger logger = LoggerFactory.getLogger(JandyApplicationServer.class);
 
   @Bean
   public JPAQueryFactory jpaQueryFactory(Provider<EntityManager> em) {
@@ -27,6 +32,12 @@ public class JandyApplicationServer {
   @Bean
   public DomainClassConverter domainClassConverter(ConversionService conversionService) {
     return new DomainClassConverter(conversionService);
+  }
+
+  @Override
+  public void run(String... args) throws Exception {
+    String version = IOUtils.toString(Thread.currentThread().getContextClassLoader().getSystemResourceAsStream("VERSION"));
+    logger.info("Launching JandyApplication v{}", version);
   }
 
   public static void main(String[] args) {

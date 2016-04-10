@@ -1,6 +1,5 @@
 package io.jandy.web.interceptor;
 
-import com.sun.xml.internal.ws.api.policy.PolicyResolver;
 import io.jandy.domain.User;
 import io.jandy.service.UserService;
 import io.jandy.service.data.GHUser;

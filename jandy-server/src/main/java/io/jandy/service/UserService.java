@@ -3,8 +3,7 @@ package io.jandy.service;
 import io.jandy.domain.User;
 import io.jandy.domain.UserRepository;
 import io.jandy.exception.UserNotFoundException;
-import org.kohsuke.github.GHMyself;
-import org.kohsuke.github.GHUser;
+import io.jandy.service.data.GHUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +31,7 @@ public class UserService {
 
     user.setAvatarUrl(ghUser.getAvatarUrl());
     user.setLogin(ghUser.getLogin());
-    user.setPublicRepos(ghUser.getPublicRepoCount());
+    user.setPublicRepos(ghUser.getPublicRepos());
     user.setEmail(ghUser.getEmail());
     return userRepository.save(user);
   }
@@ -45,9 +44,11 @@ public class UserService {
   }
 
   public User getSelf() throws IOException {
-    GHMyself self = gitHubService.getSelf();
-    if (self == null)
-      return null;
-    return getUser(self);
+    GHUser self = gitHubService.getUser();
+    return self != null ? getUser(self) : null;
+  }
+
+  public boolean isAnonymous() {
+    return gitHubService.isAnonymous();
   }
 }

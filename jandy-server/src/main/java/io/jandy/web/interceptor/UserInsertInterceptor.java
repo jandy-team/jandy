@@ -1,7 +1,13 @@
 package io.jandy.web.interceptor;
 
+import com.sun.xml.internal.ws.api.policy.PolicyResolver;
+import io.jandy.domain.User;
 import io.jandy.service.UserService;
+import io.jandy.service.data.GHUser;
+import org.hsqldb.ClientConnection;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.client.OAuth2ClientContext;
+import org.springframework.security.oauth2.config.annotation.web.configuration.OAuth2ClientConfiguration;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -19,10 +25,13 @@ public class UserInsertInterceptor implements HandlerInterceptor {
   @Autowired
   private UserService userService;
 
-
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-    request.setAttribute("self", userService.getSelf());
+    User self = null;
+    if (!request.getRequestURI().endsWith("/login") && !userService.isAnonymous())
+      self = userService.getSelf();
+
+    request.setAttribute("self", self);
     return true;
   }
 

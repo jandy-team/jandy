@@ -20,7 +20,7 @@ public class IndexController {
   @RequestMapping(value = "/")
   public String index() throws IOException {
 
-    if (!gitHubService.getGitHub().isAnonymous()) {
+    if (!gitHubService.isAnonymous()) {
       return "forward:/repos";
     } else {
       return "index";

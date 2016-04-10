@@ -11,6 +11,9 @@ spring:
     properties:
       mail.smtp.starttls.enable: true
       mail.smtp.ssl.trust: smtp.gmail.com
+  redis:
+    type: embedded
+    port: ${random.int[10024,65536]}
 security:
   basic.enabled: false
   oauth2:
@@ -29,7 +32,6 @@ multipart:
   enabled: true
   max-file-size: 512MB
   max-request-size: 1024MB
-
 logging.level:
   io.jandy: TRACE
 #  org.hibernate.SQL: debug

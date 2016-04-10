@@ -6,7 +6,7 @@ import io.jandy.exception.BadgeUnknownException;
 import io.jandy.exception.ProjectNotRegisteredException;
 import io.jandy.service.GitHubService;
 import io.jandy.service.UserService;
-import org.kohsuke.github.GHUser;
+import io.jandy.service.data.GHUser;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,12 +88,8 @@ public class ProjectController {
         b.setBuildAt(p.format(DatatypeConverter.parseDateTime(b.getFinishedAt())));
       if (b.getCommit() != null) {
         GHUser user = null;
-        try {
-          user = github.getUser(b.getCommit().getCommitterName());
-          b.getCommit().setCommitterAvatarUrl(user.getAvatarUrl());
-        } catch (IOException e) {
-          logger.error(e.getMessage(), e);
-        }
+        user = github.getUser(b.getCommit().getCommitterName());
+        b.getCommit().setCommitterAvatarUrl(user.getAvatarUrl());
       }
     });
 

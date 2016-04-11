@@ -265,7 +265,7 @@
             </goals>
             <configuration>
               <target>
-                <echo file="${project.build.directory}/generated-resources/VERSION">
+                <echo file="${project.basedir}/src/main/resources/VERSION">
                   ${project.version}
                 </echo>
               </target>

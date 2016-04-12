@@ -41,7 +41,7 @@
                       <div class="col-md-12">
                         <input type="checkbox" role="bootstrap-switch" data-size="small"
                                data-on-color="success" ${imported?seq_contains(repo.id)?then("checked", "")}>
-                        <span data-toggle="tooltip" data-placement="right" title="${repo.description}" style="font-size: 16px;">${repo.name}</span>
+                        <span data-toggle="tooltip" data-placement="right" title="${repo.description!""}" style="font-size: 16px;">${repo.name}</span>
                       </div>
                     </div>
                   </#list>

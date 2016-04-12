@@ -20,20 +20,8 @@ This project is made for opensource developers. The purpose of this project is a
 ![Architecture](https://raw.github.com/jcooky/jandy/master/docs/img/arch.jpg "Jandy Service Flow")
 * Korean: [Slideshare](http://www.slideshare.net/ssuserea348e/jandy-introduction-paper)
 
-# How to build
-## Prebuild Specification
-* JDK 1.8
-* Maven
-* Thrift command line program 0.9.2
-* Python 2.7
-
-## Build
-* #mvn -DskipTests=true clean package
-  * The jandy-server is packaged named by “jandy-server-#VERSION.jar” in jandy-server/target location
-  * Executing method is “java -jar jandy-server-#VERSION.jar”
-    * Access <code>http://localhost:3000</code> for verifying installation
-  * Profiling method is "jandy java -jar <project>.jar"
-* ex) https://github.com/jcooky/jasypt-test
+# Contributing & How to build
+Read contributing document: [CONTRIBUTING.md](https://github.com/jcooky/jandy/blob/master/CONTRIBUTING.md)
 
 # License
 This project is licensed by [GPLv3](https://github.com/jcooky/jandy/blob/master/LICENSE)

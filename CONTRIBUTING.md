@@ -33,7 +33,7 @@ Some things that will increase the chance that your pull request is accepted:
 - Follow [Google style guide](https://google.github.io/styleguide/javaguide.html).
 - Write a [good commit message](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
 
-## Running profiles on local machine instaed of Travis-CI
+## Running profiles on local machine instead of Travis-CI
 
 1. Access <code>localhost:3000</code>, and then sign in jandy by GitHub OAuth.
 2. Write <code>.jandy.yml</code> in target repository.

@@ -63,7 +63,7 @@ def classObject(name=None, packageName=None, frame=None):
             return classObject(name=cls.__name__, packageName=pkg)
         else:
             moduleName = frame.f_globals['__package__'] if '__package__' in frame.f_globals.keys() else ''
-            name = frame.f_globals['__name__']
+            name = frame.f_globals.get('__name__')
             return classObject(name=name, packageName=moduleName)
     else:
         if packageName is None:

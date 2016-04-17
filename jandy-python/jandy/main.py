@@ -25,6 +25,6 @@ def main():
         }
         sub_locals = {}
         try:
-            exec(code, sub_globals, sub_locals) in sub_globals, sub_locals
+                exec(code, sub_globals, sub_locals)
         finally:
             pr.done()

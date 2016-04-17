@@ -17,10 +17,8 @@ script:
   - mvn test
   - mvn package
 
-after_script:
-  - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USER" -p="$DOCKER_PASSWD"
-  - docker build -t jcooky/jandy:$TRAVIS_BRANCH .
-  - docker push jcooky/jandy:$TRAVIS_BRANCH
+after_success:
+  - ./travis_docker.sh
 
 notifications:
   slack:

@@ -9,11 +9,11 @@ git clone https://github.com/jcooky/jasypt-test.git
 cd jasypt-test
 mvn -DskipTests=true clean package
 export TRAVIS_REPO_SLUG=$user_id/jasypt-test TRAVIS_BUILD_ID=1 TRAVIS_BRANCH=master TRAVIS_BUILD_NUMBER=1
-python ../jandy/jandy-python/scripts/jandy
+python ../../../jandy-python/scripts/jandy
 export TRAVIS_REPO_SLUG=$user_id/jasypt-test TRAVIS_BUILD_ID=2 TRAVIS_BRANCH=master TRAVIS_BUILD_NUMBER=2
-python ../jandy/jandy-python/scripts/jandy
+python ../../../jandy-python/scripts/jandy
 export TRAVIS_REPO_SLUG=$user_id/jasypt-test TRAVIS_BUILD_ID=3 TRAVIS_BRANCH=master TRAVIS_BUILD_NUMBER=3
-python ../jandy/jandy-python/scripts/jandy
+python ../../../jandy-python/scripts/jandy
 
 # GUI running? 
 

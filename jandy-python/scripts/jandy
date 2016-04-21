@@ -35,7 +35,6 @@ def wget(url, filename):
 
 
 def do_profile(language, id, argv):
-    wget(JAVA_PROFILER_URL, 'jandy-java-profiler.jar')
     if language == 'java':
         wget(JAVA_PROFILER_URL, 'jandy-java-profiler.jar')
         args = argv[0:]

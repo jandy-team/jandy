@@ -1,16 +1,5 @@
-import threading
 import uuid
-
-nodes_lock = threading.Lock()
-methods_lock = threading.Lock()
-classes_lock = threading.Lock()
-exceptions_lock = threading.Lock()
-
-nodes = []
-methods = {}
-classes = {}
-exceptions = []
-
+import threading
 
 def treeNode(frame=None, parentId=None):
     n = {
@@ -22,12 +11,7 @@ def treeNode(frame=None, parentId=None):
         'root': False
     }
 
-    nodes_lock.acquire()
-    try:
-        nodes.append(n)
-    finally:
-        nodes_lock.release()
-
+    # nodes.append(n)
     return n
 
 
@@ -37,19 +21,15 @@ def methodObject(name=None, owner=None, frame=None):
         return methodObject(co.co_name, classObject(frame=frame))
         pass
     else:
-        methods_lock.acquire()
-        try:
-            if (name, owner['id']) in methods.keys():
-                return methods[(name, owner['id'])]
-            mk = {
-                'id': str(uuid.uuid4()),
-                'name': name,
-                'ownerId': owner['id'] if owner is not None else None
-            }
-            methods[(name, owner['id'])] = mk
-            return mk
-        finally:
-            methods_lock.release()
+        # if (name, owner['id']) in methods.keys():
+        #     return methods[(name, owner['id'])]
+        mk = {
+            'id': str(uuid.uuid4()),
+            'name': name,
+            'ownerId': owner.get('id', None)
+        }
+        # methods[(name, owner['id'])] = mk
+        return mk
 
 
 def classObject(name=None, packageName=None, frame=None):
@@ -68,19 +48,15 @@ def classObject(name=None, packageName=None, frame=None):
     else:
         if packageName is None:
             packageName = ""
-        classes_lock.acquire()
-        try:
-            if (name, packageName) in classes.keys():
-                return classes[(name, packageName)]
-            ck = {
-                'id': str(uuid.uuid4()),
-                'name': name,
-                'packageName': packageName
-            }
-            classes[(name, packageName)] = ck
-            return ck
-        finally:
-            classes_lock.release()
+        # if (name, packageName) in classes.keys():
+        #     return classes[(name, packageName)]
+        ck = {
+            'id': str(uuid.uuid4()),
+            'name': name,
+            'packageName': packageName
+        }
+        # classes[(name, packageName)] = ck
+        return ck
 
 
 def exceptionObject(exception, value, traceback):
@@ -90,31 +66,53 @@ def exceptionObject(exception, value, traceback):
         'message': str(value),
         'classId': classObject(name=exception.__name__, packageName=exception.__module__)['id'],
     }
-    exceptions_lock.acquire()
-    try:
-        exceptions.append(e)
-    finally:
-        exceptions_lock.release()
+    # exceptions.append(e)
     return e
 
 
-def profilingContext(roots):
+
+threading_lock = threading.Lock()
+
+def profilingContext(results):
     root = {
         'id': str(uuid.uuid4()),
         'childrenIds': [],
         'parentId': None,
         'root': True
     }
+
     context = {
-        'nodes': [root] + nodes,
-        'methods': list(methods.values()),
-        'classes': list(classes.values()),
-        'exceptions': exceptions,
+        'nodes': [root],
+        'methods': [],
+        'classes': [],
+        'exceptions': [],
         'rootId': root['id']
     }
 
-    for n in roots:
-        if n is not None:
+    for r in results:
+        for item in r['nodes']:
+            if item in context['nodes']:
+                context['nodes'].remove(item)
+
+        context['nodes'].extend(r['nodes'])
+
+        removeIfExists(context['methods'], r['methods'])
+        context['methods'].extend(list(r['methods'].values()))
+
+        removeIfExists(context['classes'], r['classes'])
+        context['classes'].extend(list(r['classes'].values()))
+
+        context['exceptions'].extend(r['exceptions'])
+
+        if r['root'] is not None:
+            n = r['root']
             root['childrenIds'].append(n['id'])
             n['parentId'] = root['id']
+
     return context
+
+
+def removeIfExists(list1, list2):
+    for item in list(list2.values()):
+        if item in list1:
+            list1.remove(item)

@@ -2,6 +2,7 @@ import os
 import sys
 from jandy.profiler import Profiler
 import six
+import time
 
 def usage():
     print("# python -m jandy <script file>")
@@ -17,6 +18,8 @@ def main():
         sys.path.insert(0, os.path.dirname(progname))
         code = compile(f.read(), progname, "exec")
         pr = Profiler()
+
+        start = time.time()
         pr.start()
         sub_globals = {
             '__file__': progname,
@@ -27,4 +30,5 @@ def main():
         try:
                 six.exec_(code, sub_globals, sub_locals)
         finally:
+            print("profiling time", time.time() - start)
             pr.done()

@@ -4,8 +4,10 @@ from jandy.profiler import Profiler
 import six
 import time
 
+
 def usage():
     print("# python -m jandy <script file>")
+
 
 def main():
     if len(sys.argv) < 1:
@@ -30,5 +32,4 @@ def main():
         try:
                 six.exec_(code, sub_globals, sub_locals)
         finally:
-            print("profiling time", time.time() - start)
             pr.done()

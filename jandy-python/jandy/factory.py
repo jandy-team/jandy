@@ -26,7 +26,6 @@ class ProfilingThreadContext(object):
         if frame is not None:
             co = frame.f_code
             return self.methodObject(co.co_name, self.classObject(frame=frame))
-            pass
         else:
             if (name, owner['id']) in self.methods.keys():
                 return self.methods[(name, owner['id'])]

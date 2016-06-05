@@ -2,17 +2,15 @@
 
 set -ev
 
-if [ "${TRAVIS_PULL_REQUEST}" = "true" ]; then
-  exit 0
-fi
+if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
+  if [ "${TRAVIS_BRANCH}" = "master" ]; then
+    DOCKER_TAG=latest
+  else
+    DOCKER_TAG=$TRAVIS_BRANCH
+  fi
 
-if [ "${TRAVIS_BRANCH}" = "master" ]; then
-  DOCKER_TAG=latest
-else
-  DOCKER_TAG=$TRAVIS_BRANCH
+  docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USER" -p="$DOCKER_PASSWD"
+  docker build -t jcooky/jandy:$DOCKER_TAG .
+  docker push jcooky/jandy:$DOCKER_TAG
 fi
-
-docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USER" -p="$DOCKER_PASSWD"
-docker build -t jcooky/jandy:$DOCKER_TAG .
-docker push jcooky/jandy:$DOCKER_TAG
 

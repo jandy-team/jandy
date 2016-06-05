@@ -2,7 +2,6 @@ import os
 import sys
 from jandy.profiler import Profiler
 import six
-import time
 
 
 def usage():
@@ -21,7 +20,6 @@ def main():
         code = compile(f.read(), progname, "exec")
         pr = Profiler()
 
-        start = time.time()
         pr.start()
         sub_globals = {
             '__file__': progname,

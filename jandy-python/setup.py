@@ -11,5 +11,5 @@ setup(
     packages=['jandy'],
     scripts=['scripts/jandy'],
     test_suite='tests',
-    install_requires=['wheel', 'PyYAML', 'requests']
+    install_requires=['wheel', 'six', 'PyYAML', 'requests']
 )

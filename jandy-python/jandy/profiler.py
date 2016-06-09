@@ -1,28 +1,72 @@
 import json
 import threading
 import traceback
+import uuid
 
 import math
 import sys
 
-from jandy.factory import treeNode, profilingContext, exceptionObject
+import jandy.factory as factory
 import time
 
 
-class MethodHandler(object):
+class ProfilingThreadContext(object):
     def __init__(self):
+        self.root = None
+        self.nodes = []
+        self.methods = {}
+        self.classes = {}
+        self.exceptions = []
+
+    def treeNode(self, frame=None, parentId=None):
+        n = factory.treeNode(frame=frame, parentId=parentId)
+        self.nodes.append(n)
+        return n
+
+    def methodObject(self, name=None, owner=None, frame=None):
+        mk = factory.methodObject(name=name, owner=owner, frame=frame)
+        if (mk['name'], mk['ownerId']) in self.methods.keys():
+            return self.methods[(mk['name'], mk['ownerId'])]
+
+        self.methods[(mk['name'], mk['ownerId'])] = mk
+
+    def classObject(self, name=None, packageName=None, frame=None):
+        ck = factory.classObject(name=name, packageName=packageName, frame=frame)
+        if (ck['name'], ck['packageName']) in self.classes.keys():
+            return self.classes[(ck['name'], ck['packageName'])]
+
+        self.classes[(ck['name'], ck['packageName'])] = ck
+
+    def exceptionObject(self, exception, value, traceback):
+        e = factory.exceptionObject(exception, value, traceback)
+        self.exceptions.append(e)
+
+    def build(self):
+        result = {
+            'root': self.root,
+            'nodes': self.nodes,
+            'methods': self.methods,
+            'classes': self.classes,
+            'exceptions': self.exceptions
+        }
+        return result
+
+
+class ThreadHandler(object):
+    def __init__(self):
+        self.context = ProfilingThreadContext()
         self.nodes = []
         self.current = {'id': None, 'childrenIds': list()}
-        self.root = None
+        # self.root = None
 
     def enter(self, frame):
         if '__package__' in frame.f_globals.keys() and frame.f_globals['__package__'] == 'jandy':
             return
 
         # print('---- ENTER')
-        n = treeNode(frame, self.current['id'])
-        if self.root is None:
-            self.root = n
+        n = self.context.treeNode(frame, self.current['id'])
+        if self.context.root is None:
+            self.context.root = n
 
         n['acc']['t_startTime'] = time.time()
         n['acc']['concurThreadName'] = threading.current_thread().name
@@ -44,31 +88,31 @@ class MethodHandler(object):
         self.current['acc']['elapsedTime'] = math.floor(elapsedTime * 1000.0 * 1000.0 * 1000.0)
         if excepted:
             (exception, value, traceback) = arg
-            self.current['acc']['exceptionId'] = exceptionObject(exception, value, traceback)['id']
+            self.current['acc']['exceptionId'] = factory.exceptionObject(exception, value, traceback)['id']
 
         # print('EXIT - '+str(self.current))
         if not excepted:
             self.current = self.nodes.pop()
 
 
-class MethodHandlerContext(object):
+class ThreadHandlerContext(object):
     def __init__(self):
-        self.methodHandlers = []
+        self.threadHandlers = []
         self.local = threading.local()
 
     def get(self):
-        if hasattr(self.local, 'methodHandler') is not True:
-            self.local.methodHandler = MethodHandler()
-            self.methodHandlers.append(self.local.methodHandler)
-        return self.local.methodHandler
+        if hasattr(self.local, 'threadHandler') is not True:
+            self.local.threadHandler = ThreadHandler()
+            self.threadHandlers.append(self.local.threadHandler)
+        return self.local.threadHandler
 
-    def roots(self):
-        return [m.root for m in self.methodHandlers]
+    def results(self):
+        return [t.context.build() for t in self.threadHandlers]
+
 
 class Profiler(object):
-
     def __init__(self):
-        self.context = MethodHandlerContext()
+        self.context = ThreadHandlerContext()
 
     def start(self):
         sys.settrace(self.trace)
@@ -78,7 +122,7 @@ class Profiler(object):
 
     def done(self):
         self.stop()
-        context = profilingContext(self.context.roots())
+        context = factory.profilingContext(self.context.results())
         with open("python-profiler-result.jandy", "wt") as f:
             json.dump(context, f)
 

@@ -1,77 +1,88 @@
 import uuid
-import threading
-
-def treeNode(frame=None, parentId=None):
-    n = {
-        'id': str(uuid.uuid4()),
-        'acc': {},
-        'methodId': methodObject(frame=frame)['id'],
-        'childrenIds': [],
-        'parentId': parentId,
-        'root': False
-    }
-
-    # nodes.append(n)
-    return n
 
 
-def methodObject(name=None, owner=None, frame=None):
-    if frame is not None:
-        co = frame.f_code
-        return methodObject(co.co_name, classObject(frame=frame))
-        pass
-    else:
-        # if (name, owner['id']) in methods.keys():
-        #     return methods[(name, owner['id'])]
-        mk = {
+class ProfilingThreadContext(object):
+    def __init__(self):
+        self.root = None
+        self.nodes = []
+        self.methods = {}
+        self.classes = {}
+        self.exceptions = []
+
+    def treeNode(self, frame=None, parentId=None):
+        n = {
             'id': str(uuid.uuid4()),
-            'name': name,
-            'ownerId': owner.get('id', None)
+            'acc': {},
+            'methodId': self.methodObject(frame=frame)['id'],
+            'childrenIds': [],
+            'parentId': parentId,
+            'root': False
         }
-        # methods[(name, owner['id'])] = mk
-        return mk
 
+        self.nodes.append(n)
+        return n
 
-def classObject(name=None, packageName=None, frame=None):
-    if frame is not None:
-        _self = frame.f_locals.get('self')
-        if _self is not None:
-            cls = getattr(_self, '__class__')
-            pkg = cls.__module__
-            if pkg is None:
-                pkg = frame.f_globals['__package__']
-            return classObject(name=cls.__name__, packageName=pkg)
+    def methodObject(self, name=None, owner=None, frame=None):
+        if frame is not None:
+            co = frame.f_code
+            return self.methodObject(co.co_name, self.classObject(frame=frame))
+            pass
         else:
-            moduleName = frame.f_globals['__package__'] if '__package__' in frame.f_globals.keys() else ''
-            name = frame.f_globals.get('__name__')
-            return classObject(name=name, packageName=moduleName)
-    else:
-        if packageName is None:
-            packageName = ""
-        # if (name, packageName) in classes.keys():
-        #     return classes[(name, packageName)]
-        ck = {
+            if (name, owner['id']) in self.methods.keys():
+                return self.methods[(name, owner['id'])]
+            mk = {
+                'id': str(uuid.uuid4()),
+                'name': name,
+                'ownerId': owner.get('id', None)
+            }
+            self.methods[(name, owner['id'])] = mk
+            return mk
+
+    def classObject(self, name=None, packageName=None, frame=None):
+        if frame is not None:
+            _self = frame.f_locals.get('self')
+            if _self is not None:
+                cls = getattr(_self, '__class__')
+                pkg = cls.__module__
+                if pkg is None:
+                    pkg = frame.f_globals['__package__']
+                return self.classObject(name=cls.__name__, packageName=pkg)
+            else:
+                moduleName = frame.f_globals['__package__'] if '__package__' in frame.f_globals.keys() else ''
+                name = frame.f_globals.get('__name__')
+                return self.classObject(name=name, packageName=moduleName)
+        else:
+            if packageName is None:
+                packageName = ""
+            if (name, packageName) in self.classes.keys():
+                return self.classes[(name, packageName)]
+            ck = {
+                'id': str(uuid.uuid4()),
+                'name': name,
+                'packageName': packageName
+            }
+            self.classes[(name, packageName)] = ck
+            return ck
+
+    def exceptionObject(self, exception, value, traceback):
+        e = {
             'id': str(uuid.uuid4()),
-            'name': name,
-            'packageName': packageName
+            'message': str(value),
+            'classId': self.classObject(name=exception.__name__, packageName=exception.__module__)['id'],
         }
-        # classes[(name, packageName)] = ck
-        return ck
+        self.exceptions.append(e)
+        return e
 
+    def build(self):
+        result = {
+            'root': self.root,
+            'nodes': self.nodes,
+            'methods': self.methods,
+            'classes': self.classes,
+            'exceptions': self.exceptions
+        }
+        return result
 
-def exceptionObject(exception, value, traceback):
-    #print('name='+exception.__name__+', module='+exception.__module__+', value='+str(value))
-    e = {
-        'id': str(uuid.uuid4()),
-        'message': str(value),
-        'classId': classObject(name=exception.__name__, packageName=exception.__module__)['id'],
-    }
-    # exceptions.append(e)
-    return e
-
-
-
-threading_lock = threading.Lock()
 
 def profilingContext(results):
     root = {
@@ -90,10 +101,6 @@ def profilingContext(results):
     }
 
     for r in results:
-        for item in r['nodes']:
-            if item in context['nodes']:
-                context['nodes'].remove(item)
-
         context['nodes'].extend(r['nodes'])
 
         removeIfExists(context['methods'], r['methods'])

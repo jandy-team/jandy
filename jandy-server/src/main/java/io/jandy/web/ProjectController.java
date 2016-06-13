@@ -89,7 +89,8 @@ public class ProjectController {
       if (b.getCommit() != null) {
         GHUser user = null;
         user = github.getUser(b.getCommit().getCommitterName());
-        b.getCommit().setCommitterAvatarUrl(user.getAvatarUrl());
+        // TODO This code is temporary
+        b.getCommit().setCommitterAvatarUrl(user == null ? null : user.getAvatarUrl());
       }
     });
 

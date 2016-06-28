@@ -1,3 +1,8 @@
+spring:
+  redis:
+    type: cluster
+    host: localhost
+    password:
+    port: 6379
 logging.level:
   io.jandy: TRACE
-  org.springframework.web: DEBUG

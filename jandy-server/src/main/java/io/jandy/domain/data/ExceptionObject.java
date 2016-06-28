@@ -1,4 +1,4 @@
-package io.jandy.java.data;
+package io.jandy.domain.data;
 
 /**
  * @author JCooky
@@ -7,7 +7,7 @@ package io.jandy.java.data;
 public class ExceptionObject {
 
   private String id;
-  private String classId;
+  private ClassObject klass;
   private String message;
 
   public void setId(String id) {
@@ -18,19 +18,20 @@ public class ExceptionObject {
     return id;
   }
 
-  public void setClassId(String classId) {
-    this.classId = classId;
-  }
-
-  public String getClassId() {
-    return classId;
-  }
-
   public void setMessage(String message) {
     this.message = message;
   }
 
   public String getMessage() {
     return message;
+  }
+
+  public ClassObject getKlass() {
+    return klass;
+  }
+
+  public ExceptionObject setKlass(ClassObject klass) {
+    this.klass = klass;
+    return this;
   }
 }

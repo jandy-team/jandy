@@ -12,9 +12,9 @@ travis = os.getenv('TRAVIS')
 ci = os.getenv('CI')
 
 if os.getenv('DEV') == 'true':
-    URL = "http://dev.jandy.io"
+    URL = "http://dev.jandy.org"
 elif travis == 'true' and ci == 'true':
-    URL = "http://jandy.io"
+    URL = "http://jandy.org"
 else:
     URL = "http://localhost:3000"
 JAVA_PROFILER_URL = URL + "/jandy-java-profiler.jar"
@@ -42,7 +42,7 @@ def do_profile(language, id, argv):
         args.insert(1, '-javaagent:jandy-java-profiler.jar')
         subprocess.call(args)
         # base64.encode('java-profiler-result.jandy', id + '.jandy')
-        shutil.move('java-profiler-result.jandy', id + '.jandy'),
+        shutil.move('java-profiler-result.jandy', id + '.jandy')
 
     if language == 'python':
         args = argv[0:]
@@ -52,7 +52,7 @@ def do_profile(language, id, argv):
         # with open('python-profiler-result.jandy', 'rb') as input:
         #     with open(id+'.jandy', 'wb') as output:
         #         base64.encode(input, output)
-        shutil.move('python-profiler-result.jandy', id + '.jandy'),
+        shutil.move('python-profiler-result.jandy', id + '.jandy')
 
 
 if __name__ == '__main__':

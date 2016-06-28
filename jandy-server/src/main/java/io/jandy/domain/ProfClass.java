@@ -11,9 +11,11 @@ import java.util.List;
  * @since 2015-07-08
  */
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"name", "packageName"}))
 public class ProfClass {
   @Id
-  private String id;
+  @GeneratedValue
+  private Long id;
 
   private String packageName = "";
   private String name = "";
@@ -38,11 +40,11 @@ public class ProfClass {
     return packageName;
   }
 
-  public String getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

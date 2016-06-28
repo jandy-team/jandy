@@ -6,9 +6,10 @@ package io.jandy.java.data;
  */
 public class Accumulator {
   private String concurThreadName;
+  private long concurThreadId;
   private long startTime;
   private long elapsedTime;
-  private String exceptionId;
+  private ExceptionObject exception;
 
   public void setConcurThreadName(String concurThreadName) {
     this.concurThreadName = concurThreadName;
@@ -34,11 +35,20 @@ public class Accumulator {
     return elapsedTime;
   }
 
-  public void setExceptionId(String exceptionId) {
-    this.exceptionId = exceptionId;
+  public void setException(ExceptionObject exception) {
+    this.exception = exception;
   }
 
-  public String getExceptionId() {
-    return exceptionId;
+  public ExceptionObject getException() {
+    return exception;
+  }
+
+  public long getConcurThreadId() {
+    return concurThreadId;
+  }
+
+  public Accumulator setConcurThreadId(long concurThreadId) {
+    this.concurThreadId = concurThreadId;
+    return this;
   }
 }

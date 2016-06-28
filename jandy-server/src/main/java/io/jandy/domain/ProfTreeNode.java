@@ -1,18 +1,10 @@
 package io.jandy.domain;
 
-import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.gson.annotations.Expose;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +21,9 @@ public class ProfTreeNode {
   private long startTime;
   private String concurThreadName;
   private boolean root;
+
+  @OneToOne
+  private ProfException exception;
 
   @ManyToOne
   private ProfMethod method;
@@ -116,6 +111,15 @@ public class ProfTreeNode {
 
   public ProfTreeNode setRoot(boolean root) {
     this.root = root;
+    return this;
+  }
+
+  public ProfException getException() {
+    return exception;
+  }
+
+  public ProfTreeNode setException(ProfException exception) {
+    this.exception = exception;
     return this;
   }
 }

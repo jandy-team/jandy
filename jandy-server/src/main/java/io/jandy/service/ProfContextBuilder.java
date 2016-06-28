@@ -1,7 +1,7 @@
 package io.jandy.service;
 
 import io.jandy.domain.*;
-import io.jandy.java.data.*;
+import io.jandy.domain.data.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +44,8 @@ public class ProfContextBuilder {
 
   @Autowired
   private TransactionTemplate tt;
+  @Autowired
+  private ProfExceptionRepository profExceptionRepository;
 
   @Async
   public ListenableFuture<Map<String, ProfContextDump>> buildForAsync(Map<String, ProfilingContext> contexts) {
@@ -58,103 +60,80 @@ public class ProfContextBuilder {
 
   @Transactional
   public ProfContextDump build(ProfilingContext context) {
-//    Map<String, TreeNode> nodes = context.getNodes().stream().collect(Collectors.toMap(TreeNode::getId, Function.identity()));
-    Map<String, MethodObject> methods = context.getMethods().stream().collect(Collectors.toMap(MethodObject::getId, Function.identity()));
-    Map<String, ClassObject> classes = context.getClasses().stream().collect(Collectors.toMap(ClassObject::getId, Function.identity()));
-//    Map<String, ExceptionObject> exceptions = context.getExceptions().stream().collect(Collectors.toMap(ExceptionObject::getId, Function.identity()));
 
-    saveClasses(context.getClasses());
-    saveMethods(context.getMethods(), classes);
-    saveExceptions(context.getExceptions());
+    ProfContextDump dump = new ProfContextDump();
 
     long t = System.currentTimeMillis();
     logger.trace("==== start building about tree nodes");
-    saveTreeNodes(context.getNodes(), methods);
+    List<ProfTreeNode> nodes = saveTreeNodes(context.getTreeNodes(), dump);
     logger.trace("==== elapsed: {}ms", System.currentTimeMillis() - t);
 
-    ProfContextDump dump = new ProfContextDump();
-    logger.trace("rootId:{}, root: {}", context.getRootId(), profTreeNodeRepository.findOne(context.getRootId()));
-    dump.setRoot(profTreeNodeRepository.findOne(context.getRootId()));
-    dump.setMaxTotalDuration(stream(dump.spliterator(), false).mapToLong(ProfTreeNode::getElapsedTime).max().getAsLong());
+
+    logger.trace("rootId:{}, root: {}", dump.getRoot().getId(), dump.getRoot());
+    dump.setMaxTotalDuration(nodes.stream().mapToLong(ProfTreeNode::getElapsedTime).max().getAsLong());
     return profContextDumpRepository.save(dump);
   }
 
   @Transactional
-  private int[] saveTreeNodes(List<TreeNode> nodes, Map<String, MethodObject> methods) {
-    for (TreeNode n : nodes) {
-      if (n.getMethodId() != null) {
-        MethodObject mo = methods.get(n.getMethodId());
-        n.setMethodId(mo.getId());
-      }
+  private List<ProfTreeNode> saveTreeNodes(List<TreeNode> nodes, ProfContextDump dump) {
+    List<ProfTreeNode> results = new ArrayList<>(nodes.size());
+    for (TreeNode treeNode : nodes) {
+      ProfTreeNode node = new ProfTreeNode();
+      node.setId(treeNode.getId());
+      node.setMethod(saveMethod(treeNode.getMethod()));
+      node.setElapsedTime(treeNode.getAcc() == null ? 0L : treeNode.getAcc().getElapsedTime());
+      node.setStartTime(treeNode.getAcc() == null ? 0L : treeNode.getAcc().getStartTime());
+      node.setConcurThreadName(treeNode.getAcc() == null ? null : treeNode.getAcc().getConcurThreadName());
+      node.setException(saveException(treeNode.getAcc() == null ? null : treeNode.getAcc().getException()));
+      node.setRoot(treeNode.isRoot());
+      node.setParent(treeNode.getParentId() == null ? null : profTreeNodeRepository.findOne(treeNode.getParentId()));
+      node = profTreeNodeRepository.save(node);
+
+      if (treeNode.isRoot())
+        dump.setRoot(node);
+
+      results.add(node);
     }
 
-    return jdbc.batchUpdate(
-        "insert into prof_tree_node(id, method_id, parent_id, concur_thread_name, elapsed_time, root, start_time) values (?, ?, ?, ?, ?, ?, ?)",
-        nodes.stream().map((n) -> new Object[]{
-            n.getId(),
-            n.getMethodId(),
-            n.getParentId(),
-            n.getAcc() == null ? null : n.getAcc().getConcurThreadName(),
-            n.getAcc() == null ? 0 : n.getAcc().getElapsedTime(),
-            n.isRoot() ? 1 : 0,
-            n.getAcc() == null ? 0 : n.getAcc().getStartTime()
-        }).collect(Collectors.toList())
-    );
+    return results;
   }
 
   @Transactional
-  private void saveExceptions(List<ExceptionObject> exceptions) {
+  private ProfException saveException(ExceptionObject exception) {
+    if (exception == null)
+      return null;
 
+    ProfException e = new ProfException();
+    e.setKlass(saveClass(exception.getKlass()));
+    e.setMessage(exception.getMessage());
+    return profExceptionRepository.save(e);
   }
 
   @Transactional
-  private int[] saveMethods(List<MethodObject> methods, Map<String, ClassObject> classes) {
-    methods.stream().forEach((m) -> {
-      if (m.getOwnerId() != null) {
-        ClassObject co = classes.get(m.getOwnerId());
-        m.setOwnerId(co.getId());
-      }
-    });
+  private ProfMethod saveMethod(MethodObject method) {
+    ProfClass owner = saveClass(method.getOwner());
+    ProfMethod m = profMethodRepository.findByNameAndDescriptorAndAccessAndOwner_Id(method.getName(), method.getDescriptor(), method.getAccess(), owner.getId());
+    if (m == null) {
+      m = new ProfMethod();
+      m.setName(method.getName());
+      m.setAccess(method.getAccess());
+      m.setDescriptor(method.getDescriptor());
+      m.setOwner(owner);
+      m = profMethodRepository.save(m);
+    }
 
-    methods = methods.stream().filter((m) -> {
-      ProfMethod pm = profMethodRepository.findByNameAndDescriptorAndOwner_Id(m.getName(), m.getDescriptor(), m.getOwnerId());
-      if (pm != null) {
-        m.setId(pm.getId());
-        return false;
-      }
-      return true;
-    }).collect(Collectors.toList());
-
-    return methods.size() > 0 ? jdbc.batchUpdate(
-        "insert into prof_method(id, owner_id, access, descriptor, name) values (?, ?, ?, ?, ?)",
-        methods.stream().map((m) -> new Object[]{
-            m.getId(),
-            m.getOwnerId(),
-            m.getAccess(),
-            m.getDescriptor(),
-            m.getName()
-        }).collect(Collectors.toList())
-    ) : new int[]{};
+    return m;
   }
 
   @Transactional
-  private int[] saveClasses(List<ClassObject> classes) {
-    classes = classes.stream().filter((co) -> {
-      ProfClass pc = profClassRepository.findByNameAndPackageName(co.getName(), co.getPackageName());
-      if (pc != null) {
-        co.setId(pc.getId());
-        return false;
-      }
-      return true;
-    }).collect(Collectors.toList());
-
-    return classes.size() > 0 ? jdbc.batchUpdate(
-        "insert into prof_class(id, name, package_name) values (?, ?, ?)",
-        classes.stream().map((c) -> new Object[]{
-            c.getId(),
-            c.getName(),
-            c.getPackageName()
-        }).collect(Collectors.toList())
-    ) : new int[]{};
+  private ProfClass saveClass(ClassObject klass) {
+    ProfClass cls = profClassRepository.findByNameAndPackageName(klass.getName(), klass.getPackageName());
+    if (cls == null) {
+      cls = new ProfClass();
+      cls.setPackageName(klass.getPackageName());
+      cls.setName(klass.getName());
+      cls = profClassRepository.save(cls);
+    }
+    return cls;
   }
 }

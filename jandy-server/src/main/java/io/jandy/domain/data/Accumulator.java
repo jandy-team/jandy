@@ -1,4 +1,4 @@
-package io.jandy.java.data;
+package io.jandy.domain.data;
 
 /**
  * @author JCooky
@@ -8,7 +8,7 @@ public class Accumulator {
   private String concurThreadName;
   private long startTime;
   private long elapsedTime;
-  private String exceptionId;
+  private ExceptionObject exception;
 
   public void setConcurThreadName(String concurThreadName) {
     this.concurThreadName = concurThreadName;
@@ -34,11 +34,11 @@ public class Accumulator {
     return elapsedTime;
   }
 
-  public void setExceptionId(String exceptionId) {
-    this.exceptionId = exceptionId;
+  public void setException(ExceptionObject exception) {
+    this.exception = exception;
   }
 
-  public String getExceptionId() {
-    return exceptionId;
+  public ExceptionObject getException() {
+    return exception;
   }
 }

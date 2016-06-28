@@ -15,10 +15,11 @@ public class ThreadContext {
   private TreeNode latest = new TreeNode(), root = null;
   private ArrayCallStack treeNodes = new ArrayCallStack(128);
   private String threadName;
-  private long threadId;
+  private long threadId, profId;
 
-  public ThreadContext(long threadId, String threadName, DataObjectBuilder builder) throws IOException {
+  public ThreadContext(long profId, long threadId, String threadName, DataObjectBuilder builder) throws IOException {
     this.threadId = threadId;
+    this.profId = profId;
     this.threadName = threadName;
     this.builder = builder;
   }
@@ -31,6 +32,8 @@ public class ThreadContext {
       root = latest;
       root.setRoot(true);
     }
+
+    latest.setProfId(profId);
 
     latest.getAcc().setConcurThreadName(threadName);
     latest.getAcc().setConcurThreadId(threadId);

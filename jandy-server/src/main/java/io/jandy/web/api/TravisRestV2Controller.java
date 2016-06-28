@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -83,7 +84,9 @@ public class TravisRestV2Controller {
     long profId = Long.parseLong(model.get("profId").toString());
 
     ProfContextDump prof = profContextDumpRepository.findOne(profId);
-
+    for (ProfTreeNode node : prof) {
+      System.out.println(node);
+    }
   }
 
   @RequestMapping(method = RequestMethod.PUT)
@@ -130,6 +133,11 @@ public class TravisRestV2Controller {
     treeNode.setConcurThreadName(treeNodeData.getAcc() == null ? null : treeNodeData.getAcc().getConcurThreadName());
     treeNode.setParent(parent);
     treeNode = profTreeNodeRepository.save(treeNode);
+    if (treeNode.isRoot()) {
+      ProfContextDump prof = profContextDumpRepository.findOne(treeNodeData.getProfId());
+      prof.setRoot(treeNode);
+      profContextDumpRepository.save(prof);
+    }
   }
 
   private static class ProfInfo {

@@ -33,4 +33,8 @@ public class JandyProfilingContext {
       }
     };
   }
+
+  public long getProfId() {
+    return profId;
+  }
 }

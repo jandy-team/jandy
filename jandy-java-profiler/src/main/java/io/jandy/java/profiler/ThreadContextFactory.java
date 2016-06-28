@@ -29,7 +29,7 @@ public class ThreadContextFactory extends ThreadLocal<ThreadContext> {
     ThreadContext tc = null;
     try {
       Thread currentThread = Thread.currentThread();
-      tc = new ThreadContext(currentThread.getId(), currentThread.getName(), profilingContext.getBuilder(currentThread.getId()));
+      tc = new ThreadContext(profilingContext.getProfId(), currentThread.getId(), currentThread.getName(), profilingContext.getBuilder(currentThread.getId()));
     } catch (IOException e) {
       e.printStackTrace();
     }

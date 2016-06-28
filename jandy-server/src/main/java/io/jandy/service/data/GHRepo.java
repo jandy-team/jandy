@@ -27,6 +27,9 @@ public class GHRepo implements Serializable {
   @JsonProperty("description")
   private String description;
 
+  @JsonProperty("default_branch")
+  private String defaultBranch;
+
   public Long getId() {
     return id;
   }
@@ -69,6 +72,15 @@ public class GHRepo implements Serializable {
 
   public GHRepo setDescription(String description) {
     this.description = description;
+    return this;
+  }
+
+  public String getDefaultBranch() {
+    return defaultBranch;
+  }
+
+  public GHRepo setDefaultBranch(String defaultBranch) {
+    this.defaultBranch = defaultBranch;
     return this;
   }
 }

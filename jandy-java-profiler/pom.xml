@@ -18,9 +18,11 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.github.jcooky</groupId>
-      <artifactId>jaal</artifactId>
-      <version>[0, )</version>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm-all</artifactId>
+      <version>5.1</version>
+      <scope>provided</scope>
+      <classifier>sources</classifier>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
@@ -47,17 +49,19 @@
       <version>1.5.8</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>io.undertow</groupId>
+      <artifactId>undertow-core</artifactId>
+      <version>1.4.4.Final</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.5</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
-
-  <repositories>
-    <repository>
-      <id>sonatype</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
 
   <build>
     <plugins>
@@ -130,7 +134,7 @@
             </goals>
             <configuration>
               <tasks>
-                <unzip dest="${project.build.directory}/dependency-sources" overwrite="true">
+                <unzip dest="${project.build.directory}/dependency-sources">
                   <fileset dir="${project.build.directory}/dependency-sources/">
                     <include name="*.src"/>
                     <include name="*.jar"/>
@@ -142,28 +146,15 @@
                   </fileset>
                   <globmapper from="*.java" to="*.java.new" />
                   <filterchain>
-                    <replacestring from="com.google.gson" to="io.jandy.com.google.gson" />
+                    <replacestring from="com.google.gson" to="io.jandy.java.com.google.gson" />
+                    <replacestring from="org.objectweb.asm" to="io.jandy.java.org.objectweb.asm" />
+                    <replacestring from="org.apache.kafka" to="io.jandy.java.org.apache.kafka" />
                   </filterchain>
                 </copy>
-                <move todir="${project.build.directory}/generated-sources/java/io/jandy">
+                <move todir="${project.build.directory}/generated-sources/java/io/jandy/java">
                   <fileset dir="${project.build.directory}/dependency-sources">
                     <include name="**/*.java.new" />
                     <include name="**/*.dtd" />
-                  </fileset>
-                  <globmapper from="*.java.new" to="*.java" />
-                </move>
-                <move todir="${project.build.directory}/generated-sources">
-                  <fileset dir="${project.build.directory}/generated-sources">
-                    <include name="thrift/**/*.java" />
-                  </fileset>
-                  <globmapper from="*.java" to="*.java.new" />
-                  <filterchain>
-                    <replacestring from="com.google.gson" to="io.jandy.com.google.gson" />
-                  </filterchain>
-                </move>
-                <move todir="${project.build.directory}/generated-sources">
-                  <fileset dir="${project.build.directory}/generated-sources">
-                    <include name="**/*.java.new" />
                   </fileset>
                   <globmapper from="*.java.new" to="*.java" />
                 </move>

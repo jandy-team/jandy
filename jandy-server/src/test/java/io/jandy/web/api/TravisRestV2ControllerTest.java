@@ -1,0 +1,130 @@
+package io.jandy.web.api;
+
+import io.jandy.domain.Project;
+import io.jandy.domain.ProjectRepository;
+import io.jandy.domain.User;
+import io.jandy.domain.UserRepository;
+import io.jandy.service.TravisClient;
+import io.jandy.test.AbstractWebAppTestCase;
+import io.jandy.test.util.WebLog;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
+
+/**
+ * @author JCooky
+ * @since 2015-07-08
+ */
+public class TravisRestV2ControllerTest extends AbstractWebAppTestCase {
+
+  @Autowired
+  private TravisRestV2Controller controller;
+
+  @Autowired
+  private ProjectRepository projectRepository;
+
+  @Autowired
+  private UserRepository userRepository;
+
+  @Mock
+  private TravisClient travisClient;
+
+  @Before
+  public void setUp() throws Exception {
+    User user = new User();
+    user = userRepository.save(user);
+
+    Project project = new Project();
+    project.setName("commons-io");
+    project.setAccount("jcooky");
+    project.setUser(user);
+    project = projectRepository.save(project);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    projectRepository.deleteAll();
+    userRepository.deleteAll();
+  }
+
+  @Test
+  public void testPutResultsForJava() throws Exception {
+//    when(travisClient.getBuild(anyLong())).thenReturn()
+
+    MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+    mockMvc.perform(
+        post("/rest/travis/begin")
+            .param("branchName", "master")
+            .param("ownerName", "jcooky")
+            .param("repoName", "commons-io")
+            .param("numSamples", "1")
+            .param("buildId", "1")
+            .param("buildNum", "1")
+            .param("lang", "java")
+    ).andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
+
+    try (InputStream is = ClassLoader.getSystemResourceAsStream("java-profiler-result.txt")) {
+      List<WebLog> logs = WebLog.parse(is, StandardCharsets.UTF_8);
+      for (WebLog log : logs) {
+        mockMvc.perform(
+            request(HttpMethod.resolve(log.getMethod().toUpperCase()), log.getUrl())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(log.getBody())
+        ).andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
+      }
+    }
+
+    mockMvc.perform(
+        post("/rest/travis/finish")
+          .param("buildId", "1")
+    ).andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
+  }
+
+  @Test
+  @Ignore("This test will perform after developing python profiler")
+  public void testPutResultsForPython() throws Exception {
+//    User user = new User();
+//    user = userRepository.save(user);
+//
+//    Project project = new Project();
+//    project.setUser(null);
+//    project.setName("jandy");
+//    project.setAccount("jcooky");
+//    project.setUser(user);
+//    project = projectRepository.save(project);
+
+    MockMultipartFile multipartFile = new MockMultipartFile("samples", "python-profiler-result.jandy",
+        MediaType.APPLICATION_OCTET_STREAM_VALUE, ClassLoader.getSystemResourceAsStream("python-profiler-result.jandy"));
+
+    MockMvcBuilders.standaloneSetup(controller).build()
+        .perform(MockMvcRequestBuilders.fileUpload("/rest/travis")
+            .file(multipartFile)
+            .contentType(MediaType.MULTIPART_FORM_DATA)
+            .param("ownerName", "jcooky")
+            .param("repoName", "jandy")
+            .param("buildId", "1")
+            .param("branchName", "master")
+            .param("buildNum", "1")
+            .param("language", "python")
+        ).andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+        .andDo(MockMvcResultHandlers.print());
+  }
+}

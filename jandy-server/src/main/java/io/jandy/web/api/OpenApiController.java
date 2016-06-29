@@ -1,5 +1,7 @@
 package io.jandy.web.api;
 
+import io.jandy.domain.AccessToken;
+import io.jandy.domain.AccessTokenRepository;
 import org.jasypt.util.text.BasicTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +27,13 @@ import java.util.Random;
 @RequestMapping(value = "/oauth")
 public class OpenApiController {
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Autowired
     private JdbcTemplate jdbc;
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    @Autowired
+    private AccessTokenRepository accessTokenRepository;
 
     @RequestMapping(value = "/token", method = RequestMethod.POST)
     @ResponseBody
@@ -39,6 +44,10 @@ public class OpenApiController {
         OAuth2AccessToken jandyToken = null;
 
         jandyToken = generateJandyToken(accessToken);
+
+        accessTokenRepository.save(new AccessToken(jandyToken.getValue(), accessToken));
+
+        logger.debug("saved accessToken : " + accessTokenRepository.findOne(jandyToken.getValue()).getAccessToken());
 
         return jandyToken;
     }
@@ -59,9 +68,6 @@ public class OpenApiController {
 //            accessToken = decrypt(jandyToken, key);
 //
 //            logger.debug("decrypted access token : " + accessToken);
-
-        jdbc.batchUpdate();
-
 
         return new DefaultOAuth2AccessToken(jandyToken);
     }

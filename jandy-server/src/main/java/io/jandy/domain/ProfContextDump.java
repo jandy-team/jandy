@@ -13,7 +13,7 @@ import java.util.*;
  * @since 2015-07-08
  */
 @Entity
-public class ProfContextDump implements Iterable<ProfTreeNode> {
+public class ProfContextDump {
   @Id
   @GeneratedValue
   private long id;
@@ -26,9 +26,9 @@ public class ProfContextDump implements Iterable<ProfTreeNode> {
   @CollectionTable
   private List<ProfTreeNode> slowedNodes;
 
-  @OneToOne
+  @OneToMany(mappedBy = "profContext")
   @JsonIgnore
-  private ProfTreeNode root;
+  private List<ProfThread> threads = new ArrayList<>();
 
   @ManyToOne
   @JsonIgnore
@@ -44,15 +44,6 @@ public class ProfContextDump implements Iterable<ProfTreeNode> {
 
   public ProfContextDump setId(long id) {
     this.id = id;
-    return this;
-  }
-
-  public ProfTreeNode getRoot() {
-    return root;
-  }
-
-  public ProfContextDump setRoot(ProfTreeNode root) {
-    this.root = root;
     return this;
   }
 
@@ -72,12 +63,6 @@ public class ProfContextDump implements Iterable<ProfTreeNode> {
   public ProfContextDump setMaxTotalDuration(long maxTotalDuration) {
     this.maxTotalDuration = maxTotalDuration;
     return this;
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public Iterator<ProfTreeNode> iterator() {
-    return new JavaTreeNodeIterator(root);
   }
 
   public List<ProfTreeNode> getSlowedNodes() {
@@ -106,30 +91,6 @@ public class ProfContextDump implements Iterable<ProfTreeNode> {
     return this;
   }
 
-  @Transactional(readOnly = true)
-  private class JavaTreeNodeIterator implements Iterator<ProfTreeNode> {
-
-    private Deque<ProfTreeNode> nodes = new LinkedList<>();
-
-    public JavaTreeNodeIterator(ProfTreeNode root) {
-      this.nodes.addAll(Lists.reverse(root.getChildren()));
-    }
-
-    @Override
-    public boolean hasNext() {
-      return !nodes.isEmpty();
-    }
-
-    @Override
-    public ProfTreeNode next() {
-      ProfTreeNode node = nodes.pop();
-
-      nodes.addAll(Lists.reverse(node.getChildren()));
-
-      return node;
-    }
-  }
-
   @Override
   public String toString() {
     return new ToStringBuilder(this)
@@ -140,5 +101,14 @@ public class ProfContextDump implements Iterable<ProfTreeNode> {
         .append("build_id", build.getId())
         .append("sample_id", sample.getId())
         .toString();
+  }
+
+  public List<ProfThread> getThreads() {
+    return threads;
+  }
+
+  public ProfContextDump setThreads(List<ProfThread> threads) {
+    this.threads = threads;
+    return this;
   }
 }

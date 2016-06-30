@@ -1,4 +1,4 @@
-package io.jandy.domain.data;
+package io.jandy.java.data;
 
 /**
  * @author JCooky

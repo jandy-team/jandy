@@ -5,18 +5,9 @@ package io.jandy.domain.data;
  * @since 2016-03-16
  */
 public class Accumulator {
-  private String concurThreadName;
   private long startTime;
   private long elapsedTime;
   private ExceptionObject exception;
-
-  public void setConcurThreadName(String concurThreadName) {
-    this.concurThreadName = concurThreadName;
-  }
-
-  public String getConcurThreadName() {
-    return concurThreadName;
-  }
 
   public void setStartTime(long startTime) {
     this.startTime = startTime;
@@ -41,4 +32,5 @@ public class Accumulator {
   public ExceptionObject getException() {
     return exception;
   }
+
 }

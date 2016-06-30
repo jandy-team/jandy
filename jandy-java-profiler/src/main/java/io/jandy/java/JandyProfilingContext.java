@@ -1,6 +1,11 @@
 package io.jandy.java;
 
+import io.jandy.java.data.ThreadObject;
 import io.jandy.java.data.TreeNode;
+import io.jandy.java.profiler.ThreadContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author JCooky
@@ -22,8 +27,12 @@ public class JandyProfilingContext {
     this.profId = collector.start(sampleName, repoSlug, branchName, buildId, buildNum);
   }
 
-  public void end() {
-    collector.end(profId);
+  public void end(List<ThreadContext> threadContexts) {
+    List<ThreadObject> threadObjects = new ArrayList<ThreadObject>();
+    for (ThreadContext tc : threadContexts) {
+      threadObjects.add(tc.getThreadObject());
+    }
+    collector.end(profId, threadObjects);
   }
 
   public DataObjectBuilder getBuilder(final long threadId) {

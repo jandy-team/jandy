@@ -1,6 +1,5 @@
-package io.jandy.domain.data;
+package io.jandy.java.data;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,7 +9,7 @@ import java.util.List;
 public class ProfilingContext {
   private long profId;
   private List<ThreadObject> threadObjects;
-
+  
   public long getProfId() {
     return profId;
   }

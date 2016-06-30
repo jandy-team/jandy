@@ -2,9 +2,7 @@ package io.jandy.web.api;
 
 import com.google.common.collect.ImmutableMap;
 import io.jandy.domain.*;
-import io.jandy.domain.data.ClassObject;
-import io.jandy.domain.data.MethodObject;
-import io.jandy.domain.data.TreeNode;
+import io.jandy.domain.data.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +31,7 @@ public class TravisRestV2Controller {
 
   @Autowired private ProfMethodRepository profMethodRepository;
   @Autowired private ProfClassRepository profClassRepository;
+  @Autowired private ProfThreadRepository profThreadRepository;
 
   @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
   @Transactional
@@ -80,36 +79,56 @@ public class TravisRestV2Controller {
 
   @RequestMapping(method = RequestMethod.DELETE)
   @Transactional
-  public void saveProf(@RequestBody Map<String, Object> model) {
-    long profId = Long.parseLong(model.get("profId").toString());
+  public void saveProf(@RequestBody ProfilingContext profilingContext) {
+    long profId = profilingContext.getProfId();
 
     ProfContextDump prof = profContextDumpRepository.findOne(profId);
-    for (ProfTreeNode node : prof) {
-      System.out.println(node);
+    for (ThreadObject to : profilingContext.getThreadObjects()) {
+      ProfThread profThread = new ProfThread();
+      profThread.setThreadId(to.getThreadId());
+      profThread.setThreadName(to.getThreadName());
+      profThread.setRoot(profTreeNodeRepository.findOne(to.getRootId()));
+      profThread.setProfContext(prof);
+      profThread = profThreadRepository.save(profThread);
+
+      prof.getThreads().add(profThread);
     }
+
+    prof = profContextDumpRepository.save(prof);
+
+    logger.debug("threads: {}", prof.getThreads());
+
+//    logger.debug("root's children: {}", profTreeNodeRepository.findByParent_id(prof.getRoot().getId()));
+
+//    for (ProfTreeNode node : prof) {
+//      System.out.println(node);
+//    }
   }
 
   @RequestMapping(method = RequestMethod.PUT)
   @Transactional
   public void updateTreeNode(@RequestBody TreeNode treeNodeData) {
-    ClassObject co = treeNodeData.getMethod().getOwner();
-    ProfClass klass = profClassRepository.findByNameAndPackageName(co.getName(), co.getPackageName());
-    if (klass == null) {
-      klass = new ProfClass();
-      klass.setName(co.getName());
-      klass.setPackageName(co.getPackageName());
-      klass = profClassRepository.save(klass);
-    }
+    ProfMethod method = null;
+    if (treeNodeData.getMethod() != null) {
+      ClassObject co = treeNodeData.getMethod().getOwner();
+      ProfClass klass = profClassRepository.findByNameAndPackageName(co.getName(), co.getPackageName());
+      if (klass == null) {
+        klass = new ProfClass();
+        klass.setName(co.getName());
+        klass.setPackageName(co.getPackageName());
+        klass = profClassRepository.save(klass);
+      }
 
-    MethodObject mo = treeNodeData.getMethod();
-    ProfMethod method = profMethodRepository.findByNameAndDescriptorAndAccessAndOwner_Id(mo.getName(), mo.getDescriptor(), mo.getAccess(), klass.getId());
-    if (method == null) {
-      method = new ProfMethod();
-      method.setName(mo.getName());
-      method.setDescriptor(mo.getDescriptor());
-      method.setAccess(mo.getAccess());
-      method.setOwner(klass);
-      method = profMethodRepository.save(method);
+      MethodObject mo = treeNodeData.getMethod();
+      method = profMethodRepository.findByNameAndDescriptorAndAccessAndOwner_Id(mo.getName(), mo.getDescriptor(), mo.getAccess(), klass.getId());
+      if (method == null) {
+        method = new ProfMethod();
+        method.setName(mo.getName());
+        method.setDescriptor(mo.getDescriptor());
+        method.setAccess(mo.getAccess());
+        method.setOwner(klass);
+        method = profMethodRepository.save(method);
+      }
     }
 
     ProfTreeNode parent = null;
@@ -123,21 +142,23 @@ public class TravisRestV2Controller {
     }
 
     ProfTreeNode treeNode = profTreeNodeRepository.findOne(treeNodeData.getId());
-    if (treeNode == null)
+    if (treeNode == null) {
       treeNode = new ProfTreeNode();
-    treeNode.setId(treeNodeData.getId());
+      treeNode.setId(treeNodeData.getId());
+    }
     treeNode.setMethod(method);
     treeNode.setRoot(treeNodeData.isRoot());
     treeNode.setElapsedTime(treeNodeData.getAcc() == null ? 0L : treeNodeData.getAcc().getElapsedTime());
     treeNode.setStartTime(treeNodeData.getAcc() == null ? 0L : treeNodeData.getAcc().getStartTime());
-    treeNode.setConcurThreadName(treeNodeData.getAcc() == null ? null : treeNodeData.getAcc().getConcurThreadName());
     treeNode.setParent(parent);
     treeNode = profTreeNodeRepository.save(treeNode);
-    if (treeNode.isRoot()) {
-      ProfContextDump prof = profContextDumpRepository.findOne(treeNodeData.getProfId());
-      prof.setRoot(treeNode);
-      profContextDumpRepository.save(prof);
+
+    if (parent != null) {
+      parent.getChildren().add(treeNode);
+      profTreeNodeRepository.save(parent);
     }
+
+    logger.debug("Save treeNode: {}", treeNode);
   }
 
   private static class ProfInfo {

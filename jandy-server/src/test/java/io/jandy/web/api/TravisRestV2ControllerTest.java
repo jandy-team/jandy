@@ -23,11 +23,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
  * @author JCooky
  * @since 2015-07-08
  */
-public class TravisRestV1ControllerTest extends AbstractWebAppTestCase {
+public class TravisRestV2ControllerTest extends AbstractWebAppTestCase {
 
   @Autowired
   @InjectMocks
-  private TravisRestV1Controller controller;
+  private TravisRestV2Controller controller;
 
   @Autowired
   private ProjectRepository projectRepository;

@@ -7,6 +7,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author JCooky
@@ -19,7 +20,6 @@ public class ProfTreeNode {
 
   private long elapsedTime;
   private long startTime;
-  private String concurThreadName;
   private boolean root;
 
   @OneToOne
@@ -86,22 +86,15 @@ public class ProfTreeNode {
     this.startTime = startTime;
   }
 
-  public String getConcurThreadName() {
-    return concurThreadName;
-  }
-
-  public void setConcurThreadName(String concurThreadName) {
-    this.concurThreadName = concurThreadName;
-  }
-
   @Override
   public String toString() {
     return new ToStringBuilder(this)
         .append("id", id)
         .append("method", method)
-        .append("concurThreadName", concurThreadName)
         .append("startTime", startTime)
         .append("elapsedTime", elapsedTime)
+        .append("parent", parent == null ? "" : parent.getId())
+        .append("children", children.stream().map(ProfTreeNode::getId).collect(Collectors.toList()))
         .toString();
   }
 

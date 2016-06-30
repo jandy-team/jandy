@@ -1,6 +1,8 @@
 package io.jandy.java;
 
 import io.jandy.java.com.google.gson.Gson;
+import io.jandy.java.data.ProfilingContext;
+import io.jandy.java.data.ThreadObject;
 import io.jandy.java.data.TreeNode;
 
 import java.io.*;
@@ -8,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -72,7 +75,7 @@ public class ProfilingLogCollector {
     });
   }
 
-  public void end(final long profId) {
+  public void end(final long profId, final List<ThreadObject> threadObjects) {
     wrap(new WrapFunction<Void>() {
       @Override
       public Void call() throws IOException {
@@ -88,10 +91,11 @@ public class ProfilingLogCollector {
           OutputStream os = null;
           try {
             os = conn.getOutputStream();
-            Map<String, Object> model = new HashMap<String, Object>();
-            model.put("profId", profId);
+            ProfilingContext profilingContext = new ProfilingContext();
+            profilingContext.setProfId(profId);
+            profilingContext.setThreadObjects(threadObjects);
 
-            os.write(new Gson().toJson(model).getBytes("UTF-8"));
+            os.write(new Gson().toJson(profilingContext).getBytes("UTF-8"));
             os.flush();
 
           } finally {

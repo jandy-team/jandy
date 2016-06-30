@@ -1,8 +1,12 @@
 package io.jandy.java.profiler;
 
 import io.jandy.java.JandyProfilingContext;
+import io.jandy.java.data.ThreadObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author JCooky
@@ -10,7 +14,7 @@ import java.io.IOException;
  */
 public class ThreadContextFactory extends ThreadLocal<ThreadContext> {
   private JandyProfilingContext profilingContext = new JandyProfilingContext();
-//  private List<ThreadContext> threadContexts = Collections.synchronizedList(new ArrayList<ThreadContext>());
+  private List<ThreadContext> threadContexts = Collections.synchronizedList(new ArrayList<ThreadContext>());
 
   public ThreadContextFactory() {
     super();
@@ -19,7 +23,7 @@ public class ThreadContextFactory extends ThreadLocal<ThreadContext> {
 
     Runtime.getRuntime().addShutdownHook(new Thread() {
       public void run() {
-        profilingContext.end();
+        profilingContext.end(threadContexts);
       }
     });
   }
@@ -29,7 +33,8 @@ public class ThreadContextFactory extends ThreadLocal<ThreadContext> {
     ThreadContext tc = null;
     try {
       Thread currentThread = Thread.currentThread();
-      tc = new ThreadContext(profilingContext.getProfId(), currentThread.getId(), currentThread.getName(), profilingContext.getBuilder(currentThread.getId()));
+      tc = new ThreadContext(currentThread.getId(), currentThread.getName(), profilingContext.getBuilder(currentThread.getId()));
+      threadContexts.add(tc);
     } catch (IOException e) {
       e.printStackTrace();
     }

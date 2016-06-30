@@ -1,6 +1,7 @@
 package io.jandy.java.profiler;
 
 import io.jandy.java.DataObjectBuilder;
+import io.jandy.java.data.ThreadObject;
 import io.jandy.java.data.TreeNode;
 import io.jandy.java.util.ArrayCallStack;
 
@@ -12,31 +13,27 @@ import java.io.IOException;
  */
 public class ThreadContext {
   private final DataObjectBuilder builder;
-  private TreeNode latest = new TreeNode(), root = null;
+  private TreeNode latest, root;
   private ArrayCallStack treeNodes = new ArrayCallStack(128);
-  private String threadName;
-  private long threadId, profId;
+  private ThreadObject thread = new ThreadObject();
 
-  public ThreadContext(long profId, long threadId, String threadName, DataObjectBuilder builder) throws IOException {
-    this.threadId = threadId;
-    this.profId = profId;
-    this.threadName = threadName;
+  public ThreadContext(long threadId, String threadName, DataObjectBuilder builder) throws IOException {
+    this.thread.setThreadId(threadId);
+    this.thread.setThreadName(threadName);
     this.builder = builder;
+
+    this.latest = builder.getRootTreeNode();
+    this.root = this.latest;
+    this.thread.setRootId(this.root.getId());
+
+    builder.save(this.latest);
   }
 
   public void onMethodEnter(String className, int access, String methodName, String desc) {
     treeNodes.push(latest);
 
     latest = this.builder.getTreeNode(className.replace('/', '.'), access, methodName, desc, latest.getId());
-    if (root == null) {
-      root = latest;
-      root.setRoot(true);
-    }
 
-    latest.setProfId(profId);
-
-    latest.getAcc().setConcurThreadName(threadName);
-    latest.getAcc().setConcurThreadId(threadId);
     latest.getAcc().setStartTime(System.nanoTime());
   }
 
@@ -56,15 +53,11 @@ public class ThreadContext {
     latest = treeNodes.pop();
   }
 
-  public String getThreadName() {
-    return threadName;
-  }
-
   public TreeNode getRoot() {
     return root;
   }
 
-  public long getThreadId() {
-    return threadId;
+  public ThreadObject getThreadObject() {
+    return thread;
   }
 }

@@ -13,6 +13,16 @@ public abstract class DataObjectBuilder {
 
   public abstract void save(TreeNode node);
 
+  public TreeNode getRootTreeNode() {
+    TreeNode n = new TreeNode();
+    n.setId(UUID.randomUUID().toString());
+    n.setMethod(null);
+    n.setRoot(true);
+    n.setAcc(null);
+
+    return n;
+  }
+
   public TreeNode getTreeNode(String className, int access, String methodName, String desc, String parentId) {
     TreeNode n = new TreeNode();
     n.setId(UUID.randomUUID().toString());

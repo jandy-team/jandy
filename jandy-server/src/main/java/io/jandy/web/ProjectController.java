@@ -11,6 +11,7 @@ import org.ocpsoft.prettytime.PrettyTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -88,8 +89,14 @@ public class ProjectController {
         b.setBuildAt(p.format(DatatypeConverter.parseDateTime(b.getFinishedAt())));
       if (b.getCommit() != null) {
         GHUser user = null;
-        user = github.getUser(b.getCommit().getCommitterName());
-        b.getCommit().setCommitterAvatarUrl(user.getAvatarUrl());
+        try {
+          user = github.getUser(b.getCommit().getCommitterName());
+          b.getCommit().setCommitterAvatarUrl(user.getAvatarUrl());
+        } catch (ClassNotFoundException e) {
+          logger.error(e.getMessage(),e);
+          b.getCommit().setCommitterAvatarUrl(null);
+        }
+
       }
     });
 

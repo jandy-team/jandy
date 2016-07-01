@@ -97,6 +97,7 @@ public class ProjectController {
           logger.error(e.getMessage(),e);
           b.getCommit().setCommitterAvatarUrl(null);
         } catch(NullPointerException e){
+
           logger.error(e.getMessage(),e);
         }
 

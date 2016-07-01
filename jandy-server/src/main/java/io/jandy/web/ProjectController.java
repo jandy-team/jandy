@@ -84,7 +84,7 @@ public class ProjectController {
     url = url.substring(0, url.indexOf(request.getServletPath()));
 
     PrettyTime p = new PrettyTime(Locale.ENGLISH);
-    String committerAvatarUrl;
+    final String[] committerAvatarUrl = new String[1];
     builds.stream().forEach(b -> {
       if (b.getFinishedAt() != null)
         b.setBuildAt(p.format(DatatypeConverter.parseDateTime(b.getFinishedAt())));
@@ -92,16 +92,14 @@ public class ProjectController {
         GHUser user = null;
         try {
           user = github.getUser(b.getCommit().getCommitterName());
-          b.getCommit().setCommitterAvatarUrl(user.getAvatarUrl());
-        } catch (ClassNotFoundException e) {
-          logger.error(e.getMessage(),e);
-          b.getCommit().setCommitterAvatarUrl(null);
+          committerAvatarUrl[0] = user.getAvatarUrl();
         } catch(NullPointerException e){
-
           logger.error(e.getMessage(),e);
+          committerAvatarUrl[0] = null;
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
         }
-
-
+        b.getCommit().setCommitterAvatarUrl(committerAvatarUrl[0]);
       }
     });
 

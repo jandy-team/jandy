@@ -50,7 +50,7 @@ public class GitHubService {
     return executeWithCache(url, (restTemplate) -> restTemplate.getForEntity(url, GHUser.class));
   }
 
-  public GHUser getUser (String login) throws ClassNotFoundException {
+  public GHUser getUser (String login) {
     String url = url("https://api.github.com/user/{login}");
     return executeWithCache(url, (restTemplate) -> restTemplate.getForEntity(url, GHUser.class, login));
   }

@@ -84,6 +84,7 @@ public class ProjectController {
     url = url.substring(0, url.indexOf(request.getServletPath()));
 
     PrettyTime p = new PrettyTime(Locale.ENGLISH);
+    String committerAvatarUrl;
     builds.stream().forEach(b -> {
       if (b.getFinishedAt() != null)
         b.setBuildAt(p.format(DatatypeConverter.parseDateTime(b.getFinishedAt())));
@@ -95,7 +96,10 @@ public class ProjectController {
         } catch (ClassNotFoundException e) {
           logger.error(e.getMessage(),e);
           b.getCommit().setCommitterAvatarUrl(null);
+        } catch(NullPointerException e){
+          logger.error(e.getMessage(),e);
         }
+
 
       }
     });

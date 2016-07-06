@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.org/jcooky/jandy.svg?branch=master)](https://travis-ci.org/jcooky/jandy)
-[![Slack Status](http://slack.jandy.io/badge.svg)](http://slack.jandy.io)
 
 [![Youtube](http://img.youtube.com/vi/egQPHdQj-UU/0.jpg)](http://www.youtube.com/watch?v=egQPHdQj-UU)
 # Jandy 

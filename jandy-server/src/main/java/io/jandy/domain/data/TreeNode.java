@@ -10,6 +10,7 @@ public class TreeNode {
   private MethodObject method;
   private Accumulator acc;
   private String parentId;
+  private long profId;
 
   public void setId(String id) {
     this.id = id;
@@ -50,5 +51,13 @@ public class TreeNode {
   public TreeNode setMethod(MethodObject method) {
     this.method = method;
     return this;
+  }
+
+  public long getProfId() {
+    return profId;
+  }
+
+  public void setProfId(long profId) {
+    this.profId = profId;
   }
 }

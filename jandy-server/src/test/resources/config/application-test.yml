@@ -4,5 +4,7 @@ spring:
     host: localhost
     password:
     port: 6379
+  jpa:
+    show-sql: true
 logging.level:
   io.jandy: TRACE

@@ -1,6 +1,10 @@
 spring:
-  jpa.hibernate:
-    ddl-auto: update
+  jpa:
+    properties.hibernate:
+        jdbc.batch_size: 500
+        cache.use_second_level_cache: false
+    hibernate:
+      ddl-auto: update
   datasource:
     url: jdbc:mysql://localhost/jandy?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true
     username: root

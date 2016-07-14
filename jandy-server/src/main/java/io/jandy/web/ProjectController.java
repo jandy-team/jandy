@@ -40,7 +40,7 @@ import java.util.Locale;
 @Controller
 @RequestMapping("/repos")
 public class ProjectController {
-  private final Logger logger = LoggerFactory.getLogger(ProjectController.class);
+  private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
   @Autowired
   private ProjectRepository projectRepository;

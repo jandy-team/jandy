@@ -19,13 +19,17 @@ public class ThreadContextFactory extends ThreadLocal<ThreadContext> {
   public ThreadContextFactory() {
     super();
 
-    profilingContext.start();
+    try {
+      profilingContext.start();
 
-    Runtime.getRuntime().addShutdownHook(new Thread() {
-      public void run() {
-        profilingContext.end(threadContexts);
-      }
-    });
+      Runtime.getRuntime().addShutdownHook(new Thread() {
+        public void run() {
+          profilingContext.end(threadContexts);
+        }
+      });
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
@@ -33,7 +37,7 @@ public class ThreadContextFactory extends ThreadLocal<ThreadContext> {
     ThreadContext tc = null;
     try {
       Thread currentThread = Thread.currentThread();
-      tc = new ThreadContext(currentThread.getId(), currentThread.getName(), profilingContext.getBuilder(currentThread.getId()));
+      tc = new ThreadContext(currentThread.getId(), currentThread.getName(), profilingContext.getBuilder());
       threadContexts.add(tc);
     } catch (IOException e) {
       e.printStackTrace();

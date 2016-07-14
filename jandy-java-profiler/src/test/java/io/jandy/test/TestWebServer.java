@@ -19,6 +19,7 @@ public class TestWebServer {
     @Override
     public void handle(HttpServerExchange exchange, String message) {
       System.out.println("Receive ["+exchange.getRequestMethod()+"] --> " + message);
+//      System.out.println(message);
     }
   };
 
@@ -29,7 +30,7 @@ public class TestWebServer {
           @Override
           public void handleRequest(HttpServerExchange exchange) throws Exception {
             if (exchange.getRequestPath().equalsIgnoreCase("/rest/travis")) {
-              System.out.println("Headers: " + exchange.getRequestHeaders());
+//              System.out.println("Headers: " + exchange.getRequestHeaders());
               exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, "application/json");
               if (exchange.getRequestMethod().equalToString("POST")) {
                 exchange.getRequestReceiver().receiveFullString(sysout, UTF_8);

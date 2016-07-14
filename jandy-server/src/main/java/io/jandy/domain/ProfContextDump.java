@@ -26,7 +26,7 @@ public class ProfContextDump {
   @CollectionTable
   private List<ProfTreeNode> slowedNodes;
 
-  @OneToMany(mappedBy = "profContext")
+  @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "profContext")
   @JsonIgnore
   private List<ProfThread> threads = new ArrayList<>();
 

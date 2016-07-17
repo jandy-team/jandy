@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * @author jcooky
  */
 @RestController
-@RequestMapping("/rest/travis/v2")
+@RequestMapping("/rest/travis")
 public class TravisRestV2Controller {
   private static final Logger logger = LoggerFactory.getLogger(TravisRestV2Controller.class);
 
@@ -28,6 +28,11 @@ public class TravisRestV2Controller {
 
   @Autowired
   private ObjectMapper objectMapper;
+
+  @RequestMapping(value = "/finish", method = RequestMethod.POST)
+  public void finish(@RequestParam long buildId) {
+    travisRestService.finish(buildId);
+  }
 
   @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
   public Map<String, ?> createProf(@RequestBody BuildInfo profParams) {

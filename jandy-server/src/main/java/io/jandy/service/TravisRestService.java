@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +47,10 @@ public class TravisRestService {
 
   @Autowired
   private ProfService profService;
+  @Autowired
+  private ProfExceptionRepository profExceptionRepository;
+  @Autowired
+  private BuildService buildService;
 
   @Transactional
   public Map<String, ?> createProf(BuildInfo profParams) {
@@ -85,6 +90,7 @@ public class TravisRestService {
     ProfContextDump prof = new ProfContextDump();
     prof.setBuild(build);
     prof.setSample(sample);
+    prof.setState(ProfContextState.CREATED);
     prof = profContextDumpRepository.save(prof);
 
     logger.info("Create Profiling: {}", prof.getId());
@@ -108,7 +114,7 @@ public class TravisRestService {
       prof.getThreads().add(profThread);
     }
 
-    prof.setMaxTotalDuration(0L);
+    long processStartTime = Long.MAX_VALUE, processEndTime = 0;
     for (ProfThread profThread : prof.getThreads()) {
       ProfTreeNode root = profThread.getRoot();
 
@@ -120,9 +126,14 @@ public class TravisRestService {
       }
 
       root = profTreeNodeRepository.save(root);
-
-      prof.setMaxTotalDuration(Math.max(prof.getMaxTotalDuration(), root.getElapsedTime()));
+      processStartTime = Math.min(processStartTime, root.getStartTime());
+      processEndTime = Math.max(processEndTime, root.getStartTime() + root.getElapsedTime());
     }
+
+    prof.setMaxTotalDuration(processEndTime - processStartTime);
+    ProfContextDump prev = profContextDumpRepository.findPrev(prof);
+    prof.setElapsedDuration(prev == null ? 0L : prof.getMaxTotalDuration() - prev.getMaxTotalDuration());
+    prof.setState(ProfContextState.FINISH);
 
     prof = profContextDumpRepository.save(prof);
 
@@ -131,31 +142,26 @@ public class TravisRestService {
   }
 
   @Transactional
-  public ListenableFuture<Object> updateTreeNodes(List<TreeNode> treeNodes) throws IOException {
+  public void updateTreeNodes(List<TreeNode> treeNodes) throws IOException {
     int cnt = treeNodes.size(), i = 0;
 
     logger.trace("---------- START ----------- ");
     for (TreeNode node : treeNodes) {
       updateTreeNode(node);
-      System.out.print(".");
 
       if (++i > 500) {
         em.flush();
         em.clear();
-        System.out.println();
         i = 0;
       }
     }
 
     em.flush();
     em.clear();
-    System.out.println();
 
     logger.trace("----------  END  ----------- ");
 
     logger.debug("Number of saved call nodes: {}", cnt);
-
-    return new AsyncResult<>(null);
   }
 
   @Transactional
@@ -196,7 +202,32 @@ public class TravisRestService {
     treeNode.setRoot(treeNodeData.isRoot());
     treeNode.setElapsedTime(treeNodeData.getAcc() == null ? 0L : treeNodeData.getAcc().getElapsedTime());
     treeNode.setStartTime(treeNodeData.getAcc() == null ? 0L : treeNodeData.getAcc().getStartTime());
+    treeNode.setException(treeNodeData.getAcc() == null ? null : createException(treeNodeData.getAcc().getException()));
     treeNode.setParent(parent);
     treeNode = profTreeNodeRepository.save(treeNode);
+  }
+
+  private ProfException createException(ExceptionObject exception) {
+    if (exception == null)
+      return null;
+
+    ProfException e = new ProfException();
+    e.setMessage(exception.getMessage());
+    e.setKlass(profService.findClass(exception.getKlass().getName(), exception.getKlass().getPackageName()));
+
+    return profExceptionRepository.save(e);
+  }
+
+  @Async
+  public void finish(long buildId) {
+    Build build = buildRepository.findByTravisBuildId(buildId);
+    List<ProfContextDump> profiles = profContextDumpRepository.findByBuild(build);
+
+    build.setNumSamples(build.getSamples().size());
+    build.setNumSucceededSamples((int)profiles.stream()
+        .filter(s -> s.getElapsedDuration() >= 0)
+        .count());
+
+    buildService.setBuildInfo(build);
   }
 }

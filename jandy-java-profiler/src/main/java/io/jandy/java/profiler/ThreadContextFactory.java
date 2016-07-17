@@ -4,6 +4,8 @@ import io.jandy.java.JandyProfilingContext;
 import io.jandy.java.data.ThreadObject;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +26,10 @@ public class ThreadContextFactory extends ThreadLocal<ThreadContext> {
 
       Runtime.getRuntime().addShutdownHook(new Thread() {
         public void run() {
+          for (ThreadContext tc : threadContexts) {
+            tc.onExit();
+          }
+
           profilingContext.end(threadContexts);
         }
       });

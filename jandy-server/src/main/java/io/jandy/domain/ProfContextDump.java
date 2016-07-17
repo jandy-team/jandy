@@ -18,6 +18,7 @@ public class ProfContextDump {
   @GeneratedValue
   private long id;
 
+  private ProfContextState state;
   private long maxTotalDuration;
   // elapsed duration to be compare prev build
   private Long elapsedDuration;
@@ -109,6 +110,15 @@ public class ProfContextDump {
 
   public ProfContextDump setThreads(List<ProfThread> threads) {
     this.threads = threads;
+    return this;
+  }
+
+  public ProfContextState getState() {
+    return state;
+  }
+
+  public ProfContextDump setState(ProfContextState state) {
+    this.state = state;
     return this;
   }
 }

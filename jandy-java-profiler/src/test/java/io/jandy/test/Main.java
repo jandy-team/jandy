@@ -11,6 +11,12 @@ import java.io.IOException;
  * @since 2015-08-17
  */
 public class Main {
+  static {
+    for (int i = 0; i < 100000; ++i) {
+      System.out.println(i);
+    }
+  }
+
   public static void main(String[] args) throws IOException {
     String password = args.length >= 1 ? args[0] : "strong";
     String text = args.length >= 2 ? args[1] : "i am hero";

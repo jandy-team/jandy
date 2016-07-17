@@ -37,7 +37,7 @@ public class ThreadContext {
     latest.getAcc().setStartTime(System.nanoTime());
   }
 
-  public void onMethodExit(Throwable throwable, String className, int access, String methodName, String desc) {
+  public void onMethodExit(Throwable throwable) {
     //    assert(latest.method.getName().equals(method.getName()));
     //    assert(latest.method.getDescriptor().equals(method.getDescriptor()));
     //    assert(latest.method.getAccess() == method.getAccess());
@@ -51,6 +51,11 @@ public class ThreadContext {
     builder.save(latest);
 
     latest = treeNodes.pop();
+  }
+
+  public void onExit() {
+    while (latest != root)
+      onMethodExit(null);
   }
 
   public TreeNode getRoot() {

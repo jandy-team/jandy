@@ -12,6 +12,6 @@ public class JandyProfilingAdvicer {
   }
 
   public static void end(Throwable throwable, String className, int access, String methodName, String desc) {
-    factory.get().onMethodExit(throwable, className, access, methodName, desc);
+    factory.get().onMethodExit(throwable);
   }
 }

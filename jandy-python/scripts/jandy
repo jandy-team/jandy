@@ -18,7 +18,6 @@ elif travis == 'true' and ci == 'true':
 else:
     URL = "http://localhost:3000"
 JAVA_PROFILER_URL = URL + "/jandy-java-profiler.jar"
-PYTHON_PROFILER_URL = URL + "/jandy-python-profiler.zip"
 
 ownerName, repoName = os.getenv('TRAVIS_REPO_SLUG').split('/')
 branchName = os.getenv('TRAVIS_BRANCH')
@@ -34,15 +33,18 @@ def wget(url, filename):
         response.close()
 
 
-def do_profile(language, id, argv):
+def do_profile(language, id, batchSize, argv):
     wget(JAVA_PROFILER_URL, 'jandy-java-profiler.jar')
     if language == 'java':
         wget(JAVA_PROFILER_URL, 'jandy-java-profiler.jar')
         args = argv[0:]
+        args.insert(1, '-Djandy.batch.size='+batchSize)
+        args.insert(1, '-Djandy.base.url='+URL)
+        args.insert(1, '-Djandy.sample.name='+id)
         args.insert(1, '-javaagent:jandy-java-profiler.jar')
         subprocess.call(args)
         # base64.encode('java-profiler-result.jandy', id + '.jandy')
-        shutil.move('java-profiler-result.jandy', id + '.jandy')
+        # shutil.move('java-profiler-result.jandy', id + '.jandy')
 
     if language == 'python':
         args = argv[0:]
@@ -58,25 +60,18 @@ def do_profile(language, id, argv):
 if __name__ == '__main__':
     with open('.jandy.yml', 'rb') as conf:
         yml = yaml.load(conf)
-        params = {
-            'ownerName': ownerName,
-            'repoName': repoName,
-            'branchName': branchName,
-            'buildId': buildId,
-            'buildNum': buildNum,
-            'language': yml['language'].lower()
-        }
+        batchSize = yml['batch-size']
 
         files = []
         try:
             for sample in yml['samples']:
                 sampleId = sample['id']
                 argv = sample['script'].split()
-                do_profile(yml['language'].lower(), sampleId, argv)
+                do_profile(yml['language'].lower(), sampleId, batchSize, argv)
 
-                files.append(('samples', open(sampleId+'.jandy', "rb")))
-
-            r = requests.post(URL + "/rest/travis", data=params, files=files)
+            r = requests.post(URL + "/rest/travis/finish", data={
+                buildId: buildId
+            })
             r.raise_for_status()
         finally:
             for tuple in files:

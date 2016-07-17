@@ -22,20 +22,34 @@ public class ProfContextDumpRepositoryImpl implements ProfContextDumpRepositoryC
   private JPAQueryFactory qf;
 
   @Override
-  public ProfContextDump findLastProfile(long branchId, String sampleName) {
-    QProfContextDump prof = QProfContextDump.profContextDump;
+  public ProfContextDump findPrev(ProfContextDump current) {
+    QSample s = QSample.sample;
     QBuild b = QBuild.build;
+    QProfContextDump p = QProfContextDump.profContextDump;
+    QBranch br = QBranch.branch;
+
+    long branchId = current.getBuild().getBranch().getId();
+    long buildNumber = current.getBuild().getNumber();
+    long sampleId = current.getSample().getId();
+
+    return qf.query()
+        .from(s, b, br, p)
+        .where(s.id.eq(sampleId), br.id.eq(branchId), s.builds.contains(b), b.samples.contains(s), p.build.eq(b), b.branch.eq(br), p.sample.eq(s),
+            b.number.lt(buildNumber))
+        .orderBy(b.number.desc())
+        .limit(1L)
+        .uniqueResult(p);
+  }
+
+  @Override
+  public List<ProfContextDump> findByBuild(Build build) {
+    QBuild b = QBuild.build;
+    QProfContextDump p = QProfContextDump.profContextDump;
     QSample s = QSample.sample;
 
     return qf.query()
-        .from(prof)
-        .where(prof.build.branch.id.eq(branchId), prof.sample.name.eq(sampleName), prof.build.number.eq(
-            qf.subQuery()
-                .from(b, s)
-                .where(b.samples.contains(s), b.branch.id.eq(branchId), s.name.eq(sampleName))
-                .unique(b.number.max())
-        ))
-        .uniqueResult(prof);
+        .from(s, b, p)
+        .where(b.id.eq(build.getId()), b.samples.contains(s), p.build.eq(b), p.sample.eq(s))
+        .list(p);
   }
-
 }

@@ -1,13 +1,13 @@
 package io.jandy.domain.data;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author JCooky
  * @since 2016-03-16
  */
-public class ProfilingContext {
+public class ProfilingContext implements Serializable {
   private long profId;
   private List<ThreadObject> threadObjects;
 

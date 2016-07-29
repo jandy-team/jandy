@@ -29,26 +29,30 @@ public class TravisRestV2Controller {
   @Autowired
   private ObjectMapper objectMapper;
 
+  @RequestMapping(value = "/begin", method = RequestMethod.POST)
+  public void begin(BuildInfo buildInfo) {
+    travisRestService.begin(buildInfo);
+  }
+
   @RequestMapping(value = "/finish", method = RequestMethod.POST)
-  public void finish(@RequestParam long buildId) {
+  public void finish(@RequestParam long buildId) throws Exception {
     travisRestService.finish(buildId);
   }
 
   @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-  public Map<String, ?> createProf(@RequestBody BuildInfo profParams) {
-    Map<String, ?> model = travisRestService.createProf(profParams);
-
-    return model;
+  public Map<String, ?> createProf(@RequestBody ProfilingInfo profParams) {
+    return travisRestService.createProf(profParams);
   }
 
-  @RequestMapping(method = RequestMethod.DELETE)
-  public void saveProf(@RequestBody ProfilingContext profilingContext) throws InterruptedException {
+  @RequestMapping(value = "/{id:[0-9]+}", method = RequestMethod.POST)
+  public void saveProf(@PathVariable long id, @RequestBody ProfilingContext profilingContext) throws Exception {
     travisRestService.saveProf(profilingContext);
   }
 
   @RequestMapping(method = RequestMethod.PUT)
-  public void updateTreeNode(InputStream is) throws IOException {
-    List<TreeNode> treeNodes = IOUtils.readLines(is, Charsets.UTF_8)
+  public void updateTreeNode(InputStream is) throws Exception {
+    List<TreeNode> treeNodes =
+    IOUtils.readLines(is, Charsets.UTF_8)
         .stream()
         .map(this::toTreeNode)
         .collect(Collectors.toList());

@@ -9,21 +9,27 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.actuate.system.ApplicationPidFileWriter;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.repository.support.DomainClassConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.util.ResourceUtils;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import javax.inject.Provider;
 import javax.persistence.EntityManager;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Created by JCooky on 15. 6. 29..
  */
 @SpringBootApplication
 @EnableAsync
+@EnableCaching
 public class JandyApplicationServer implements CommandLineRunner {
   private final Logger logger = LoggerFactory.getLogger(JandyApplicationServer.class);
 
@@ -38,6 +44,13 @@ public class JandyApplicationServer implements CommandLineRunner {
   @Bean
   public DomainClassConverter domainClassConverter(ConversionService conversionService) {
     return new DomainClassConverter(conversionService);
+  }
+
+  @Bean
+  public TaskExecutor taskExecutor() {
+    ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+    taskExecutor.setCorePoolSize(Runtime.getRuntime().availableProcessors()-1);
+    return taskExecutor;
   }
 
   @Override

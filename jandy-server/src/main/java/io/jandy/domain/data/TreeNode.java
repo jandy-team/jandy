@@ -1,10 +1,12 @@
 package io.jandy.domain.data;
 
+import java.io.Serializable;
+
 /**
  * @author JCooky
  * @since 2016-03-16
  */
-public class TreeNode {
+public class TreeNode implements Serializable {
   private String id = null;
   private boolean root;
   private MethodObject method;

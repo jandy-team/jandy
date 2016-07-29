@@ -19,7 +19,7 @@ public class ProfThread {
   private long threadId;
   private String threadName;
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.REMOVE)
   @JsonIgnore
   private ProfTreeNode root;
 

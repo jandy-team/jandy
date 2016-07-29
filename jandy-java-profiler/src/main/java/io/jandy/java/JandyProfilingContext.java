@@ -46,6 +46,7 @@ public class JandyProfilingContext {
   public DataObjectBuilder getBuilder() {
     return new DataObjectBuilder() {
       public void save(TreeNode node) {
+        node.setProfId(profId);
         collector.update(node);
       }
     };

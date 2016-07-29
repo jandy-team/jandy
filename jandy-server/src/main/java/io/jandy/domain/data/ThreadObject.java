@@ -1,10 +1,12 @@
 package io.jandy.domain.data;
 
+import java.io.Serializable;
+
 /**
  * @author JCooky
  * @since 2016-06-30
  */
-public class ThreadObject {
+public class ThreadObject implements Serializable {
   private long threadId;
   private String threadName;
   private String rootId;

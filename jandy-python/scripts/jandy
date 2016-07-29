@@ -24,6 +24,7 @@ branchName = os.getenv('TRAVIS_BRANCH')
 buildId = os.getenv('TRAVIS_BUILD_ID')
 buildNum = os.getenv('TRAVIS_BUILD_NUMBER')
 
+
 def wget(url, filename):
     if travis == 'true' and os.path.exists(filename):
         return
@@ -31,6 +32,13 @@ def wget(url, filename):
         response = requests.get(url)
         dest.write(response.content)
         response.close()
+
+
+def do_execute(args):
+    shfile = "_jandy_prof.sh"
+    with open(shfile, "wt") as f:
+        f.writelines(" ".join(args))
+    subprocess.call(["bash", shfile])
 
 
 def do_profile(language, id, batchSize, argv):
@@ -42,7 +50,7 @@ def do_profile(language, id, batchSize, argv):
         args.insert(1, '-Djandy.base.url='+URL)
         args.insert(1, '-Djandy.sample.name='+id)
         args.insert(1, '-javaagent:jandy-java-profiler.jar')
-        subprocess.call(args)
+        do_execute(args)
         # base64.encode('java-profiler-result.jandy', id + '.jandy')
         # shutil.move('java-profiler-result.jandy', id + '.jandy')
 
@@ -64,13 +72,25 @@ if __name__ == '__main__':
 
         files = []
         try:
+            r = requests.post(URL + "/rest/travis/begin", data={
+                'ownerName': ownerName,
+                'repoName': repoName,
+                'branchName': branchName,
+                'buildId': buildId,
+                'buildNum': buildNum,
+                'lang': yml['language'].lower(),
+                'numSamples': len(yml['samples'])
+            })
+            if r.status_code is not 200:
+                r.raise_for_status()
+
             for sample in yml['samples']:
                 sampleId = sample['id']
                 argv = sample['script'].split()
                 do_profile(yml['language'].lower(), sampleId, batchSize, argv)
 
             r = requests.post(URL + "/rest/travis/finish", data={
-                buildId: buildId
+                'buildId': buildId
             })
             r.raise_for_status()
         finally:

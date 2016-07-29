@@ -1,10 +1,12 @@
 package io.jandy.domain.data;
 
+import java.io.Serializable;
+
 /**
  * @author JCooky
  * @since 2016-03-16
  */
-public class Accumulator {
+public class Accumulator implements Serializable {
   private long startTime;
   private long elapsedTime;
   private ExceptionObject exception;

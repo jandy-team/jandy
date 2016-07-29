@@ -23,10 +23,6 @@ public class ProfContextDump {
   // elapsed duration to be compare prev build
   private Long elapsedDuration;
 
-  @ElementCollection
-  @CollectionTable
-  private List<ProfTreeNode> slowedNodes;
-
   @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "profContext")
   @JsonIgnore
   private List<ProfThread> threads = new ArrayList<>();
@@ -66,15 +62,6 @@ public class ProfContextDump {
     return this;
   }
 
-  public List<ProfTreeNode> getSlowedNodes() {
-    return slowedNodes;
-  }
-
-  public ProfContextDump setSlowedNodes(List<ProfTreeNode> slowedNodes) {
-    this.slowedNodes = slowedNodes;
-    return this;
-  }
-
   public void setElapsedDuration(Long elapsedDuration) {
     this.elapsedDuration = elapsedDuration;
   }
@@ -98,7 +85,6 @@ public class ProfContextDump {
         .append("id", id)
         .append("maxTotalDuration", maxTotalDuration)
         .append("elapsedDuration", elapsedDuration)
-        .append("slowedNodes", slowedNodes)
         .append("build_id", build.getId())
         .append("sample_id", sample.getId())
         .toString();

@@ -1,0 +1,4 @@
+jandy:
+  zk:
+    type: cluster
+    connections: localhost:2181

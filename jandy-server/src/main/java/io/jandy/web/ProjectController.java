@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.http.CacheControl;
@@ -62,13 +61,17 @@ public class ProjectController {
 
   @RequestMapping(method = RequestMethod.GET)
   public ModelAndView index() throws Exception {
-    List<Project> projects = userService.getSelf().getProjects();
-
-    if (projects.isEmpty()) {
-      logger.debug("Send redirect to /profile");
-      return new ModelAndView("redirect:/profile");
+    if (userService.isAnonymous()) {
+      return new ModelAndView("redirect:/");
     } else {
-      return new ModelAndView("redirect:/repos/" + projects.get(0).getAccount() + "/" + projects.get(0).getName());
+      List<Project> projects = userService.getSelf().getProjects();
+
+      if (projects.isEmpty()) {
+        logger.debug("Send redirect to /profile");
+        return new ModelAndView("redirect:/profile");
+      } else {
+        return new ModelAndView("redirect:/repos/" + projects.get(0).getAccount() + "/" + projects.get(0).getName());
+      }
     }
   }
 
@@ -102,7 +105,7 @@ public class ProjectController {
 
   @RequestMapping(value = "/{account}/{projectName}.svg")
   public ResponseEntity<String> getBadge(@PathVariable String account, @PathVariable String projectName) throws Exception {
-    return getBadge(account, projectName, "master");
+    return getBadge(account, projectName, github.getRepo(account, projectName).getDefaultBranch());
   }
 
   @RequestMapping(value = "/{account}/{projectName}/{branchName}.svg")

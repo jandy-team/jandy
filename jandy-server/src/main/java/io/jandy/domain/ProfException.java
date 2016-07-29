@@ -12,6 +12,7 @@ public class ProfException {
   @GeneratedValue
   private Long id;
 
+  @Column(length = 1024)
   private String message;
 
   @ManyToOne

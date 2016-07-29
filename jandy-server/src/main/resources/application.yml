@@ -28,6 +28,9 @@ security:
       userInfoUri: https://api.github.com/user
       preferTokenInfo: false
 server.port: 3000
+jandy:
+  zk:
+    type: embedded
 multipart:
   enabled: true
   max-file-size: 512MB

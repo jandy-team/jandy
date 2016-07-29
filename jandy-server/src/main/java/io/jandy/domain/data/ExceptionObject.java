@@ -1,10 +1,12 @@
 package io.jandy.domain.data;
 
+import java.io.Serializable;
+
 /**
  * @author JCooky
  * @since 2016-03-16
  */
-public class ExceptionObject {
+public class ExceptionObject implements Serializable {
 
   private String id;
   private ClassObject klass;

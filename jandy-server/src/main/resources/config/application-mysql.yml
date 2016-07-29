@@ -6,6 +6,7 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
+#    url: jdbc:mysql://localhost/jandy?useUnicode=true&characterEncoding=utf8
     url: jdbc:mysql://localhost/jandy?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true
     username: root
     password:

@@ -8,15 +8,10 @@ import io.jandy.java.data.TreeNode;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author JCooky
@@ -55,12 +50,8 @@ public class ProfilingLogCollector {
           try {
             os = conn.getOutputStream();
             Map<String, Object> model = new HashMap<String, Object>();
-            model.put("repoSlug", repoSlug);
-            model.put("sampleName", sampleName);
-            model.put("branchName", branchName);
             model.put("buildId", buildId);
-            model.put("buildNum", buildNum);
-            model.put("lang", lang);
+            model.put("sampleName", sampleName);
 
             os.write(new Gson().toJson(model).getBytes(UTF_8));
             os.flush();
@@ -95,9 +86,9 @@ public class ProfilingLogCollector {
       public Void call() throws IOException {
         HttpURLConnection conn = null;
         try {
-          conn = (HttpURLConnection) new URL(baseUrl).openConnection();
+          conn = (HttpURLConnection) new URL(baseUrl+"/"+profId).openConnection();
           conn.setRequestProperty("Content-Type", "application/json");
-          conn.setRequestMethod("DELETE");
+          conn.setRequestMethod("POST");
           conn.setUseCaches(false);
           conn.setDoInput(true);
           conn.setDoOutput(true);

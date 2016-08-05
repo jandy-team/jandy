@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
  * @since 2016-06-14
  */
 @Repository
-public interface ProfExceptionRepository extends JpaRepository<ProfException, Long> {
+public interface ProfExceptionRepository extends JpaRepository<ProfException, String> {
 }

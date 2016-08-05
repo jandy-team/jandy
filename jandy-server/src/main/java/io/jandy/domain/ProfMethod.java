@@ -16,7 +16,7 @@ public class ProfMethod {
   private Long id;
 
   private String name;
-  @Column(length = 1024)
+  @Column(length = 512)
   private String descriptor;
   private int access;
 

@@ -279,6 +279,9 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <mainClass>io.jandy.JandyApplicationServer</mainClass>
+        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>

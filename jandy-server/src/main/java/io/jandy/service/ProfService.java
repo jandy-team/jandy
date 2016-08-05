@@ -1,17 +1,31 @@
 package io.jandy.service;
 
+import com.google.common.collect.Sets;
 import io.jandy.domain.*;
 import io.jandy.domain.data.*;
+import io.jandy.util.sql.BatchUpdateQueryBuilder;
+import io.jandy.util.sql.InsertQueryBuilder;
+
+import static io.jandy.util.sql.Query.*;
+import static io.jandy.util.sql.conditional.Where.eq;
+
+import io.jandy.util.sql.SelectQueryBuilder;
+import org.hibernate.engine.jdbc.internal.BasicFormatterImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author JCooky
@@ -19,7 +33,7 @@ import java.util.List;
  */
 @Service
 public class ProfService {
-  private static final Logger logger = LoggerFactory.getLogger(ProfService.class);
+  private static final Logger log = LoggerFactory.getLogger(ProfService.class);
 
   @Autowired
   private ProfClassRepository profClassRepository;
@@ -46,46 +60,8 @@ public class ProfService {
   @Autowired
   private CommitRepository commitRepository;
 
-
-  @Transactional(readOnly = true)
-  public ProfClass findClass(String name, String packageName) {
-    ProfClass klass = profClassRepository.findByNameAndPackageName(name, packageName);
-    if (klass == null) {
-      klass = createClass(name, packageName);
-    }
-
-    return klass;
-  }
-
-  @Transactional
-  public synchronized ProfClass createClass(String name, String packageName) {
-    ProfClass klass = new ProfClass();
-    klass.setName(name);
-    klass.setPackageName(packageName);
-
-    return profClassRepository.save(klass);
-  }
-
-  @Transactional(readOnly = true)
-  public ProfMethod findMethod(String name, String descriptor, int access, ProfClass klass) {
-    ProfMethod method = profMethodRepository.findByNameAndDescriptorAndAccessAndOwner_Id(name, descriptor, access, klass.getId());
-    if (method == null) {
-      method = createMethod(name, descriptor, access, klass);
-    }
-
-    return method;
-  }
-
-  @Transactional
-  public synchronized ProfMethod createMethod(String name, String descriptor, int access, ProfClass klass) {
-    ProfMethod method = new ProfMethod();
-    method.setName(name);
-    method.setDescriptor(descriptor);
-    method.setAccess(access);
-    method.setOwner(klass);
-    return profMethodRepository.save(method);
-  }
-
+  @Autowired
+  private JdbcTemplate jdbc;
 
   @Transactional
   public void doSaveProf(ProfilingContext profilingContext) throws InterruptedException {
@@ -126,89 +102,114 @@ public class ProfService {
 
     prof = profContextDumpRepository.save(prof);
 
-    logger.debug("threads: {}", prof.getThreads());
-    logger.info("Finish ProfilingContext ({})", prof.getId());
-  }
-
-
-  @Transactional
-  public void doUpdateTreeNodes(List<TreeNode> treeNodes) throws IOException {
-    int cnt = treeNodes.size(), i = 0;
-
-    logger.trace("---------- START ----------- ");
-    for (TreeNode node : treeNodes) {
-      updateTreeNode(node);
-      ++i;
-
-      if (i >= 500) {
-        em.flush();
-        em.clear();
-        i = 0;
-      }
-    }
-
-    em.flush();
-    em.clear();
-
-    logger.trace("----------  END  ----------- ");
-
-    logger.debug("Number of saved call nodes: {}", cnt);
+    log.debug("threads: {}", prof.getThreads());
+    log.info("Finish ProfilingContext ({})", prof.getId());
   }
 
   @Transactional
-  public void updateTreeNode(TreeNode treeNodeData) {
-    ProfMethod method = null;
-    if (treeNodeData.getMethod() != null) {
-      while (true) {
-        try {
-          ClassObject co = treeNodeData.getMethod().getOwner();
-          ProfClass klass = this.findClass(co.getName(), co.getPackageName());
+  public void doUpdateTreeNodes(List<TreeNode> treeNodes) {
+    int index = 0;
 
-          MethodObject mo = treeNodeData.getMethod();
-          method = this.findMethod(mo.getName(), mo.getDescriptor(), mo.getAccess(), klass);
-          break;
-        } catch (DataIntegrityViolationException e) {
-          logger.warn(e.getMessage(), e);
-        }
-      }
+    while (index < treeNodes.size()) {
+      doUpdateTreeNodes0(treeNodes.subList(index, Math.min(treeNodes.size(), index + 500)));
+      index += 500;
     }
 
-    ProfTreeNode parent = null;
-    if (treeNodeData.getParentId() != null) {
-      parent = profTreeNodeRepository.findOne(treeNodeData.getParentId());
-      if (parent == null) {
-        parent = new ProfTreeNode();
-        parent.setId(treeNodeData.getParentId());
-        parent = profTreeNodeRepository.save(parent);
-      }
-    }
-
-    ProfTreeNode treeNode = profTreeNodeRepository.findOne(treeNodeData.getId());
-    if (treeNode == null) {
-      treeNode = new ProfTreeNode();
-      treeNode.setId(treeNodeData.getId());
-    }
-
-    treeNode.setMethod(method);
-    treeNode.setRoot(treeNodeData.isRoot());
-    treeNode.setElapsedTime(treeNodeData.getAcc() == null ? 0L : treeNodeData.getAcc().getElapsedTime());
-    treeNode.setStartTime(treeNodeData.getAcc() == null ? 0L : treeNodeData.getAcc().getStartTime());
-    treeNode.setException(treeNodeData.getAcc() == null ? null : createException(treeNodeData.getAcc().getException()));
-    treeNode.setParent(parent);
-    treeNode = profTreeNodeRepository.save(treeNode);
+    log.debug("Finish to update tree nodes");
   }
 
-  private ProfException createException(ExceptionObject exception) {
-    if (exception == null)
-      return null;
+  @Transactional
+  private void doUpdateTreeNodes0(List<TreeNode> treeNodes) {
+    BasicFormatterImpl formatter = new BasicFormatterImpl();
 
-    ProfException e = new ProfException();
-    e.setMessage(exception.getMessage());
-    e.setKlass(this.findClass(exception.getKlass().getName(), exception.getKlass().getPackageName()));
+    Set<MethodObject> methodObjects = treeNodes.stream().map(TreeNode::getMethod).filter(Objects::nonNull).collect(Collectors.toSet());
+    Set<ClassObject> classObjects = treeNodes.stream().map(TreeNode::getMethod).filter(Objects::nonNull).map(MethodObject::getOwner).filter(Objects::nonNull).collect(Collectors.toSet());
+    List<ExceptionObject> exceptionObjects = treeNodes.stream().map(n -> n.getAcc() == null ? null : n.getAcc().getException()).filter(Objects::nonNull).collect(Collectors.toList());
 
-    return profExceptionRepository.save(e);
+    if (classObjects.size() > 0) {
+      InsertQueryBuilder q = insert().ignore().into("prof_class")
+          .columns("name", "package_name");
+      classObjects.forEach(co -> q.value(co.getName(), co.getPackageName()));
+
+      String sql = q.toSql();
+      jdbc.update(sql);
+    }
+
+    if (methodObjects.size() > 0) {
+      InsertQueryBuilder q = insert().ignore().into("prof_method")
+          .columns("name", "access", "descriptor", "owner_id");
+      methodObjects.forEach(mo -> q.value(mo.getName(), mo.getAccess(), mo.getDescriptor(),
+          subQuery(
+              select().columns("id").from("prof_class").where(
+                  eq("name", mo.getOwner().getName()).and(eq("package_name", mo.getOwner().getPackageName()))
+              )
+          )
+      ));
+
+      String sql = q.toSql();
+      jdbc.update(sql);
+    }
+
+    if (exceptionObjects.size() > 0) {
+      InsertQueryBuilder q = insert().ignore().into("prof_exception").columns("id", "message", "klass_id");
+      exceptionObjects.forEach(eo -> q.value(
+          eo.getId(), eo.getMessage(),
+          subQuery(
+              select().columns("id").from("prof_class").where(
+                  eq("name", eo.getKlass().getName()).and(eq("package_name", eo.getKlass().getPackageName()))
+              )
+          )
+      ));
+
+      String sql = q.toSql();
+      jdbc.update(sql);
+    }
+
+    Set<String> ids = treeNodes.stream().map(TreeNode::getParentId).filter(Objects::nonNull).collect(Collectors.toSet());
+    ids.addAll(treeNodes.stream().map(TreeNode::getId).filter(Objects::nonNull).collect(Collectors.toSet()));
+
+    if (ids.size() > 0) {
+      InsertQueryBuilder q = insert().ignore().into("prof_tree_node").columns("id", "elapsed_time", "root", "start_time");
+      for (String id : ids) q.value(id, 0, 0, 0);
+
+      String sql = q.toSql();
+      jdbc.update(sql);
+    }
+
+    if (treeNodes.size() > 0) {
+      BatchUpdateQueryBuilder<String> q = update("prof_tree_node");
+      for (TreeNode treeNodeData : treeNodes) {
+        String id = treeNodeData.getId();
+        MethodObject mo = treeNodeData.getMethod();
+        ExceptionObject eo = treeNodeData.getAcc() == null ? null : treeNodeData.getAcc().getException();
+
+        q
+            .set(id, "elapsed_time", treeNodeData.getAcc() == null ? 0L : treeNodeData.getAcc().getElapsedTime())
+            .set(id, "start_time", treeNodeData.getAcc() == null ? 0L : treeNodeData.getAcc().getStartTime())
+            .set(id, "root", treeNodeData.isRoot())
+            .set(id, "exception_id", eo == null ? null : eo.getId())
+            .set(id, "method_id", mo == null ? null : subQuery(
+                select().columns("id").from("prof_method").where(
+                    eq("access", mo.getAccess()).and(
+                        eq("descriptor", mo.getDescriptor()).and(
+                            eq("name", mo.getName()).and(
+                                eq("owner_id", mo.getOwner() == null ? null : subQuery(
+                                    select().columns("id").from("prof_class").where(
+                                        eq("name", mo.getOwner().getName()).and(eq("package_name", mo.getOwner().getPackageName()))
+                                    )
+                                ))
+                            )
+                        )
+                    )
+                )
+            ))
+            .set(id, "parent_id", treeNodeData.getParentId());
+      }
+
+      String sql = q.toSql();
+      jdbc.update(sql);
+    }
   }
-
 
   @Transactional
   public void doFinish(long buildId) {
@@ -240,9 +241,9 @@ public class ProfService {
         }
       }
 
-      logger.trace("Save the build information{buildId: {}}", build);
+      log.trace("Save the build information{buildId: {}}", build);
     } catch (InterruptedException | IOException | IllegalStateException e) {
-      logger.error(e.getMessage(), e);
+      log.error(e.getMessage(), e);
     }
 
     buildRepository.save(build);

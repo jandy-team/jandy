@@ -1,6 +1,7 @@
 package io.jandy.domain.data;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * @author JCooky
@@ -58,24 +59,15 @@ public class MethodObject implements Serializable {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-
     MethodObject that = (MethodObject) o;
-
-    if (access != that.access) return false;
-    if (id != null ? !id.equals(that.id) : that.id != null) return false;
-    if (name != null ? !name.equals(that.name) : that.name != null) return false;
-    if (descriptor != null ? !descriptor.equals(that.descriptor) : that.descriptor != null) return false;
-    return owner != null ? owner.equals(that.owner) : that.owner == null;
-
+    return access == that.access &&
+        Objects.equals(name, that.name) &&
+        Objects.equals(descriptor, that.descriptor) &&
+        Objects.equals(owner, that.owner);
   }
 
   @Override
   public int hashCode() {
-    int result = id != null ? id.hashCode() : 0;
-    result = 31 * result + (name != null ? name.hashCode() : 0);
-    result = 31 * result + access;
-    result = 31 * result + (descriptor != null ? descriptor.hashCode() : 0);
-    result = 31 * result + (owner != null ? owner.hashCode() : 0);
-    return result;
+    return Objects.hash(name, access, descriptor, owner);
   }
 }

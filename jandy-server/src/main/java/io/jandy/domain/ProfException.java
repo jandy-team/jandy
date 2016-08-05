@@ -9,8 +9,7 @@ import javax.persistence.*;
 @Entity
 public class ProfException {
   @Id
-  @GeneratedValue
-  private Long id;
+  private String id;
 
   @Column(length = 1024)
   private String message;
@@ -21,11 +20,11 @@ public class ProfException {
   @OneToOne(mappedBy = "exception")
   private ProfTreeNode treeNode;
 
-  public Long getId() {
+  public String getId() {
     return id;
   }
 
-  public ProfException setId(Long id) {
+  public ProfException setId(String id) {
     this.id = id;
     return this;
   }

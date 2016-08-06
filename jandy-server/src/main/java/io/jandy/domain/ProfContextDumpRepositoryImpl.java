@@ -1,17 +1,9 @@
 package io.jandy.domain;
 
-import com.mysema.query.Tuple;
-import com.mysema.query.jpa.impl.JPAQuery;
-import com.mysema.query.jpa.impl.JPAQueryFactory;
-import io.jandy.JandyApplicationServer;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author JCooky
@@ -32,13 +24,13 @@ public class ProfContextDumpRepositoryImpl implements ProfContextDumpRepositoryC
     long buildNumber = current.getBuild().getNumber();
     long sampleId = current.getSample().getId();
 
-    return qf.query()
+    return qf.select(p)
         .from(s, b, br, p)
         .where(s.id.eq(sampleId), br.id.eq(branchId), s.builds.contains(b), b.samples.contains(s), p.build.eq(b), b.branch.eq(br), p.sample.eq(s),
             b.number.lt(buildNumber))
         .orderBy(b.number.desc())
         .limit(1L)
-        .uniqueResult(p);
+        .fetchOne();
   }
 
   @Override
@@ -47,9 +39,9 @@ public class ProfContextDumpRepositoryImpl implements ProfContextDumpRepositoryC
     QProfContextDump p = QProfContextDump.profContextDump;
     QSample s = QSample.sample;
 
-    return qf.query()
+    return qf.select(p)
         .from(s, b, p)
         .where(b.id.eq(build.getId()), b.samples.contains(s), p.build.eq(b), p.sample.eq(s))
-        .list(p);
+        .fetch();
   }
 }

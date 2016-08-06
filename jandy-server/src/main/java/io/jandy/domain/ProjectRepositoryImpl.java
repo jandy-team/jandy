@@ -1,6 +1,6 @@
 package io.jandy.domain;
 
-import com.mysema.query.jpa.impl.JPAQueryFactory;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static io.jandy.domain.QBranch.branch;
@@ -19,9 +19,9 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
     QBuild b = QBuild.build;
     QBranch br = branch;
 
-    return qf.query()
+    return qf.select(p)
         .from(p, b, br)
         .where(b.id.eq(build.getId()), b.branch.eq(br), br.project.eq(p))
-        .uniqueResult(p);
+        .fetchOne();
   }
 }

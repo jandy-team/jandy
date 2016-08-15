@@ -36,20 +36,12 @@ public class ProfService {
   private static final Logger log = LoggerFactory.getLogger(ProfService.class);
 
   @Autowired
-  private ProfClassRepository profClassRepository;
-  @Autowired
-  private ProfMethodRepository profMethodRepository;
-
-  @Autowired
   private ProfTreeNodeRepository profTreeNodeRepository;
   @Autowired
   private ProfThreadRepository profThreadRepository;
 
   @Autowired
   private BuildRepository buildRepository;
-
-  @Autowired
-  private EntityManager em;
 
   @Autowired
   private ProfExceptionRepository profExceptionRepository;
@@ -120,60 +112,54 @@ public class ProfService {
 
   @Transactional
   private void doUpdateTreeNodes0(List<TreeNode> treeNodes) {
-    BasicFormatterImpl formatter = new BasicFormatterImpl();
-
     Set<MethodObject> methodObjects = treeNodes.stream().map(TreeNode::getMethod).filter(Objects::nonNull).collect(Collectors.toSet());
     Set<ClassObject> classObjects = treeNodes.stream().map(TreeNode::getMethod).filter(Objects::nonNull).map(MethodObject::getOwner).filter(Objects::nonNull).collect(Collectors.toSet());
     List<ExceptionObject> exceptionObjects = treeNodes.stream().map(n -> n.getAcc() == null ? null : n.getAcc().getException()).filter(Objects::nonNull).collect(Collectors.toList());
 
     if (classObjects.size() > 0) {
-      InsertQueryBuilder q = insert().ignore().into("prof_class")
-          .columns("name", "package_name");
-      classObjects.forEach(co -> q.value(co.getName(), co.getPackageName()));
-
-      String sql = q.toSql();
-      jdbc.update(sql);
+      insert().ignore().into("prof_class")
+          .columns("name", "package_name")
+          .values(classObjects.stream().map(co -> new Object[] {co.getName(), co.getPackageName()}))
+          .execute(jdbc);
     }
 
     if (methodObjects.size() > 0) {
-      InsertQueryBuilder q = insert().ignore().into("prof_method")
-          .columns("name", "access", "descriptor", "owner_id");
-      methodObjects.forEach(mo -> q.value(mo.getName(), mo.getAccess(), mo.getDescriptor(),
-          subQuery(
-              select().columns("id").from("prof_class").where(
-                  eq("name", mo.getOwner().getName()).and(eq("package_name", mo.getOwner().getPackageName()))
+      insert().ignore().into("prof_method")
+          .columns("name", "access", "descriptor", "owner_id")
+          .values(methodObjects.stream().map(mo -> new Object[]{
+              mo.getName(), mo.getAccess(), mo.getDescriptor(),
+              subQuery(
+                  select().columns("id").from("prof_class").where(
+                      eq("name", mo.getOwner().getName()).and(eq("package_name", mo.getOwner().getPackageName()))
+                  )
               )
-          )
-      ));
-
-      String sql = q.toSql();
-      jdbc.update(sql);
+          }))
+          .execute(jdbc);
     }
 
     if (exceptionObjects.size() > 0) {
-      InsertQueryBuilder q = insert().ignore().into("prof_exception").columns("id", "message", "klass_id");
-      exceptionObjects.forEach(eo -> q.value(
-          eo.getId(), eo.getMessage(),
-          subQuery(
-              select().columns("id").from("prof_class").where(
-                  eq("name", eo.getKlass().getName()).and(eq("package_name", eo.getKlass().getPackageName()))
+      insert().ignore().into("prof_exception")
+          .columns("id", "message", "klass_id")
+          .values(exceptionObjects.stream().map(eo -> new Object[]{
+              eo.getId(), eo.getMessage(),
+              subQuery(
+                  select().columns("id").from("prof_class").where(
+                      eq("name", eo.getKlass().getName()).and(eq("package_name", eo.getKlass().getPackageName()))
+                  )
               )
-          )
-      ));
-
-      String sql = q.toSql();
-      jdbc.update(sql);
+          }))
+          .execute(jdbc);
     }
 
     Set<String> ids = treeNodes.stream().map(TreeNode::getParentId).filter(Objects::nonNull).collect(Collectors.toSet());
     ids.addAll(treeNodes.stream().map(TreeNode::getId).filter(Objects::nonNull).collect(Collectors.toSet()));
 
     if (ids.size() > 0) {
-      InsertQueryBuilder q = insert().ignore().into("prof_tree_node").columns("id", "elapsed_time", "root", "start_time");
-      for (String id : ids) q.value(id, 0, 0, 0);
-
-      String sql = q.toSql();
-      jdbc.update(sql);
+      insert().ignore().into("prof_tree_node").columns("id", "elapsed_time", "root", "start_time")
+          .values(ids.stream().map(id -> new Object[]{
+              id, 0, 0, 0
+          }))
+          .execute(jdbc);
     }
 
     if (treeNodes.size() > 0) {
@@ -206,8 +192,7 @@ public class ProfService {
             .set(id, "parent_id", treeNodeData.getParentId());
       }
 
-      String sql = q.toSql();
-      jdbc.update(sql);
+      q.execute(jdbc);
     }
   }
 

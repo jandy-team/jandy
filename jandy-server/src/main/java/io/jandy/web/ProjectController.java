@@ -88,7 +88,15 @@ public class ProjectController {
         b.setBuildAt(p.format(DatatypeConverter.parseDateTime(b.getFinishedAt())));
       if (b.getCommit() != null) {
         GHUser user = null;
-        user = github.getUser(b.getCommit().getCommitterName());
+        try {
+          if(github.getUser(b.getCommit().getCommitterName()) != null){
+            user = github.getUser(b.getCommit().getCommitterName());
+          }else{}
+        }catch (NullPointerException e){
+          logger.error(e.getMessage(),e);
+        }catch (Exception e ){
+          logger.error(e.getMessage(),e);
+        }
         // TODO This code is temporary
         b.getCommit().setCommitterAvatarUrl(user == null ? null : user.getAvatarUrl());
       }

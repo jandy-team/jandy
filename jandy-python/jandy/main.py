@@ -1,7 +1,7 @@
 import os
 import sys
 from jandy.profiler import Profiler
-
+import six
 
 def usage():
     print("# python -m jandy <script file>")
@@ -25,6 +25,10 @@ def main():
         }
         sub_locals = {}
         try:
+<<<<<<< HEAD
                 exec(code, sub_globals, sub_locals)
+=======
+                six.exec_(code, sub_globals, sub_locals)
+>>>>>>> fc92cb30491ab88d6ade6f7cc2c676baee50ff6a
         finally:
             pr.done()

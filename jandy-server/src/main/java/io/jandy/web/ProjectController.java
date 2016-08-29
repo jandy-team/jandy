@@ -88,7 +88,7 @@ public class ProjectController {
         b.setBuildAt(p.format(DatatypeConverter.parseDateTime(b.getFinishedAt())));
       if (b.getCommit() != null) {
         GHUser user = null;
-        try {
+        try{
           if(github.getUser(b.getCommit().getCommitterName()) != null){
             user = github.getUser(b.getCommit().getCommitterName());
           }else{}

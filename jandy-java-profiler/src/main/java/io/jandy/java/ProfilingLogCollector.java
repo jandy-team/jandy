@@ -90,7 +90,7 @@ public class ProfilingLogCollector {
           conn.setRequestProperty("Content-Type", "application/json");
           conn.setRequestMethod("POST");
           conn.setUseCaches(false);
-          conn.setDoInput(true);
+          conn.setDoInput(false);
           conn.setDoOutput(true);
 
           OutputStream os = null;
@@ -108,7 +108,7 @@ public class ProfilingLogCollector {
               os.close();
           }
 
-          conn.getInputStream().close();
+//          conn.getInputStream().close();
         } finally {
           if (conn != null)
             conn.disconnect();
@@ -156,7 +156,7 @@ public class ProfilingLogCollector {
           conn.setRequestProperty("Content-Type", "application/json");
           conn.setRequestMethod("PUT");
           conn.setUseCaches(false);
-          conn.setDoInput(true);
+          conn.setDoInput(false);
           conn.setDoOutput(true);
 
           OutputStream os = null;
@@ -180,7 +180,7 @@ public class ProfilingLogCollector {
               os.close();
           }
 
-          conn.getInputStream().close();
+//          conn.getInputStream().close();
         } finally {
           if (conn != null)
             conn.disconnect();

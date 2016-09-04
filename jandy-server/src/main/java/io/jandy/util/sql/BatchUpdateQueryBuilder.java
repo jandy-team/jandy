@@ -2,6 +2,7 @@ package io.jandy.util.sql;
 
 import io.jandy.util.sql.conditional.Where;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +34,10 @@ public class BatchUpdateQueryBuilder<ID> {
 
     }
     return this;
+  }
+
+  public int execute(JdbcTemplate jdbc) {
+    return jdbc.update(toSql());
   }
 
   public String toSql() {

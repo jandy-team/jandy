@@ -3,8 +3,10 @@ package io.jandy.util.sql;
 import io.jandy.domain.data.ClassObject;
 import io.jandy.util.sql.conditional.Where;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * @author JCooky
@@ -39,6 +41,15 @@ public class InsertQueryBuilder {
   public InsertQueryBuilder value(Object... value) {
     this.values.add(value);
     return this;
+  }
+
+  public InsertQueryBuilder values(Stream<Object[]> values) {
+    values.forEach(this::value);
+    return this;
+  }
+
+  public int execute(JdbcTemplate jdbc) {
+    return jdbc.update(toSql());
   }
 
   public String toSql() {

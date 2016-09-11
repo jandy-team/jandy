@@ -3,8 +3,10 @@ import sys
 from jandy.profiler import Profiler
 import six
 
+
 def usage():
     print("# python -m jandy <script file>")
+
 
 def main():
     if len(sys.argv) < 1:
@@ -17,6 +19,7 @@ def main():
         sys.path.insert(0, os.path.dirname(progname))
         code = compile(f.read(), progname, "exec")
         pr = Profiler()
+
         pr.start()
         sub_globals = {
             '__file__': progname,

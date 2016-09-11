@@ -5,24 +5,24 @@ import traceback
 import math
 import sys
 
-from jandy.factory import treeNode, profilingContext, exceptionObject
+from jandy.factory import ProfilingThreadContext, profilingContext
 import time
 
 
-class MethodHandler(object):
+class ThreadHandler(object):
     def __init__(self):
+        self.context = ProfilingThreadContext()
         self.nodes = []
         self.current = {'id': None, 'childrenIds': list()}
-        self.root = None
 
     def enter(self, frame):
         if '__package__' in frame.f_globals.keys() and frame.f_globals['__package__'] == 'jandy':
             return
 
         # print('---- ENTER')
-        n = treeNode(frame, self.current['id'])
-        if self.root is None:
-            self.root = n
+        n = self.context.treeNode(frame, self.current['id'])
+        if self.context.root is None:
+            self.context.root = n
 
         n['acc']['t_startTime'] = time.time()
         n['acc']['concurThreadName'] = threading.current_thread().name
@@ -44,31 +44,31 @@ class MethodHandler(object):
         self.current['acc']['elapsedTime'] = math.floor(elapsedTime * 1000.0 * 1000.0 * 1000.0)
         if excepted:
             (exception, value, traceback) = arg
-            self.current['acc']['exceptionId'] = exceptionObject(exception, value, traceback)['id']
+            self.current['acc']['exceptionId'] = self.context.exceptionObject(exception, value, traceback)['id']
 
         # print('EXIT - '+str(self.current))
         if not excepted:
             self.current = self.nodes.pop()
 
 
-class MethodHandlerContext(object):
+class ThreadHandlerContext(object):
     def __init__(self):
-        self.methodHandlers = []
+        self.threadHandlers = []
         self.local = threading.local()
 
     def get(self):
-        if hasattr(self.local, 'methodHandler') is not True:
-            self.local.methodHandler = MethodHandler()
-            self.methodHandlers.append(self.local.methodHandler)
-        return self.local.methodHandler
+        if hasattr(self.local, 'threadHandler') is not True:
+            self.local.threadHandler = ThreadHandler()
+            self.threadHandlers.append(self.local.threadHandler)
+        return self.local.threadHandler
 
-    def roots(self):
-        return [m.root for m in self.methodHandlers]
+    def results(self):
+        return [t.context.build() for t in self.threadHandlers]
+
 
 class Profiler(object):
-
     def __init__(self):
-        self.context = MethodHandlerContext()
+        self.context = ThreadHandlerContext()
 
     def start(self):
         sys.settrace(self.trace)
@@ -78,7 +78,7 @@ class Profiler(object):
 
     def done(self):
         self.stop()
-        context = profilingContext(self.context.roots())
+        context = profilingContext(self.context.results())
         with open("python-profiler-result.jandy", "wt") as f:
             json.dump(context, f)
 

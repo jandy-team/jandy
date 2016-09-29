@@ -11,10 +11,10 @@ import yaml
 travis = os.getenv('TRAVIS')
 ci = os.getenv('CI')
 
-if os.getenv('DEV') == 'true':
-    URL = "http://dev.jandy.io"
+if os.getenv('JANDY_HOST'):
+    URL = os.getenv("JANDY_HOST")
 elif travis == 'true' and ci == 'true':
-    URL = "http://jandy.io"
+    URL = "http://jandy.org"
 else:
     URL = "http://localhost:3000"
 JAVA_PROFILER_URL = URL + "/jandy-java-profiler.jar"
@@ -24,6 +24,7 @@ ownerName, repoName = os.getenv('TRAVIS_REPO_SLUG').split('/')
 branchName = os.getenv('TRAVIS_BRANCH')
 buildId = os.getenv('TRAVIS_BUILD_ID')
 buildNum = os.getenv('TRAVIS_BUILD_NUMBER')
+
 
 def wget(url, filename):
     if travis == 'true' and os.path.exists(filename):

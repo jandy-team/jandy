@@ -12,12 +12,14 @@ import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +32,8 @@ import java.util.function.Function;
 @Service
 public class GitHubService {
   private Logger logger = LoggerFactory.getLogger(GitHubService.class);
+
+  public final static int PROJECTS_NUMBER_PER_PAGE = 10;
 
   @Autowired
   private OAuth2ClientContext clientContext;
@@ -70,7 +74,28 @@ public class GitHubService {
 
   public List<GHRepo> getUserRepos(String login) {
     String url = url("https://api.github.com/users/{login}/repos");
-    return Arrays.asList(executeWithCache(url, (restTemplate) -> restTemplate.getForEntity(url, GHRepo[].class, login)));
+
+    String tempUrl = url + "&per_page=" + PROJECTS_NUMBER_PER_PAGE;
+
+    return Arrays.asList(executeWithCache(tempUrl, (restTemplate) -> restTemplate.getForEntity(tempUrl, GHRepo[].class, login)));
+  }
+
+  public List<GHRepo> getNextPageUserRepos(String login, int projectCount) {
+
+    String url = url("https://api.github.com/users/{login}/repos");
+    int nextPageIndex = (projectCount / PROJECTS_NUMBER_PER_PAGE) + 1;
+    String tempUrl = url + "&per_page=" + PROJECTS_NUMBER_PER_PAGE + "&page=" + nextPageIndex;
+
+    return Arrays.asList(executeWithCache(tempUrl, (restTemplate) -> restTemplate.getForEntity(tempUrl, GHRepo[].class, login)));
+  }
+
+  public List<GHRepo> getNextPageOrgRepos(String login, int projectCount) {
+
+    String url = url("https://api.github.com/orgs/{login}/repos");
+    int nextPageIndex = (projectCount / PROJECTS_NUMBER_PER_PAGE) + 1;
+    String tempUrl = url + "&per_page=" + PROJECTS_NUMBER_PER_PAGE + "&page=" + nextPageIndex;
+
+    return Arrays.asList(executeWithCache(tempUrl, (restTemplate) -> restTemplate.getForEntity(tempUrl, GHRepo[].class, login)));
   }
 
   public List<GHRepo> getOrgRepos(String login) {
@@ -92,18 +117,23 @@ public class GitHubService {
   }
 
   private <R> R executeWithCache(String key, Function<RestTemplate, ResponseEntity<R>> f) {
+    return executeWithCache0(key, f).getBody();
+  }
+
+  private <R> HttpCacheEntry<R> executeWithCache0(String key, Function<RestTemplate, ResponseEntity<R>> f) {
     Cache cache = cacheManager.getCache(key);
-    HttpCacheEntry entry = cache.get(key, HttpCacheEntry.class);
+    HttpCacheEntry<R> entry = cache.get(key, HttpCacheEntry.class);
     RestTemplate restTemplate = createRestTemplate(entry == null ? null : entry.getEtag());
     ResponseEntity<R> httpEntity = f.apply(restTemplate);
     if (entry == null || !HttpStatus.NOT_MODIFIED.equals(httpEntity.getStatusCode())) {
-      entry = new HttpCacheEntry();
+      entry = new HttpCacheEntry<>();
       entry.setEtag(httpEntity.getHeaders().getETag());
       entry.setBody(httpEntity.getBody());
+      entry.setHeaders(httpEntity.getHeaders());
       cache.put(key, entry);
     }
 
-    return (R) entry.getBody();
+    return entry;
   }
 
   private RestTemplate createRestTemplate(String etag) {

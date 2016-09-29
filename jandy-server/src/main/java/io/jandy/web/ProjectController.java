@@ -6,13 +6,15 @@ import io.jandy.exception.BadgeUnknownException;
 import io.jandy.exception.ProjectNotRegisteredException;
 import io.jandy.service.GitHubService;
 import io.jandy.service.UserService;
+import io.jandy.service.data.GHOrg;
+import io.jandy.service.data.GHRepo;
 import io.jandy.service.data.GHUser;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.http.CacheControl;
@@ -20,18 +22,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * @author JCooky
@@ -100,17 +98,17 @@ public class ProjectController {
           logger.error(e.getMessage(),e);
           committerAvatarUrl[0] = null;
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+          logger.error(e.getMessage(),e);
         }
         b.getCommit().setCommitterAvatarUrl(committerAvatarUrl[0]);
       }
     });
 
     return new ModelAndView("builds")
-        .addObject("project", project)
-        .addObject("url", url)
-        .addObject("builds", builds)
-        ;
+            .addObject("project", project)
+            .addObject("url", url)
+            .addObject("builds", builds)
+            ;
   }
 
   @RequestMapping(value = "/{account}/{projectName}.svg")
@@ -132,20 +130,20 @@ public class ProjectController {
     headers.setDate(current);
 
     return ResponseEntity
-        .ok()
-        .headers(headers)
-        .cacheControl(CacheControl.noCache())
-        .lastModified(current)
-        .eTag(Long.toString(latest.getId()))
-        .body(FreeMarkerTemplateUtils.processTemplateIntoString(configurer.getConfiguration().getTemplate("badge/mybadge.ftl"), latest));
+            .ok()
+            .headers(headers)
+            .cacheControl(CacheControl.noCache())
+            .lastModified(current)
+            .eTag(Long.toString(latest.getId()))
+            .body(FreeMarkerTemplateUtils.processTemplateIntoString(configurer.getConfiguration().getTemplate("badge/mybadge.ftl"), latest));
   }
 
   @ExceptionHandler(BadgeUnknownException.class)
   public ResponseEntity<String> getBadgeForUnknown() throws IOException, TemplateException {
     return ResponseEntity
-        .ok()
-        .cacheControl(CacheControl.noCache())
-        .lastModified(System.currentTimeMillis())
-        .body(FreeMarkerTemplateUtils.processTemplateIntoString(configurer.getConfiguration().getTemplate("badge/unknown-badge.ftl"), null));
+            .ok()
+            .cacheControl(CacheControl.noCache())
+            .lastModified(System.currentTimeMillis())
+            .body(FreeMarkerTemplateUtils.processTemplateIntoString(configurer.getConfiguration().getTemplate("badge/unknown-badge.ftl"), null));
   }
 }

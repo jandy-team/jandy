@@ -6,13 +6,14 @@ import io.jandy.exception.BadgeUnknownException;
 import io.jandy.exception.ProjectNotRegisteredException;
 import io.jandy.service.GitHubService;
 import io.jandy.service.UserService;
+import io.jandy.service.data.GHOrg;
+import io.jandy.service.data.GHRepo;
 import io.jandy.service.data.GHUser;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.http.CacheControl;
@@ -20,18 +21,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * @author JCooky
@@ -55,7 +52,7 @@ public class ProjectController {
   @Autowired
   private FreeMarkerConfigurer configurer;
   @Autowired
-  private GitHubService github;
+  private GitHubService gitHubService;
 
   @Autowired
   private UserService userService;
@@ -88,7 +85,7 @@ public class ProjectController {
         b.setBuildAt(p.format(DatatypeConverter.parseDateTime(b.getFinishedAt())));
       if (b.getCommit() != null) {
         GHUser user = null;
-        user = github.getUser(b.getCommit().getCommitterName());
+        user = gitHubService.getUser(b.getCommit().getCommitterName());
         b.getCommit().setCommitterAvatarUrl(user.getAvatarUrl());
       }
     });
@@ -135,4 +132,73 @@ public class ProjectController {
         .lastModified(System.currentTimeMillis())
         .body(FreeMarkerTemplateUtils.processTemplateIntoString(configurer.getConfiguration().getTemplate("badge/unknown-badge.ftl"), null));
   }
+
+
+  @RequestMapping(value = "/projects/{owner}", method = RequestMethod.GET)
+  @ResponseBody
+  public List<GHRepo> getProjects(@PathVariable String owner) {
+
+    GHUser ghUser = gitHubService.getUser();
+
+    Map<String, List<GHRepo>> repositories = new LinkedHashMap<>();
+    repositories.put(ghUser.getLogin(), gitHubService.getUserRepos(ghUser.getLogin()));
+
+    for (GHOrg org : gitHubService.getUserOrgs(ghUser.getLogin())) {
+      repositories.put(org.getLogin(), gitHubService.getOrgRepos(org.getLogin()));
+    }
+
+    return repositories.get(owner);
+  }
+
+  @RequestMapping(value = "/projects/imported/{owner}", method = RequestMethod.GET)
+  @ResponseBody
+  public List<String> getImportedProjects(@PathVariable String owner) {
+
+    List<Project> importedProjects = projectRepository.findByAccount(owner);
+
+    List<String> importedProjectsIds = new LinkedList<>();
+    for(Project importedProject : importedProjects) {
+      importedProjectsIds.add(String.valueOf(importedProject.getGitHubId()));
+    }
+
+    return importedProjectsIds;
+  }
+
+  @RequestMapping(value="/projects/loadNext/{owner}/{currentPageProjectCount}", method = RequestMethod.GET)
+  @ResponseBody
+  public List<GHRepo> loadNextPageProjects(@PathVariable String owner, @PathVariable int currentPageProjectCount) throws IOException {
+
+    logger.info("loadNextPageProjects owner : " + owner + " currentPageProjectCount : " + currentPageProjectCount);
+
+    GHUser ghUser = gitHubService.getUser();
+
+    List<GHRepo> nextPageProjects = new LinkedList<>();
+
+    int projectsCount = 0;
+    if(ghUser.getLogin().contentEquals(owner)) {
+      logger.info("load projects from user");
+      projectsCount = ghUser.getPublicRepos();
+
+      if(currentPageProjectCount >= projectsCount) {
+        return null;
+      }
+
+      nextPageProjects.addAll(gitHubService.getNextPageUserRepos(ghUser.getLogin(), currentPageProjectCount));
+
+    } else {
+      logger.info("load projects from org");
+      projectsCount = gitHubService.getOrg(owner).getPublicRepos();
+
+      if(currentPageProjectCount >= projectsCount) {
+        return null;
+      }
+
+      nextPageProjects.addAll(gitHubService.getNextPageOrgRepos(ghUser.getLogin(), currentPageProjectCount));
+
+    }
+
+    return nextPageProjects;
+  }
+
+
 }

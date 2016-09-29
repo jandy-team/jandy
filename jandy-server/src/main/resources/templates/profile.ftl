@@ -1,66 +1,154 @@
 <#include "include/layouts.ftl">
 <@layoutFully>
-  <link rel="stylesheet" href="${root}/css/profile.css">
-  <div id="profile" class="container-fluid">
-    <div class="row">
-      <aside id="left-menu" class="col-md-3 affix" role="navigation">
-        <div class="panel panel-default">
-          <div class="panel-heading" style="background-color: #fff">
-            <h3 class="panel-title" style="color: rgb(139, 139, 139); font-size: 20px;">Organizations</h3>
-          </div>
-          <ul id="org-list" class="list-group">
-            <a href="#repos-${user.login}" class="list-group-item" style="border-left: 5px solid ${colors[user.login?lower_case]};">
+<link rel="stylesheet" href="${root}/css/profile.css">
+<div id="profile" class="container-fluid">
+  <div class="row">
+    <aside id="left-menu" class="col-md-3 affix" role="navigation">
+      <div class="panel panel-default visible-md visible-lg">
+        <div class="panel-heading" style="background-color: #fff">
+          <h3 class="panel-title" style="color: rgb(139, 139, 139); font-size: 20px;">Organizations</h3>
+        </div>
+        <ul id="org-list" class="list-group">
+          <a href="#repos-${user.login}" class="list-group-item" style="border-left: 5px solid ${colors[user.login?lower_case]};">
+            <div class="row">
+              <span class="col-md-9">${user.login}</span>
+              <span class="col-md-3" style="text-align: center; border-left: 1px #dddddd solid;">${user.publicRepos}</span>
+            </div>
+          </a>
+          <#foreach org in organizations>
+            <a href="#repos-${org.login?lower_case}" class="list-group-item" style="border-left: 5px solid ${colors[org['login']?lower_case]};">
               <div class="row">
-                <span class="col-md-9">${user.login}</span>
-                <span class="col-md-3" style="text-align: center; border-left: 1px #dddddd solid;">${user.publicRepos}</span>
+                <span class="col-md-9">${org.login}</span>
+                <span class="col-md-3" style="text-align: center; border-left: 1px #dddddd solid;">${org.publicRepos}</span>
               </div>
             </a>
-            <#foreach org in organizations>
-              <a href="#repos-${org.login?lower_case}" class="list-group-item" style="border-left: 5px solid ${colors[org['login']?lower_case]};">
-                <div class="row">
-                  <span class="col-md-9">${org.login}</span>
-                  <span class="col-md-3" style="text-align: center; border-left: 1px #dddddd solid;">${org.publicRepos}</span>
-                </div>
-              </a>
-            </#foreach>
-          </ul>
-        </div>
-      </aside>
-      <section class="col-md-9 col-md-offset-3" role="main">
+          </#foreach>
+        </ul>
+      </div>
+    </aside>
+    <section class="col-md-9 col-md-offset-3" role="main">
+
+      <ul class="nav nav-tabs">
         <#foreach ownerName in repositories?keys>
-          <div class="row">
-            <div id="repos-${ownerName?lower_case}" class="panel panel-default" style="border-top: 5px ${colors[ownerName?lower_case]} solid;">
-              <div class="panel-heading" style="background-color: #fff; border-bottom: none;">
-                <h2 class="panel-title" style="font-size: 30px; padding-left: 15px;">${ownerName}</h2>
-              </div>
-              <div class="panel-body">
-                <article class="container-fluid">
-                  <#list repositories[ownerName] as repo>
-                    <div class="row" style="vertical-align: middle; height: 30px;" data-full-name="${repo.fullName}"
-                         data-github-id="${repo.id?c}">
-                      <div class="col-md-12">
-                        <input type="checkbox" role="bootstrap-switch" data-size="small"
-                               data-on-color="success" ${imported?seq_contains(repo.id)?then("checked", "")}>
-                        <span data-toggle="tooltip" data-placement="right" title="${repo.description!""}" style="font-size: 16px;">${repo.name}</span>
-                      </div>
-                    </div>
-                  </#list>
-                </article>
-              </div>
-            </div>
-          </div>
+          <li><a ownerName=${ownerName} data-color="${colors[ownerName?lower_case]}" href="#" class="tablinks">${ownerName}</a></li>
         </#foreach>
-      </section>
-    </div>
+      </ul>
+
+      <div class="row visible-md visible-lg">
+        <div id="repos" class="panel panel-default" style="border-top: 5px solid;">
+          <div class="panel-body">
+            <article id="repos-row" class="container-fluid">
+            </article>
+          </div>
+        </div>
+      </div>
+
+    </section>
   </div>
+</div>
 <script>
 
   $(function () {
+
+    var g_importedProjects;
+
+    $(".nav-tabs li a").on("click", function() {
+
+      var owner = $(this).attr("ownerName");
+      var color = $(this).data("color");
+
+      $.ajax({
+        url: "${root}/repos/projects/" + owner,
+        type: "GET"
+      }).success(function(projects) {
+
+        $("#repos").css({
+          'border-top-width': '5px',
+          'border-top-color': color,
+          'border-top-style': 'solid'
+        });
+        $(".panel-body").html('');
+
+        loadProjects(projects);
+
+        $.ajax({
+          url: "${root}/repos/projects/imported/" + owner,
+          type: "GET"
+        }).success(function(importedProjects) {
+
+          g_importedProjects = importedProjects;
+          onSwitch(importedProjects);
+
+        });
+
+      });
+    });
+
+    $(window).scroll(function() {
+
+      var owner = $(".repo_row").attr("data-full-name").split("/", 1);
+
+      if($(window).scrollTop() + $(window).height() == $(document).height()) {
+
+        var currentPageProjectCount = $("div[class='repo_row']").length;
+
+        $.ajax({
+          url: "${root}/repos/projects/loadNext/" + owner + "/" + currentPageProjectCount,
+          type: "GET"
+        }).success(function(projects) {
+
+          loadProjects(projects);
+
+          onSwitch(g_importedProjects);
+
+        });
+
+      }
+
+    });
+
+  })
+
+  function loadProjects(projects) {
+
+    for(var index in projects) {
+
+      $(".panel-body").append(
+          $("<div></div>")
+              .attr('class', 'repo_row')
+              .attr('style', 'vertical-align: middle; height: 30px;')
+              .attr('data-full-name', projects[index].full_name)
+              .attr('data-github-id', projects[index].id)
+              .append(
+              $("<div/>", {
+                'class': 'col-md-12',
+                'html': [
+
+                  $("<input/>", {
+                    'type': 'checkbox',
+                    'role': 'bootstrap-switch',
+                    'data-size' : 'small',
+                    'data-on-color': 'success',
+                    'id': 'bootstrap-switch'
+                  }),
+                  $("<span/>", {
+                    'data-toggle': 'tooltip',
+                    'data-placement': 'right',
+                    'title': projects[index].description,
+                    'style': 'font-size: 16px;'
+                  }).text(projects[index].name)
+                ]
+              })
+          )
+      );
+    }
+
     $("[role='bootstrap-switch']").bootstrapSwitch().on('switchChange.bootstrapSwitch', function (event, state) {
       var $this = $(this);
 
       if (state == true) {
-        var fullName = $this.parents('.row[data-full-name]').data('full-name');
+        var fullName = $this.parents('.repo_row[data-full-name]').data('full-name');
+
         waitingDialog.show('Importing...');
         $.ajax({
           url: "${root}/profile/project",
@@ -75,7 +163,7 @@
           waitingDialog.hide();
         })
       } else {
-        var githubId = $this.parents('.row[data-github-id]').data('github-id');
+        var githubId = $this.parents('.repo_row[data-github-id]').data('github-id');
 
         waitingDialog.show('Disabling...');
         $.ajax({
@@ -88,7 +176,21 @@
         })
       }
     });
-    $("[data-toggle='tooltip']").tooltip()
-  })
+
+    $("[data-toggle='tooltip']").tooltip();
+  }
+
+  function onSwitch(importedProjects) {
+
+    importedProjects.forEach(function(importedProject, index) {
+      console.log('importedProject.id : ', importedProject);
+
+      console.log($('[data-github-id=' + importedProject + ']').attr('data-github-id'));
+      $('[data-github-id=' + importedProject + ']').find('[role="bootstrap-switch"]').bootstrapSwitch('state', true);
+
+    });
+
+  }
+
 </script>
 </@layoutFully>

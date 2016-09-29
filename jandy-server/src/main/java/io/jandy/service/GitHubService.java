@@ -4,24 +4,18 @@ import io.jandy.domain.cache.HttpCacheEntry;
 import io.jandy.service.data.GHOrg;
 import io.jandy.service.data.GHRepo;
 import io.jandy.service.data.GHUser;
-import io.jandy.util.http.ClientHttpResponseWrapper;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,6 +29,8 @@ import java.util.function.Function;
 public class GitHubService {
   private Logger logger = LoggerFactory.getLogger(GitHubService.class);
 
+  private final int PROJECTS_NUMBER_PER_PAGE = 10;
+
   @Autowired
   private OAuth2ClientContext clientContext;
 
@@ -47,11 +43,11 @@ public class GitHubService {
 
   public GHUser getUser() {
     String url = url("https://api.github.com/user");
-    return executeWithCache(url, (restTemplate) -> restTemplate.getForEntity(url, GHUser.class));
+    return executeWithCache(url, restTemplate -> restTemplate.getForEntity(url, GHUser.class));
   }
 
   public GHUser getUser(String login) {
-    String url = url("https://api.github.com/user/{login}");
+    String url = url("https://api.github.com/users/{login}");
     return executeWithCache(url, (restTemplate) -> restTemplate.getForEntity(url, GHUser.class, login));
   }
 
@@ -67,7 +63,28 @@ public class GitHubService {
 
   public List<GHRepo> getUserRepos(String login) {
     String url = url("https://api.github.com/users/{login}/repos");
-    return Arrays.asList(executeWithCache(url, (restTemplate) -> restTemplate.getForEntity(url, GHRepo[].class, login)));
+
+    String tempUrl = url + "&per_page=" + PROJECTS_NUMBER_PER_PAGE;
+
+    return Arrays.asList(executeWithCache(tempUrl, (restTemplate) -> restTemplate.getForEntity(tempUrl, GHRepo[].class, login)));
+  }
+
+  public List<GHRepo> getNextPageUserRepos(String login, int projectCount) {
+
+    String url = url("https://api.github.com/users/{login}/repos");
+    int nextPageIndex = (projectCount / PROJECTS_NUMBER_PER_PAGE) + 1;
+    String tempUrl = url + "&per_page=" + PROJECTS_NUMBER_PER_PAGE + "&page=" + nextPageIndex;
+
+    return Arrays.asList(executeWithCache(tempUrl, (restTemplate) -> restTemplate.getForEntity(tempUrl, GHRepo[].class, login)));
+  }
+
+  public List<GHRepo> getNextPageOrgRepos(String login, int projectCount) {
+
+    String url = url("https://api.github.com/orgs/{login}/repos");
+    int nextPageIndex = (projectCount / PROJECTS_NUMBER_PER_PAGE) + 1;
+    String tempUrl = url + "&per_page=" + PROJECTS_NUMBER_PER_PAGE + "&page=" + nextPageIndex;
+
+    return Arrays.asList(executeWithCache(tempUrl, (restTemplate) -> restTemplate.getForEntity(tempUrl, GHRepo[].class, login)));
   }
 
   public List<GHRepo> getOrgRepos(String login) {
@@ -89,17 +106,22 @@ public class GitHubService {
   }
 
   private <R> R executeWithCache(String key, Function<RestTemplate, ResponseEntity<R>> f) {
-    HttpCacheEntry entry = (HttpCacheEntry) redisTemplate.opsForValue().get(key);
+    return executeWithCache0(key, f).getBody();
+  }
+
+  private <R> HttpCacheEntry<R> executeWithCache0(String key, Function<RestTemplate, ResponseEntity<R>> f) {
+    HttpCacheEntry<R> entry = (HttpCacheEntry<R>) redisTemplate.opsForValue().get(key);
     RestTemplate restTemplate = createRestTemplate(entry == null ? null : entry.getEtag());
     ResponseEntity<R> httpEntity = f.apply(restTemplate);
     if (entry == null || !HttpStatus.NOT_MODIFIED.equals(httpEntity.getStatusCode())) {
-      entry = new HttpCacheEntry();
+      entry = new HttpCacheEntry<R>();
       entry.setEtag(httpEntity.getHeaders().getETag());
       entry.setBody(httpEntity.getBody());
+      entry.setHeaders(httpEntity.getHeaders());
       redisTemplate.opsForValue().set(key, entry);
     }
 
-    return (R) entry.getBody();
+    return entry;
   }
 
   private RestTemplate createRestTemplate(String etag) {
@@ -117,4 +139,6 @@ public class GitHubService {
 
     return restTemplate;
   }
+
+
 }

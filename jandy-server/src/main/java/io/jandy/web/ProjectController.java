@@ -98,17 +98,17 @@ public class ProjectController {
           logger.error(e.getMessage(),e);
           committerAvatarUrl[0] = null;
         } catch (Exception e) {
-          logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(),e);
         }
         b.getCommit().setCommitterAvatarUrl(committerAvatarUrl[0]);
       }
     });
 
     return new ModelAndView("builds")
-            .addObject("project", project)
-            .addObject("url", url)
-            .addObject("builds", builds)
-            ;
+        .addObject("project", project)
+        .addObject("url", url)
+        .addObject("builds", builds)
+        ;
   }
 
   @RequestMapping(value = "/{account}/{projectName}.svg")
@@ -130,20 +130,20 @@ public class ProjectController {
     headers.setDate(current);
 
     return ResponseEntity
-            .ok()
-            .headers(headers)
-            .cacheControl(CacheControl.noCache())
-            .lastModified(current)
-            .eTag(Long.toString(latest.getId()))
-            .body(FreeMarkerTemplateUtils.processTemplateIntoString(configurer.getConfiguration().getTemplate("badge/mybadge.ftl"), latest));
+        .ok()
+        .headers(headers)
+        .cacheControl(CacheControl.noCache())
+        .lastModified(current)
+        .eTag(Long.toString(latest.getId()))
+        .body(FreeMarkerTemplateUtils.processTemplateIntoString(configurer.getConfiguration().getTemplate("badge/mybadge.ftl"), latest));
   }
 
   @ExceptionHandler(BadgeUnknownException.class)
   public ResponseEntity<String> getBadgeForUnknown() throws IOException, TemplateException {
     return ResponseEntity
-            .ok()
-            .cacheControl(CacheControl.noCache())
-            .lastModified(System.currentTimeMillis())
-            .body(FreeMarkerTemplateUtils.processTemplateIntoString(configurer.getConfiguration().getTemplate("badge/unknown-badge.ftl"), null));
+        .ok()
+        .cacheControl(CacheControl.noCache())
+        .lastModified(System.currentTimeMillis())
+        .body(FreeMarkerTemplateUtils.processTemplateIntoString(configurer.getConfiguration().getTemplate("badge/unknown-badge.ftl"), null));
   }
 }

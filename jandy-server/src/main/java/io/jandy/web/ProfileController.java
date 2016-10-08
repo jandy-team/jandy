@@ -89,9 +89,11 @@ public class ProfileController {
         .addObject("organizations", organizations)
         .addObject("repositories", repositories)
         .addObject("imported", imported)
+        .addObject("projects_number_per_page", gitHubService.PROJECTS_NUMBER_PER_PAGE)
         ;
   }
 
+//  TODO: add description in Project class
   @RequestMapping(value = "/project", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
   public void importProject(@RequestBody Map<String, ?> req) throws IOException, UserNotFoundException {
@@ -106,6 +108,7 @@ public class ProfileController {
       project.setGitHubId(repository.getId());
       project.setName(name);
       project.setUser(userService.getSelf());
+      //project.setDescription(repository.getDescription());
       logger.trace("make new project: {} and save it", project.toString());
     } else {
       User user = userService.getSelf();
@@ -122,5 +125,73 @@ public class ProfileController {
     project.setUser(null);
     projectRepository.save(project);
   }
+
+
+  // TODO: move to profileController, remove {owner} from url. userService.getSelf() is used for security and session.
+  @RequestMapping(value = "/projects/{owner}", method = RequestMethod.GET)
+  @ResponseBody
+  public List<GHRepo> getProjects(@PathVariable String owner) throws IOException {
+
+    GHUser ghUser = gitHubService.getUser();
+
+    Map<String, List<GHRepo>> repositories = new LinkedHashMap<>();
+    repositories.put(ghUser.getLogin(), gitHubService.getUserRepos(ghUser.getLogin()));
+
+    for (GHOrg org : gitHubService.getUserOrgs(ghUser.getLogin())) {
+      repositories.put(org.getLogin(), gitHubService.getOrgRepos(org.getLogin()));
+    }
+
+    return repositories.get(owner);
+  }
+
+  @RequestMapping(value = "/projects/imported/{owner}", method = RequestMethod.GET)
+  @ResponseBody
+  public List<GHRepo> getImportedProjects(@PathVariable String owner) throws IOException {
+
+    return projectRepository.findByAccount(owner)
+            .stream()
+            .filter((project) -> project.getUser() != null)
+            .map((project) -> gitHubService.getRepo(owner, project.getName()))
+            .collect(Collectors.toList());
+
+  }
+
+  @RequestMapping(value="/projects/loadNext/{owner}/{currentPageProjectCount}", method = RequestMethod.GET)
+  @ResponseBody
+  public List<GHRepo> loadNextPageProjects(@PathVariable String owner, @PathVariable int currentPageProjectCount) throws IOException {
+
+    logger.info("loadNextPageProjects owner : " + owner + " currentPageProjectCount : " + currentPageProjectCount);
+
+    GHUser ghUser = gitHubService.getUser();
+
+    List<GHRepo> nextPageProjects = new LinkedList<>();
+
+    int projectsCount = 0;
+    if(ghUser.getLogin().contentEquals(owner)) {
+      logger.info("load projects from user");
+      projectsCount = ghUser.getPublicRepos();
+
+      if(currentPageProjectCount >= projectsCount) {
+        return null;
+      }
+
+      nextPageProjects.addAll(gitHubService.getNextPageUserRepos(ghUser.getLogin(), currentPageProjectCount));
+
+    } else {
+      logger.info("load projects from org");
+      System.out.println(userService.getSelf().getLogin() +  "        " + owner);
+      projectsCount = gitHubService.getOrg(owner).getPublicRepos();
+
+      if(currentPageProjectCount >= projectsCount) {
+        return null;
+      }
+
+      nextPageProjects.addAll(gitHubService.getNextPageOrgRepos(ghUser.getLogin(), currentPageProjectCount));
+
+    }
+
+    return nextPageProjects;
+  }
+
 
 }

@@ -146,4 +146,6 @@ public class ProjectController {
         .lastModified(System.currentTimeMillis())
         .body(FreeMarkerTemplateUtils.processTemplateIntoString(configurer.getConfiguration().getTemplate("badge/unknown-badge.ftl"), null));
   }
+
+
 }

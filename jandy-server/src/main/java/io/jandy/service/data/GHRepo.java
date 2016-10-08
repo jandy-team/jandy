@@ -34,6 +34,11 @@ public class GHRepo implements Serializable {
     return id;
   }
 
+  @JsonProperty("github_id")
+  public Long getGithubId() {
+    return id;
+  }
+
   public GHRepo setId(Long id) {
     this.id = id;
     return this;

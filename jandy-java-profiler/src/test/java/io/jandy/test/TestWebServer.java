@@ -42,20 +42,14 @@ public class TestWebServer {
         .setHandler(new HttpHandler() {
           @Override
           public void handleRequest(HttpServerExchange exchange) throws Exception {
-            exchange.getRequestReceiver().receiveFullString(sysout);
+            exchange.getRequestReceiver().receiveFullString(sysout, UTF_8);
             if (exchange.getRequestPath().startsWith("/rest/travis")) {
-//              System.out.println("Headers: " + exchange.getRequestHeaders());
               exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, "application/json");
-              if (exchange.getRequestMethod().equalToString("POST")) {
-//                exchange.getRequestReceiver().receiveFullString(sysout, UTF_8);
+              if (exchange.getRequestPath().equals("/rest/travis/prof/create") && exchange.getRequestMethod().equalToString("POST")) {
                 exchange.getResponseSender().send("{\"profId\": 1}");
-              } else if (exchange.getRequestMethod().equalToString("PUT")) {
-//                exchange.getRequestReceiver().receiveFullString(sysout, UTF_8);
               }
-              exchange.endExchange();
-            } else {
-              System.out.println(exchange.getRequestPath() + " is can't");
             }
+            exchange.endExchange();
           }
         }).build();
     server.start();

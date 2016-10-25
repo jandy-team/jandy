@@ -12,11 +12,11 @@ travis = os.getenv('TRAVIS')
 ci = os.getenv('CI')
 
 if os.getenv('DEV') == 'true':
-    URL = "http://dev.jandy.org"
+    URL = "dev.jandy.org"
 elif travis == 'true' and ci == 'true':
-    URL = "http://jandy.org"
+    URL = "jandy.org"
 else:
-    URL = "http://localhost:3000"
+    URL = "localhost:3000"
 JAVA_PROFILER_URL = URL + "/jandy-java-profiler.jar"
 
 ownerName, repoName = os.getenv('TRAVIS_REPO_SLUG').split('/')
@@ -46,7 +46,7 @@ def do_profile(language, id, batchSize, argv):
         wget(JAVA_PROFILER_URL, 'jandy-java-profiler.jar')
         args = argv[0:]
         args.insert(1, '-Djandy.batch.size='+batchSize)
-        args.insert(1, '-Djandy.base.url='+URL)
+        args.insert(1, '-Djandy.base.url=http://'+URL)
         args.insert(1, '-Djandy.sample.name='+id)
         args.insert(1, '-javaagent:jandy-java-profiler.jar')
         do_execute(args)

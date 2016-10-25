@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -65,6 +64,8 @@ public class TravisRestService {
     build = buildRepository.save(build);
 
     profilingDaemonService.start(bi.getBuildId());
+
+    logger.info("start build for profiling: {}/{} -> {}", bi.getOwnerName(), bi.getRepoName(), bi.getBuildId());
   }
 
   @Transactional
@@ -105,6 +106,9 @@ public class TravisRestService {
       return ;
 
     Build build = profContextDumpRepository.findOne(treeNodes.get(0).getProfId()).getBuild();
+
+    logger.info("update about build id: {}", build.getId());
+
     profilingDaemonService.put(build.getTravisBuildId(), ProfilingDaemonService.Task.UPDATE, treeNodes);
   }
 

@@ -4,7 +4,9 @@ import json
 import tempfile
 import threading
 import time
+import re
 
+import math
 import requests
 from contextlib import closing
 from jandy.ProfilingContext import ProfilingContext
@@ -14,7 +16,7 @@ from jandy.Serializer import Serializer
 class ProfilingLogCollector(Serializer):
     def __init__(self, baseUrl, batchSize):
         self.baseUrl = baseUrl+'/rest/travis'
-        self.batchSize = int(batchSize)
+        self.batchSize = self.toBytes(batchSize)
         self.bos = None
         self.batchFile = tempfile.NamedTemporaryFile(prefix="batch", suffix=str(round(time.time() * 1000)), delete=False)
         self._lock = threading.Lock()
@@ -55,10 +57,11 @@ class ProfilingLogCollector(Serializer):
             pass
 
         self.batchFile.close()
+        self.batchFile.delete()
 
     def update(self, node=None):
-        if node:
-            with self._lock:
+        with self._lock:
+            if node:
                 nodeDict = self.serialize(node)
                 data = (self.toJson(nodeDict)+"\n").encode('utf-8')
 
@@ -67,27 +70,38 @@ class ProfilingLogCollector(Serializer):
                     self.update()
 
                 if self.bos is None:
-                    self.bos = io.BufferedWriter(self.batchFile)
+                    self.bos = io.FileIO(self.batchFile.name, mode='w')
                 self.bos.write(data)
                 return None
+            else:
+                if self.bos is None:
+                    return
+
+                self.bos.close()
+                self.bos = None
+
+                headers = {
+                    'Content-Length': self.batchSize,
+                    'Content-Type': 'application/json'
+                }
+
+                with open(self.batchFile.name, 'r') as f:
+                    requests.put(self.baseUrl, headers=headers, data=f)
+
+
+    def toBytes(self, str):
+        prog = re.compile('([\d.]+)([GMK]B)', re.IGNORECASE)
+        result = prog.match(str)
+        powerMap = {
+            'GB': 3,
+            'MB': 2,
+            'KB': 1
+        }
+        if result:
+            number = result.group(1)
+            pow = powerMap.get(result.group(2).upper())
+            bytes = int(number) * math.pow(1024, pow)
+            return bytes
         else:
-            if self.bos is None:
-                return
+            return -1
 
-            self.bos.close()
-            self.bos = None
-
-            headers = {
-                'Content-Length': self.batchSize,
-                'Content-Type': 'application/json'
-            }
-
-            with open(self.batchFile.name, 'rb') as f:
-                requests.put(self.baseUrl, headers=headers, data=self.readInChunks(f))
-
-    def readInChunks(self, fileObj, chunkSize=2048):
-        while True:
-            data = fileObj.read(chunkSize)
-            if not data:
-                break
-            yield data

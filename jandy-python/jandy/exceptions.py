@@ -1,4 +1,3 @@
-
 class JandyClassError(Exception):
     pass
 

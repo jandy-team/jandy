@@ -42,7 +42,6 @@ def do_execute(args):
 
 
 def do_profile(language, id, batchSize, argv):
-    wget(JAVA_PROFILER_URL, 'jandy-java-profiler.jar')
     if language == 'java':
         wget(JAVA_PROFILER_URL, 'jandy-java-profiler.jar')
         args = argv[0:]
@@ -51,18 +50,15 @@ def do_profile(language, id, batchSize, argv):
         args.insert(1, '-Djandy.sample.name='+id)
         args.insert(1, '-javaagent:jandy-java-profiler.jar')
         do_execute(args)
-        # base64.encode('java-profiler-result.jandy', id + '.jandy')
-        # shutil.move('java-profiler-result.jandy', id + '.jandy')
 
     if language == 'python':
         args = argv[0:]
         args.insert(1, '-m')
         args.insert(2, 'jandy')
+        args.insert(3, str(batchSize))
+        args.insert(4, URL)
+        args.insert(5, id)
         subprocess.call(args)
-        # with open('python-profiler-result.jandy', 'rb') as input:
-        #     with open(id+'.jandy', 'wb') as output:
-        #         base64.encode(input, output)
-        shutil.move('python-profiler-result.jandy', id + '.jandy')
 
 
 if __name__ == '__main__':

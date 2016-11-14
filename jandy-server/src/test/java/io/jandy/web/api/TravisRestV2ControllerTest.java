@@ -99,32 +99,33 @@ public class TravisRestV2ControllerTest extends AbstractWebAppTestCase {
   }
 
   @Test
-  @Ignore("This test will perform after developing python profiler")
   public void testPutResultsForPython() throws Exception {
-//    User user = new User();
-//    user = userRepository.save(user);
-//
-//    Project project = new Project();
-//    project.setUser(null);
-//    project.setName("jandy");
-//    project.setAccount("jcooky");
-//    project.setUser(user);
-//    project = projectRepository.save(project);
-
-    MockMultipartFile multipartFile = new MockMultipartFile("samples", "python-profiler-result.jandy",
-        MediaType.APPLICATION_OCTET_STREAM_VALUE, ClassLoader.getSystemResourceAsStream("python-profiler-result.jandy"));
-
-    MockMvcBuilders.standaloneSetup(controller).build()
-        .perform(MockMvcRequestBuilders.fileUpload("/rest/travis")
-            .file(multipartFile)
-            .contentType(MediaType.MULTIPART_FORM_DATA)
-            .param("ownerName", "jcooky")
-            .param("repoName", "jandy")
-            .param("buildId", "1")
+    MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+    mockMvc.perform(
+        post("/rest/travis/begin")
             .param("branchName", "master")
+            .param("ownerName", "jcooky")
+            .param("repoName", "commons-io")
+            .param("numSamples", "1")
+            .param("buildId", "1")
             .param("buildNum", "1")
-            .param("language", "python")
-        ).andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
-        .andDo(MockMvcResultHandlers.print());
+            .param("lang", "python")
+    ).andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
+
+    try (InputStream is = ClassLoader.getSystemResourceAsStream("python-profiler-result.txt")) {
+      List<WebLog> logs = WebLog.parse(is, StandardCharsets.UTF_8);
+      for (WebLog log : logs) {
+        mockMvc.perform(
+            request(HttpMethod.resolve(log.getMethod().toUpperCase()), log.getUrl())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(log.getBody())
+        ).andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
+      }
+    }
+
+    mockMvc.perform(
+        post("/rest/travis/finish")
+            .param("buildId", "1")
+    ).andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
   }
 }

@@ -9,14 +9,12 @@ def usage():
 
 
 def main():
-    print(sys.argv)
     batchSize = sys.argv[1]
     baseUrl = sys.argv[2]
     id = sys.argv[3]
 
-    sys.argv = sys.argv[:1] + sys.argv[4:]
+    sys.argv = sys.argv[4:]
 
-    print('test')
     progname = sys.argv[0]
     with open(progname, "rb") as f:
         sys.path.insert(0, os.path.dirname(progname))
@@ -30,7 +28,6 @@ def main():
         }
         sub_locals = {}
         try:
-            print('test')
             six.exec_(code, sub_globals, sub_locals)
         finally:
             pr.done()

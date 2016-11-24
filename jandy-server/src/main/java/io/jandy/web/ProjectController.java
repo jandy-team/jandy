@@ -11,6 +11,7 @@ import org.ocpsoft.prettytime.PrettyTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.querydsl.QPageRequest;
@@ -86,22 +87,22 @@ public class ProjectController {
     url = url.substring(0, url.indexOf(request.getServletPath()));
 
     PrettyTime p = new PrettyTime(Locale.ENGLISH);
+    final String[] committerAvatarUrl = new String[1];
     builds.stream().forEach(b -> {
       if (b.getFinishedAt() != null)
         b.setBuildAt(p.format(DatatypeConverter.parseDateTime(b.getFinishedAt())));
       if (b.getCommit() != null) {
         GHUser user = null;
-        try{
-          if(github.getUser(b.getCommit().getCommitterName()) != null){
-            user = github.getUser(b.getCommit().getCommitterName());
-          }else{}
-        }catch (NullPointerException e){
+        try {
+          user = github.getUser(b.getCommit().getCommitterName());
+          committerAvatarUrl[0] = user.getAvatarUrl();
+        } catch(NullPointerException e){
           logger.error(e.getMessage(),e);
-        }catch (Exception e ){
-          logger.error(e.getMessage(),e);
+          committerAvatarUrl[0] = null;
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
         }
-        // TODO This code is temporary
-        b.getCommit().setCommitterAvatarUrl(user == null ? null : user.getAvatarUrl());
+        b.getCommit().setCommitterAvatarUrl(committerAvatarUrl[0]);
       }
     });
 

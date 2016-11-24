@@ -5,5 +5,5 @@ package io.jandy.domain;
  * @since 2015-12-05
  */
 public enum BuildState {
-  PASSED, FAILED, PROGRESS, UNKNOWN
+  PASSED, FAILED, PROGRESS, CREATED, UNKNOWN
 }

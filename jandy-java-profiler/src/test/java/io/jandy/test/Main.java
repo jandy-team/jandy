@@ -4,12 +4,14 @@ import org.jasypt.util.password.PasswordEncryptor;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.jasypt.util.text.BasicTextEncryptor;
 
+import java.io.IOException;
+
 /**
  * @author JCooky
  * @since 2015-08-17
  */
 public class Main {
-  public static void main(String[] args) {
+  public static void main(String[] args) throws IOException {
     String password = args.length >= 1 ? args[0] : "strong";
     String text = args.length >= 2 ? args[1] : "i am hero";
 

@@ -26,8 +26,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
     http.authorizeRequests()
-        .anyRequest().permitAll()
-        .antMatchers("/profile/**").authenticated();
+        .anyRequest().permitAll();
 
     http.logout()
         .logoutUrl("/logout")

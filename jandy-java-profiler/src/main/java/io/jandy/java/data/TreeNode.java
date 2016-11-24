@@ -1,8 +1,5 @@
 package io.jandy.java.data;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author JCooky
  * @since 2016-03-16
@@ -10,9 +7,10 @@ import java.util.List;
 public class TreeNode {
   private String id = null;
   private boolean root;
-  private String methodId;
+  private MethodObject method;
   private Accumulator acc;
   private String parentId;
+  private long profId;
 
   public void setId(String id) {
     this.id = id;
@@ -30,14 +28,6 @@ public class TreeNode {
     return root;
   }
 
-  public void setMethodId(String methodId) {
-    this.methodId = methodId;
-  }
-
-  public String getMethodId() {
-    return methodId;
-  }
-
   public void setAcc(Accumulator acc) {
     this.acc = acc;
   }
@@ -52,5 +42,23 @@ public class TreeNode {
 
   public void setParentId(String parentId) {
     this.parentId = parentId;
+  }
+
+  public MethodObject getMethod() {
+    return method;
+  }
+
+  public TreeNode setMethod(MethodObject method) {
+    this.method = method;
+    return this;
+  }
+
+  public long getProfId() {
+    return profId;
+  }
+
+  public TreeNode setProfId(long profId) {
+    this.profId = profId;
+    return this;
   }
 }

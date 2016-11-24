@@ -1,5 +1,7 @@
 language: java
 
+batch-size: 512KB
+
 samples:
   - t1:
      script: jandy java -jar jasypt-test.jar AES128 "password" "text"

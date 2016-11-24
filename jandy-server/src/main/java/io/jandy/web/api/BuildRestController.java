@@ -27,7 +27,7 @@ public class BuildRestController {
 
   @RequestMapping(value = "/{id}/root", method = RequestMethod.GET)
   public ProfTreeNode getRoot(@PathVariable("id") ProfContextDump dump) throws Exception {
-    return getNode(dump.getRoot());
+    return getNode(dump.getThreads().get(0).getRoot());
   }
 
   @RequestMapping(value = "/node/{id}", method = RequestMethod.GET)

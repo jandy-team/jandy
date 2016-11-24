@@ -3,9 +3,10 @@ import sys
 import threading
 import time
 
+from datetime import datetime
+
 from jandy.context import JandyProfilingContext
 from jandy.data import ThreadObject
-
 
 class ThreadContext:
     def __init__(self, threadId, threadName, builder):
@@ -16,6 +17,7 @@ class ThreadContext:
         self.threadObject = ThreadObject(threadId=threadId, threadName=threadName, rootId=self.root.id)
 
         self.context.save(self.latest)
+        self.depth = -1
 
     def getThreadObject(self):
         return self.threadObject
@@ -24,16 +26,19 @@ class ThreadContext:
         if '__package__' in frame.f_globals.keys() and frame.f_globals['__package__'] == 'jandy':
             return False
 
-        # print('---- ENTER')
-        n = self.context.getTreeNode(self.latest.id, frame)
-        # if self.context.root is None:
-        #     self.context.root = n
+        self.nodes.append(self.latest)
 
+        n = self.context.getTreeNode(self.latest.id, frame)
+        n.acc.elapsedTime = 0
         n.acc.startTime = time.time()
 
-        self.nodes.append(self.latest)
         self.latest = n
-        # print('ENTER - '+str(self.latest))
+
+        # self.depth += 1
+        # for i in range(self.depth):
+        #     print('  ', end='')
+        #
+        # print('ENTER - %s -- %f' % (str(self.latest), self.latest.acc._start))
 
         return True
 
@@ -41,21 +46,34 @@ class ThreadContext:
         if '__package__' in frame.f_globals.keys() and frame.f_globals['__package__'] == 'jandy':
             return False
 
+        if self.latest is self.root:
+            return True
+
         # print('---- EXIT: '+str(frame.f_globals))
         startTime = self.latest.acc.startTime
-        elapsedTime = time.time() - startTime
+        elapsedTime = self.latest.acc.elapsedTime + time.time() - startTime
 
-        self.latest.acc.startTime = math.floor(startTime * 1000.0 * 1000.0 * 1000.0)
-        self.latest.acc.elapsedTime = math.floor(elapsedTime * 1000.0 * 1000.0 * 1000.0)
+        self.latest.acc.elapsedTime = int(round(elapsedTime * 1000 * 1000 * 1000))
+        self.latest.acc.startTime = int(round(startTime * 1000 * 1000 * 1000))
         if excepted:
             (exception, value, traceback) = arg
             self.latest.acc.exception = self.context.getExceptionObject(exception, value, traceback)
 
-        # print('EXIT - '+str(self.latest))
-        if not excepted:
-            self.latest = self.nodes.pop()
+        # for i in range(self.depth):
+        #     print('  ', end='')
+        #
+        # print('EXIT - %s -- %f / %f' % (str(self.latest), self.latest.acc.elapsedTime, self.latest.acc.startTime))
+        # self.depth -= 1
 
+        _time = time.time()
         self.context.save(self.latest)
+        _time = time.time() - _time
+
+        # if not excepted:
+        self.latest = self.nodes.pop()
+
+        if self.latest.acc is not None:
+            self.latest.acc.elapsedTime -= _time
 
         return True
 

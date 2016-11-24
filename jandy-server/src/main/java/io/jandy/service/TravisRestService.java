@@ -51,7 +51,7 @@ public class TravisRestService {
 
     Build build = buildRepository.findByTravisBuildId(bi.getBuildId());
     if (build != null) {
-      build.getProfiles().forEach(p -> profContextDumpRepository.delete(p));
+      buildRepository.deleteProfilesById(build.getId());
       buildRepository.delete(build);
     }
 
@@ -105,7 +105,8 @@ public class TravisRestService {
     if (treeNodes.size() == 0)
       return ;
 
-    Build build = profContextDumpRepository.findOne(treeNodes.get(0).getProfId()).getBuild();
+    Build build = profContextDumpRepository.findOne(treeNodes.get(0).getProfId())
+        .getBuild();
 
     logger.info("update about build id: {}", build.getId());
 

@@ -52,14 +52,12 @@ public class TravisRestV2Controller {
 
   @RequestMapping(value = "/prof/put", method = RequestMethod.POST)
   public void updateTreeNode(InputStream is) throws Exception {
-    List<TreeNode> treeNodes =
-    IOUtils.readLines(is, Charsets.UTF_8)
-        .stream()
-        .filter((n) -> n == null)
-        .map(this::toTreeNode)
-        .collect(Collectors.toList());
+    List<String> treeNodes = IOUtils.readLines(is, Charsets.UTF_8);
 
-    travisRestService.updateTreeNodes(treeNodes);
+    travisRestService.updateTreeNodes(treeNodes.stream()
+        .filter((n) -> n != null)
+        .map(this::toTreeNode)
+        .collect(Collectors.toList()));
   }
 
   private TreeNode toTreeNode(String json) {

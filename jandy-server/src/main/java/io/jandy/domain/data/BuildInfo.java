@@ -1,5 +1,7 @@
 package io.jandy.domain.data;
 
+import com.google.common.base.MoreObjects;
+
 public class BuildInfo {
   private long buildId;
   private long buildNum;
@@ -70,5 +72,18 @@ public class BuildInfo {
   public BuildInfo setRepoName(String repoName) {
     this.repoName = repoName;
     return this;
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("buildId", buildId)
+        .add("buildNum", buildNum)
+        .add("ownerName", ownerName)
+        .add("repoName", repoName)
+        .add("branchName", branchName)
+        .add("lang", lang)
+        .add("numSamples", numSamples)
+        .toString();
   }
 }

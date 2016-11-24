@@ -12,6 +12,7 @@ import org.springframework.boot.system.ApplicationPidFileWriter;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.repository.support.DomainClassConverter;
@@ -39,6 +40,7 @@ public class JandyApplicationServer implements CommandLineRunner {
   }
 
   @Bean
+  @Profile("!jpatest")
   public DomainClassConverter domainClassConverter(ConversionService conversionService) {
     return new DomainClassConverter(conversionService);
   }

@@ -19,7 +19,7 @@ class ThreadObject(Serializable):
 
 
 class ProfilingContext(Serializable):
-    def __init__(self, profId, threadObjects=[]):
+    def __init__(self, profId, threadObjects):
         self.profId = profId
         self.threadObjects = threadObjects
 
@@ -30,6 +30,9 @@ class ClassObject(Serializable):
         self.name = name
         self.packageName = packageName
 
+    def __str__(self):
+        return self.packageName+'.'+self.name if self.packageName else self.name
+
 
 class MethodObject(Serializable):
     def __init__(self, name, owner):
@@ -39,7 +42,7 @@ class MethodObject(Serializable):
 
 
 class ExceptionObject(Serializable):
-    def __init__(self, klass, message, id=str(uuid.uuid4())):
+    def __init__(self, id, klass, message):
         Serializable.__init__(self)
         self.id = id
         self.klass = klass
@@ -55,13 +58,16 @@ class Accumulator(Serializable):
 
 
 class TreeNode(Serializable):
-    def __init__(self, parentId, method, acc=Accumulator(), profId=None, id=str(uuid.uuid4()), root=False):
+    def __init__(self, id, parentId, method, acc, profId=None, root=False):
         self.profId = profId
         self.id = id
         self.parentId = parentId
         self.root = root
         self.acc = acc
         self.method = method
+
+    def __str__(self):
+        return str(self.method.owner)+"."+self.method.name
 
 
 class DataObjectBuilder:
@@ -79,10 +85,10 @@ class DataObjectBuilder:
         pass
 
     def getRootTreeNode(self):
-        return TreeNode(None, None, acc=None, root=True)
+        return TreeNode(str(uuid.uuid4()), None, None, None, root=True)
 
     def getTreeNode(self, parentId, frame):
-        return TreeNode(parentId, self.getMethodObject(frame=frame))
+        return TreeNode(str(uuid.uuid4()), parentId, self.getMethodObject(frame=frame), Accumulator())
 
     def getMethodObject(self, name=None, owner=None, frame=None):
         if frame is not None:
@@ -110,5 +116,5 @@ class DataObjectBuilder:
             return ClassObject(name, packageName)
 
     def getExceptionObject(self, exception, value, traceback):
-        return ExceptionObject(self.getClassObject(name=exception.__name__, packageName=exception.__module__), str(value))
+        return ExceptionObject(str(uuid.uuid4()), self.getClassObject(name=exception.__name__, packageName=exception.__module__), str(value))
 

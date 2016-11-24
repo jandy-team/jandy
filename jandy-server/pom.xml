@@ -13,7 +13,7 @@
 	<artifactId>jandy-server</artifactId>
 
 	<properties>
-		<spring.boot.version>1.4.0.RELEASE</spring.boot.version>
+		<spring.boot.version>1.4.2.RELEASE</spring.boot.version>
 		<java.version>1.8</java.version>
 		<querydsl.version>4.1.3</querydsl.version>
 		<curator.version>3.2.0</curator.version>
@@ -74,14 +74,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-redis</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.session</groupId>
-			<artifactId>spring-session-data-redis</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

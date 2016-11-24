@@ -12,5 +12,6 @@ spring:
     password:
     driver-class-name: com.mysql.jdbc.Driver
     continue-on-error: true
-    validation-query: SELECT 1
-    test-on-borrow: true
+    tomcat:
+      validation-query: SELECT 1
+      test-on-borrow: true

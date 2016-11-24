@@ -45,12 +45,18 @@ public class ThreadContext {
     //    assert(latest.method.getOwner().getPackageName().equals(owner.getPackageName()));
 
     long elapsedTime = System.nanoTime() - latest.getAcc().getStartTime();
-    latest.getAcc().setElapsedTime(elapsedTime);
+    latest.getAcc().setElapsedTime(latest.getAcc().getElapsedTime() + elapsedTime);
     if (throwable != null)
       latest.getAcc().setException(builder.getExceptionObject(throwable));
+
+    long time = System.nanoTime();
     builder.save(latest);
+    time = System.nanoTime() - time;
 
     latest = treeNodes.pop();
+    if (latest.getAcc() != null) {
+      latest.getAcc().setElapsedTime(latest.getAcc().getElapsedTime() - time);
+    }
   }
 
   public void onExit() {

@@ -1,14 +1,15 @@
 # import re, os
 # from jandy.profiler import Profiler
 #
+#
 # class Base:
+#     def __init__(self):
+#         print('init call')
+#
 #     def compile(self, str):
 #         re.compile(str)
 #
-#     def print_usage(self):
-#         raise e.MyException("Error Nice")
-#
-#
+# #
 # p = Profiler("12K", "localhost:3000", 1)
 # try:
 #     p.start()

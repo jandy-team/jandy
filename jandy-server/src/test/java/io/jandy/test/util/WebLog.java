@@ -4,8 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.MoreObjects;
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -97,6 +96,12 @@ public class WebLog {
     return logs;
   }
 
+  public static List<WebLog> parse(File file, Charset charset) throws IOException {
+    try (InputStream is = new BufferedInputStream(new FileInputStream(file))) {
+      return parse(is, charset);
+    }
+  }
+
   private static String find(String str, Pattern pattern) {
     Matcher matcher = pattern.matcher(str);
     if (matcher.find()) {
@@ -104,11 +109,5 @@ public class WebLog {
     }
 
     return null;
-  }
-
-  public static void main(String[] args) throws IOException {
-    try (InputStream is = ClassLoader.getSystemResourceAsStream("java-profiler-result.txt")) {
-      System.out.println(parse(is, Charsets.UTF_8));
-    }
   }
 }

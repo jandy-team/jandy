@@ -6,7 +6,7 @@ package io.jandy.java.data;
  */
 public class Accumulator {
   private long startTime;
-  private long elapsedTime;
+  private long elapsedTime = 0;
   private ExceptionObject exception;
 
   public void setStartTime(long startTime) {

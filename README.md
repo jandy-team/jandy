@@ -1,8 +1,9 @@
 [![Build Status](https://travis-ci.org/jcooky/jandy.svg?branch=master)](https://travis-ci.org/jcooky/jandy)
-[![Slack Status](http://slack.jandy.io/badge.svg)](http://slack.jandy.io)
+[![Join the chat at https://gitter.im/jandy-team/jandy](https://badges.gitter.im/jandy-team/jandy.svg)](https://gitter.im/jandy-team/jandy?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![Youtube](http://img.youtube.com/vi/egQPHdQj-UU/0.jpg)](http://www.youtube.com/watch?v=egQPHdQj-UU)
 # Jandy 
+
 This project is fork from [vondom/sky](https://github.com/vondom/sky)
 
 Jandy is a dynamic analysis project for opensource developer using on github and travis-ci

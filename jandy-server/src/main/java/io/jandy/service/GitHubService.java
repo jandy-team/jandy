@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.DefaultResponseErrorHandler;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
@@ -46,7 +48,14 @@ public class GitHubService {
 
   public GHUser getUser(String login) {
     String url = url("https://api.github.com/users/{login}");
-    return executeWithCache(url, (restTemplate) -> restTemplate.getForEntity(url, GHUser.class, login));
+    return executeWithCache(url, (restTemplate) -> {
+      try {
+        return restTemplate.getForEntity(url, GHUser.class, login);
+      } catch (HttpClientErrorException e) {
+        logger.error(e.getMessage(), e);
+        return null;
+      }
+    });
   }
 
   public List<GHOrg> getUserOrgs(String login) {

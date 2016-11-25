@@ -35,7 +35,7 @@ import static org.apache.commons.lang3.StringUtils.lowerCase;
 @Controller
 @RequestMapping("/profile")
 public class ProfileController {
-  private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  private static final Logger logger = LoggerFactory.getLogger(ProfileController.class);
 
   @Autowired
   private UserService userService;

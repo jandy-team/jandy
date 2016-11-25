@@ -9,22 +9,25 @@ import javax.persistence.*;
  * @since 2015-07-08
  */
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"name", "descriptor", "access", "owner_id"}))
 public class ProfMethod {
   @Id
-  private String id;
+  @GeneratedValue
+  private Long id;
 
   private String name;
+  @Column(length = 512)
   private String descriptor;
   private int access;
 
   @ManyToOne
   private ProfClass owner;
 
-  public String getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

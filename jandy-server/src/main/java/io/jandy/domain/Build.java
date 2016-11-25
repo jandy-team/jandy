@@ -25,7 +25,8 @@ public class Build {
   private long number;
   private BuildState state = BuildState.UNKNOWN;
 
-  private int numSamples, numSucceededSamples;
+  private int numSamples;
+  private int numSucceededSamples;
 
   @Transient
   private String buildAt;

@@ -1,19 +1,20 @@
 package io.jandy.java.key;
 
-import com.github.jcooky.jaal.common.profile.ClassType;
-import com.github.jcooky.jaal.common.profile.MethodType;
-
 
 /**
  * @author JCooky
  * @since 2015-09-20
  */
 public class MethodKey {
-  private MethodType methodType;
-  private ClassType owner;
+  public String name, descriptor;
+  public int access;
+  public ClassKey owner;
+  private String desc;
 
-  public MethodKey(MethodType methodType, ClassType owner) {
-    this.methodType = methodType;
+  public MethodKey(String name, String descriptor, int access, ClassKey owner) {
+    this.name = name;
+    this.descriptor = descriptor;
+    this.access = access;
     this.owner = owner;
   }
 
@@ -24,15 +25,31 @@ public class MethodKey {
 
     MethodKey methodKey = (MethodKey) o;
 
-    if (methodType != null ? !methodType.equals(methodKey.methodType) : methodKey.methodType != null) return false;
-    return !(owner != null ? !owner.equals(methodKey.owner) : methodKey.owner != null);
+    if (access != methodKey.access) return false;
+    if (name != null ? !name.equals(methodKey.name) : methodKey.name != null) return false;
+    if (descriptor != null ? !descriptor.equals(methodKey.descriptor) : methodKey.descriptor != null) return false;
+    return owner != null ? owner.equals(methodKey.owner) : methodKey.owner == null;
 
   }
 
   @Override
   public int hashCode() {
-    int result = methodType != null ? methodType.hashCode() : 0;
+    int result = name != null ? name.hashCode() : 0;
+    result = 31 * result + (descriptor != null ? descriptor.hashCode() : 0);
+    result = 31 * result + access;
     result = 31 * result + (owner != null ? owner.hashCode() : 0);
     return result;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public int getAccess() {
+    return access;
+  }
+
+  public String getDesc() {
+    return desc;
   }
 }

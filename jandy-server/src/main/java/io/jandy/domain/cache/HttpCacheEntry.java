@@ -1,14 +1,16 @@
 package io.jandy.domain.cache;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author JCooky
  * @since 2016-04-10
  */
-public class HttpCacheEntry implements Serializable {
+public class HttpCacheEntry<T> implements Serializable {
   private String etag;
-  private Object body;
+  private T body;
+  private List<String> link;
 
   public String getEtag() {
     return etag;
@@ -19,12 +21,21 @@ public class HttpCacheEntry implements Serializable {
     return this;
   }
 
-  public Object getBody() {
+  public T getBody() {
     return body;
   }
 
-  public HttpCacheEntry setBody(Object body) {
+  public HttpCacheEntry setBody(T body) {
     this.body = body;
     return this;
+  }
+
+
+  public void setLink(List<String> link) {
+    this.link = link;
+  }
+
+  public List<String> getLink() {
+    return link;
   }
 }

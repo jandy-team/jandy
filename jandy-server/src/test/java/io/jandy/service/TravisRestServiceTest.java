@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -32,7 +33,7 @@ import static org.mockito.Mockito.*;
  * @since 2016-11-19
  */
 @RunWith(SpringRunner.class)
-@WebMvcTest(TravisRestService.class)
+@SpringBootTest
 public class TravisRestServiceTest {
 
   @Autowired

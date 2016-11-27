@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.system.ApplicationPidFileWriter;
 import org.springframework.cache.annotation.EnableCaching;
@@ -40,7 +41,7 @@ public class JandyApplicationServer implements CommandLineRunner {
   }
 
   @Bean
-  @Profile("!jpatest")
+  @ConditionalOnBean(ConversionService.class)
   public DomainClassConverter domainClassConverter(ConversionService conversionService) {
     return new DomainClassConverter(conversionService);
   }

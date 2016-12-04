@@ -1,8 +1,7 @@
 package io.jandy.domain.cache;
 
-import org.springframework.http.HttpHeaders;
-
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author JCooky
@@ -11,7 +10,7 @@ import java.io.Serializable;
 public class HttpCacheEntry<T> implements Serializable {
   private String etag;
   private T body;
-  private HttpHeaders headers;
+  private List<String> link;
 
   public String getEtag() {
     return etag;
@@ -31,12 +30,12 @@ public class HttpCacheEntry<T> implements Serializable {
     return this;
   }
 
-  public HttpHeaders getHeaders() {
-    return headers;
+
+  public void setLink(List<String> link) {
+    this.link = link;
   }
 
-  public HttpCacheEntry setHeaders(HttpHeaders headers) {
-    this.headers = headers;
-    return this;
+  public List<String> getLink() {
+    return link;
   }
 }

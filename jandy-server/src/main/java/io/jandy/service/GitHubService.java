@@ -116,20 +116,22 @@ public class GitHubService {
     result.addAll(Arrays.asList(entry.getBody()));
 
     Pattern pattern = Pattern.compile("<(?<url>[:.\\-/a-z?&=0-9_]+)>;\\s+rel=\"(?<key>\\w+)\"");
-    entry.getLink().stream()
-        .flatMap(links -> Arrays.stream(StringUtils.split(links, ',')))
-        .filter(link -> link != null)
-        .map(String::trim)
-        .map(pattern::matcher)
-        .filter(Matcher::matches)
-        .map(m -> new KeyValue<>(m.group("key"), m.group("url")))
-        .filter(m -> m.getKey().equals("next"))
-        .map(KeyValue::getValue)
-        .findFirst()
-        .ifPresent((nextUrl) -> {
-          logger.trace("PRINT nextUrl: {}", nextUrl);
-          result.addAll(getForAll(nextUrl, cls));
-        });
+    if (entry.getLink() != null && !entry.getLink().isEmpty()) {
+      entry.getLink().stream()
+          .flatMap(links -> Arrays.stream(StringUtils.split(links, ',')))
+          .filter(link -> link != null)
+          .map(String::trim)
+          .map(pattern::matcher)
+          .filter(Matcher::matches)
+          .map(m -> new KeyValue<>(m.group("key"), m.group("url")))
+          .filter(m -> m.getKey().equals("next"))
+          .map(KeyValue::getValue)
+          .findFirst()
+          .ifPresent((nextUrl) -> {
+            logger.trace("PRINT nextUrl: {}", nextUrl);
+            result.addAll(getForAll(nextUrl, cls));
+          });
+    }
 
     return result;
   }

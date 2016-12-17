@@ -39,7 +39,7 @@ public class GitHubService {
 
   public GitHubService(RestTemplateBuilder builder) {
     this.restTemplate = builder
-        .build(CachedRestTemplate.class);
+            .build(CachedRestTemplate.class);
 
     this.restTemplate.setAccept("application/vnd.github.v3+json");
   }
@@ -74,30 +74,6 @@ public class GitHubService {
     return getForAll("https://api.github.com/users/{login}/repos", GHRepo[].class, login);
   }
 
-  public List<GHRepo> getUserRepos(String login, int projectsNumberPerPage) {
-    
-    String url = "https://api.github.com/users/{login}/repos" + "?per_page=" + projectsNumberPerPage; 
-    return getForAll(url, GHRepo[].class, login);
-  }
-
-  public List<GHRepo> getNextPageUserRepos(String login, int projectCount) {
-
-    String url = url("https://api.github.com/users/{login}/repos");
-    int nextPageIndex = (projectCount / PROJECTS_NUMBER_PER_PAGE) + 1;
-    String tempUrl = url + "&per_page=" + PROJECTS_NUMBER_PER_PAGE + "&page=" + nextPageIndex;
-
-    return Arrays.asList(executeWithCache(tempUrl, (restTemplate) -> restTemplate.getForEntity(tempUrl, GHRepo[].class, login)));
-  }
-
-  public List<GHRepo> getNextPageOrgRepos(String login, int projectCount) {
-
-    String url = url("https://api.github.com/orgs/{login}/repos");
-    int nextPageIndex = (projectCount / PROJECTS_NUMBER_PER_PAGE) + 1;
-    String tempUrl = url + "&per_page=" + PROJECTS_NUMBER_PER_PAGE + "&page=" + nextPageIndex;
-
-    return Arrays.asList(executeWithCache(tempUrl, (restTemplate) -> restTemplate.getForEntity(tempUrl, GHRepo[].class, login)));
-  }
-
   public List<GHRepo> getOrgRepos(String login) {
     return Arrays.asList(restTemplate.getForObject("https://api.github.com/orgs/{login}/repos", GHRepo[].class, login));
   }
@@ -115,12 +91,12 @@ public class GitHubService {
     return restTemplate.getUriTemplateHandler().expand(url, uriParams);
   }
 
-  private <T> T getForObject(String url, Class<T> cls, Object ...uriParams) {
+  private <T> T getForObject(String url, Class<T> cls, Object... uriParams) {
 
     return restTemplate.getForObject(
-        cacheManager.getCache(namespace()),
-        uri(url, uriParams),
-        cls
+            cacheManager.getCache(namespace()),
+            uri(url, uriParams),
+            cls
     );
   }
 
@@ -128,11 +104,11 @@ public class GitHubService {
     return this.getClass().getName();
   }
 
-  private <R> List<R> getForAll(String url, Class<R[]> cls, Object ...uriParams) {
+  private <R> List<R> getForAll(String url, Class<R[]> cls, Object... uriParams) {
     HttpCacheEntry<R[]> entry = restTemplate.getForCacheEntry(
-        cacheManager.getCache(namespace()),
-        uri(url, uriParams),
-        cls
+            cacheManager.getCache(namespace()),
+            uri(url, uriParams),
+            cls
     );
 
     logger.debug("Call getForAll({}, {})", url, cls);
@@ -140,20 +116,22 @@ public class GitHubService {
     result.addAll(Arrays.asList(entry.getBody()));
 
     Pattern pattern = Pattern.compile("<(?<url>[:.\\-/a-z?&=0-9_]+)>;\\s+rel=\"(?<key>\\w+)\"");
-    entry.getLink().stream()
-        .flatMap(links -> Arrays.stream(StringUtils.split(links, ',')))
-        .filter(link -> link != null)
-        .map(String::trim)
-        .map(pattern::matcher)
-        .filter(Matcher::matches)
-        .map(m -> new KeyValue<>(m.group("key"), m.group("url")))
-        .filter(m -> m.getKey().equals("next"))
-        .map(KeyValue::getValue)
-        .findFirst()
-        .ifPresent((nextUrl) -> {
-          logger.trace("PRINT nextUrl: {}", nextUrl);
-          result.addAll(getForAll(nextUrl, cls));
-        });
+    if (entry.getLink() != null && !entry.getLink().isEmpty()) {
+      entry.getLink().stream()
+              .flatMap(links -> Arrays.stream(StringUtils.split(links, ',')))
+              .filter(link -> link != null)
+              .map(String::trim)
+              .map(pattern::matcher)
+              .filter(Matcher::matches)
+              .map(m -> new KeyValue<>(m.group("key"), m.group("url")))
+              .filter(m -> m.getKey().equals("next"))
+              .map(KeyValue::getValue)
+              .findFirst()
+              .ifPresent((nextUrl) -> {
+                logger.trace("PRINT nextUrl: {}", nextUrl);
+                result.addAll(getForAll(nextUrl, cls));
+              });
+    }
 
     return result;
   }

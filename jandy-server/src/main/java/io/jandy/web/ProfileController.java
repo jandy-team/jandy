@@ -89,7 +89,6 @@ public class ProfileController {
         .addObject("organizations", organizations)
         .addObject("repositories", repositories)
         .addObject("imported", imported)
-        .addObject("projects_number_per_page", gitHubService.PROJECTS_NUMBER_PER_PAGE)
         ;
   }
 
@@ -155,43 +154,5 @@ public class ProfileController {
             .collect(Collectors.toList());
 
   }
-
-  @RequestMapping(value="/projects/loadNext/{owner}/{currentPageProjectCount}", method = RequestMethod.GET)
-  @ResponseBody
-  public List<GHRepo> loadNextPageProjects(@PathVariable String owner, @PathVariable int currentPageProjectCount) throws IOException {
-
-    logger.info("loadNextPageProjects owner : " + owner + " currentPageProjectCount : " + currentPageProjectCount);
-
-    GHUser ghUser = gitHubService.getUser();
-
-    List<GHRepo> nextPageProjects = new LinkedList<>();
-
-    int projectsCount = 0;
-    if(ghUser.getLogin().contentEquals(owner)) {
-      logger.info("load projects from user");
-      projectsCount = ghUser.getPublicRepos();
-
-      if(currentPageProjectCount >= projectsCount) {
-        return null;
-      }
-
-      nextPageProjects.addAll(gitHubService.getNextPageUserRepos(ghUser.getLogin(), currentPageProjectCount));
-
-    } else {
-      logger.info("load projects from org");
-      System.out.println(userService.getSelf().getLogin() +  "        " + owner);
-      projectsCount = gitHubService.getOrg(owner).getPublicRepos();
-
-      if(currentPageProjectCount >= projectsCount) {
-        return null;
-      }
-
-      nextPageProjects.addAll(gitHubService.getNextPageOrgRepos(ghUser.getLogin(), currentPageProjectCount));
-
-    }
-
-    return nextPageProjects;
-  }
-
 
 }

@@ -67,15 +67,6 @@
 
     });
 
-    $(window).scroll(function() {
-
-      if($(window).scrollTop() + $(window).height() == $(document).height()) {
-
-        loadNextPageProjects(importedProjectsIds);
-      }
-
-    });
-
     // Request projects
     function requestProjects(owner, color) {
 
@@ -117,66 +108,8 @@
 
             activateBootstrapSwitch();
 
-            windowHeight = $(window).height();
-            bodyHeight = $("body").height();
-
-            loadedProjectCount = $(".repo_row").length;
-
-            var ownerProjectCount = getOwnerProjectCount(owner);
-
-            if((bodyHeight <= windowHeight) && (loadedProjectCount < ownerProjectCount)) {
-              loadNextPageProjects(importedProjectsIds);
-            }
-
           });
 
-    }
-
-    function getOwnerProjectCount(owner) {
-
-      var projectCount = 0;
-      var owners = $(".list-group-item").find("div");
-
-      owners.each(function(number, element) {
-
-        if($(element).find(".col-md-9").text() === owner) {
-          projectCount = $(element).find(".col-md-3").text();
-        }
-
-      });
-
-      return projectCount;
-    }
-
-    // Request projects after current loaded projects
-    function loadNextPageProjects(importedProjectsIds) {
-
-      var owner = $(".repo_row").attr("data-full-name").split("/", 1)[0];
-      var currentPageProjectCount = $("div[class='repo_row']").length;
-
-      var windowHeight = $(window).height();
-      var bodyHeight = $("body").height();
-
-      $.ajax({
-        url: "${root}/profile/projects/loadNext/" + owner + "/" + currentPageProjectCount,
-        type: "GET"
-      }).done(function (projects) {
-
-        $(".panel-body").append(makeProjectDivs(projects, importedProjectsIds));
-        activateBootstrapSwitch();
-
-        windowHeight = $(window).height();
-        bodyHeight = $("body").height();
-
-        loadedProjectCount = $(".repo_row").length;
-
-        var ownerProjectCount = getOwnerProjectCount(owner);
-
-        if((bodyHeight <= windowHeight) && (loadedProjectCount < ownerProjectCount)) {
-          loadNextPageProjects(importedProjectsIds);
-        }
-
-      });
     }
 
     function makeProjectDivs(projects, importedProjectsIds) {

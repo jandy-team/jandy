@@ -14,6 +14,11 @@ spring:
   redis:
     type: embedded
     port: ${random.int[10024,65536]}
+  http:
+    multipart:
+      enabled: true
+      max-file-size: 512MB
+      max-request-size: 1024MB
 security:
   basic.enabled: false
   oauth2:
@@ -31,10 +36,6 @@ server.port: 3000
 jandy:
   zk:
     type: embedded
-multipart:
-  enabled: true
-  max-file-size: 512MB
-  max-request-size: 1024MB
 logging.level:
   io.jandy: TRACE
 #  org.hibernate.SQL: debug

@@ -51,7 +51,8 @@ public class TravisRestService {
 
     Build build = buildRepository.findByTravisBuildId(bi.getBuildId());
     if (build != null) {
-      buildRepository.deleteProfilesById(build.getId());
+      profContextDumpRepository.delete(build.getProfiles());
+      sampleRepository.delete(build.getSamples());
       buildRepository.delete(build);
     }
 

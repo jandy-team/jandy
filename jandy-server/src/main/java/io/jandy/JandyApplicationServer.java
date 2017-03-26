@@ -1,6 +1,9 @@
 package io.jandy;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import io.jandy.service.ProfService;
+import io.jandy.service.impl.ProfServiceForJPA;
+import io.jandy.service.impl.ProfServiceForMySQL;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,11 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.system.ApplicationPidFileWriter;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.task.TaskExecutor;
@@ -52,6 +58,18 @@ public class JandyApplicationServer implements CommandLineRunner {
     taskExecutor.setCorePoolSize(Runtime.getRuntime().availableProcessors()-1);
     return taskExecutor;
   }
+
+//  @Bean
+//  @Profile("mysql")
+//  public ProfService profServiceForMySQL() {
+//    return new ProfServiceForMySQL();
+//  }
+//
+//  @Bean
+//  @Profile("!mysql")
+//  public ProfService profServiceForJPA() {
+//    return new ProfServiceForJPA();
+//  }
 
   @Override
   public void run(String... args) throws Exception {

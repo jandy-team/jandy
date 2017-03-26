@@ -280,7 +280,7 @@
 				<version>1.8</version>
 				<executions>
 					<execution>
-						<phase>process-resources</phase>
+						<phase>initialize</phase>
 						<goals>
 							<goal>run</goal>
 						</goals>

@@ -1,5 +1,8 @@
 package io.jandy.domain;
 
+import lombok.Data;
+import lombok.experimental.Accessors;
+
 import javax.persistence.*;
 
 /**
@@ -7,6 +10,8 @@ import javax.persistence.*;
  * @since 2016-06-14
  */
 @Entity
+@Data
+@Accessors(chain = true)
 public class ProfException {
   @Id
   private String id;
@@ -20,30 +25,4 @@ public class ProfException {
   @OneToOne(mappedBy = "exception")
   private ProfTreeNode treeNode;
 
-  public String getId() {
-    return id;
-  }
-
-  public ProfException setId(String id) {
-    this.id = id;
-    return this;
-  }
-
-  public String getMessage() {
-    return message;
-  }
-
-  public ProfException setMessage(String message) {
-    this.message = message;
-    return this;
-  }
-
-  public ProfClass getKlass() {
-    return klass;
-  }
-
-  public ProfException setKlass(ProfClass klass) {
-    this.klass = klass;
-    return this;
-  }
 }

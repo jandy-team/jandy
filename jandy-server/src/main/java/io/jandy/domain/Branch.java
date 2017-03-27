@@ -1,6 +1,7 @@
 package io.jandy.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.List;
  * @since 2015-06-30
  */
 @Entity
+@Data
 public class Branch {
   @Id
   @GeneratedValue
@@ -25,36 +27,4 @@ public class Branch {
   @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "branch")
   @OrderBy("number DESC")
   private List<Build> builds = new ArrayList<>();
-
-  public long getId() {
-    return id;
-  }
-
-  public void setId(long id) {
-    this.id = id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public Project getProject() {
-    return project;
-  }
-
-  public void setProject(Project project) {
-    this.project = project;
-  }
-
-  public List<Build> getBuilds() {
-    return builds;
-  }
-
-  public void setBuilds(List<Build> builds) {
-    this.builds = builds;
-  }
 }

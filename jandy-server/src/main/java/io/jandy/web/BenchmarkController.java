@@ -1,8 +1,8 @@
 package io.jandy.web;
 
 import io.jandy.domain.*;
-import io.jandy.service.GitHubService;
-import io.jandy.service.data.GHUser;
+import io.jandy.util.api.GitHubApi;
+import io.jandy.util.api.json.GHUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author JCooky
@@ -21,7 +20,7 @@ import java.util.Map;
 public class BenchmarkController {
 
   @Autowired
-  private GitHubService github;
+  private GitHubApi github;
 
   @RequestMapping("/{id:\\d+}")
   public ModelAndView getProf(@PathVariable("id") ProfContextDump prof) throws IOException {

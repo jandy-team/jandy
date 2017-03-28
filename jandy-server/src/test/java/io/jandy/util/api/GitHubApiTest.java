@@ -1,38 +1,21 @@
-package io.jandy.service;
+package io.jandy.util.api;
 
+import io.jandy.util.api.GitHubApi;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.TypeExcludeFilter;
-import org.springframework.boot.test.autoconfigure.web.client.MockRestServiceServerAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.boot.test.web.client.MockServerRestTemplateCustomizer;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
-import org.springframework.security.oauth2.config.annotation.web.configuration.OAuth2ClientConfiguration;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
-
-import static org.junit.Assert.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -46,20 +29,17 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  * @since 2016-11-27
  */
 @RunWith(SpringRunner.class)
-@RestClientTest(GitHubService.class)
-public class GitHubServiceTest {
+@RestClientTest(GitHubApi.class)
+public class GitHubApiTest {
 
   @Autowired
-  private GitHubService gitHubService;
+  private GitHubApi gitHubApi;
 
   @MockBean
   private CacheManager cacheManager;
 
   @MockBean
   private OAuth2ClientContext clientContext;
-
-//  @Autowired
-//  private RestTemplate restTemplate;
 
   @Autowired
   private MockRestServiceServer server;
@@ -71,8 +51,8 @@ public class GitHubServiceTest {
     Cache page1 = mock(Cache.class, "page1"),
         page2 = mock(Cache.class, "page2");
 
-    when(cacheManager.getCache(eq(GitHubService.class.getName()))).thenReturn(page1);
-    when(cacheManager.getCache(eq(GitHubService.class.getName()))).thenReturn(page2);
+    when(cacheManager.getCache(eq(GitHubApi.class.getName()))).thenReturn(page1);
+    when(cacheManager.getCache(eq(GitHubApi.class.getName()))).thenReturn(page2);
 
     headers = new HttpHeaders();
     headers.set(HttpHeaders.ETAG, "abcd");
@@ -88,7 +68,7 @@ public class GitHubServiceTest {
     server.expect(once(), requestTo("https://api.github.com/user/1345314/repos?page=2")).andExpect(method(HttpMethod.GET))
         .andRespond(withSuccess().headers(headers).body(new ClassPathResource("github/users-jcooky-repos.2.json")).contentType(MediaType.APPLICATION_JSON));
 
-    gitHubService.getUserRepos("jcooky");
+    gitHubApi.getUserRepos("jcooky");
 
     server.verify();
   }

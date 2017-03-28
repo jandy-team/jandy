@@ -6,6 +6,8 @@ import io.jandy.domain.data.BuildInfo;
 import io.jandy.domain.data.ProfilingContext;
 import io.jandy.domain.data.ProfilingInfo;
 import io.jandy.domain.data.TreeNode;
+import io.jandy.util.worker.JandyTask;
+import io.jandy.util.worker.JandyWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +37,7 @@ public class TravisRestService {
   private SampleRepository sampleRepository;
 
   @Autowired
-  private ProfilingDaemonService profilingDaemonService;
+  private JandyWorker jandyWorker;
 
   @Transactional
   public void begin(BuildInfo bi) {
@@ -64,7 +66,7 @@ public class TravisRestService {
     build.setNumSamples(bi.getNumSamples());
     build = buildRepository.save(build);
 
-    profilingDaemonService.start(bi.getBuildId());
+    jandyWorker.start(bi.getBuildId(), ProfService.class);
 
     logger.info("start build for profiling: {}/{} -> {}", bi.getOwnerName(), bi.getRepoName(), bi.getBuildId());
   }
@@ -99,7 +101,7 @@ public class TravisRestService {
 
   public void saveProf(ProfilingContext profilingContext) throws Exception {
     Build build = profContextDumpRepository.findOne(profilingContext.getProfId()).getBuild();
-    profilingDaemonService.put(build.getTravisBuildId(), ProfilingDaemonService.Task.SAVE, profilingContext);
+    jandyWorker.put(build.getTravisBuildId(), JandyTask.SAVE, profilingContext);
   }
 
   public void updateTreeNodes(List<TreeNode> treeNodes) throws Exception {
@@ -111,11 +113,11 @@ public class TravisRestService {
 
     logger.info("update about build id: {}", build.getId());
 
-    profilingDaemonService.put(build.getTravisBuildId(), ProfilingDaemonService.Task.UPDATE, treeNodes);
+    jandyWorker.put(build.getTravisBuildId(), JandyTask.UPDATE, treeNodes);
   }
 
   public void finish(long buildId) throws Exception {
-    profilingDaemonService.put(buildId, ProfilingDaemonService.Task.FINISH, Long.valueOf(buildId));
+    jandyWorker.put(buildId, JandyTask.FINISH, Long.valueOf(buildId));
   }
 
 }

@@ -6,14 +6,13 @@ import io.jandy.domain.data.BuildInfo;
 import io.jandy.domain.data.ProfilingContext;
 import io.jandy.domain.data.ProfilingInfo;
 import io.jandy.domain.data.TreeNode;
-import io.jandy.web.api.TravisRestV2Controller;
+import io.jandy.util.worker.JandyTask;
+import io.jandy.util.worker.JandyWorker;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -52,7 +51,7 @@ public class TravisRestServiceTest {
   private BuildRepository buildRepository;
 
   @MockBean
-  private ProfilingDaemonService profilingDaemonService;
+  private JandyWorker jandyWorker;
 
   @MockBean
   private SampleRepository sampleRepository;
@@ -102,7 +101,7 @@ public class TravisRestServiceTest {
 
     travisRestService.begin(bi);
 
-    verify(profilingDaemonService, times(1)).start(eq(bi.getBuildId()));
+    verify(jandyWorker, times(1)).start(eq(bi.getBuildId()), any());
     verify(projectRepository, times(1)).findByAccountAndName(eq(bi.getOwnerName()), eq(bi.getRepoName()));
     verify(branchRepository, times(1)).findByNameAndProject_Id(eq(bi.getBranchName()), eq(project.getId()));
     verify(buildRepository, times(1)).findByTravisBuildId(eq(bi.getBuildId()));
@@ -175,7 +174,7 @@ public class TravisRestServiceTest {
     this.travisRestService.saveProf(profContext);
 
     verify(profContextDumpRepository, times(1)).findOne(eq(profContext.getProfId()));
-    verify(profilingDaemonService, times(1)).put(eq(build.getTravisBuildId()), eq(ProfilingDaemonService.Task.SAVE), refEq(profContext));
+    verify(jandyWorker, times(1)).put(eq(build.getTravisBuildId()), eq(JandyTask.SAVE), refEq(profContext));
   }
 
   @Test
@@ -201,14 +200,14 @@ public class TravisRestServiceTest {
     travisRestService.updateTreeNodes(treenodes);
 
     verify(profContextDumpRepository, times(1)).findOne(eq(prof.getId()));
-    verify(profilingDaemonService, times(1)).put(eq(build.getTravisBuildId()), eq(ProfilingDaemonService.Task.UPDATE), refEq(treenodes));
+    verify(jandyWorker, times(1)).put(eq(build.getTravisBuildId()), eq(JandyTask.UPDATE), refEq(treenodes));
   }
 
   @Test
   public void testFinish() throws Exception {
     travisRestService.finish(1L);
 
-    verify(profilingDaemonService, times(1)).put(eq(1L), eq(ProfilingDaemonService.Task.FINISH), eq(Long.valueOf(1L)));
+    verify(jandyWorker, times(1)).put(eq(1L), eq(JandyTask.FINISH), eq(Long.valueOf(1L)));
   }
 
 }

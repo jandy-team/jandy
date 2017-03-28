@@ -14,8 +14,6 @@ import java.net.URI;
  */
 public class CachedRestTemplate extends RestTemplate {
 
-  private CacheManager cacheManager;
-
   private String accept;
 
   public void setAccept(String accept) {

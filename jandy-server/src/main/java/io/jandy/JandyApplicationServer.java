@@ -59,18 +59,6 @@ public class JandyApplicationServer implements CommandLineRunner {
     return taskExecutor;
   }
 
-//  @Bean
-//  @Profile("mysql")
-//  public ProfService profServiceForMySQL() {
-//    return new ProfServiceForMySQL();
-//  }
-//
-//  @Bean
-//  @Profile("!mysql")
-//  public ProfService profServiceForJPA() {
-//    return new ProfServiceForJPA();
-//  }
-
   @Override
   public void run(String... args) throws Exception {
     String version = IOUtils.toString(applicationContext.getResource("classpath:VERSION").getInputStream());

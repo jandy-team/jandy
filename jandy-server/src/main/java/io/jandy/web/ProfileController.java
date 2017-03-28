@@ -1,16 +1,15 @@
 package io.jandy.web;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import io.jandy.domain.Project;
 import io.jandy.domain.ProjectRepository;
 import io.jandy.domain.User;
 import io.jandy.exception.UserNotFoundException;
-import io.jandy.service.GitHubService;
+import io.jandy.util.api.GitHubApi;
 import io.jandy.service.UserService;
-import io.jandy.service.data.GHOrg;
-import io.jandy.service.data.GHRepo;
-import io.jandy.service.data.GHUser;
+import io.jandy.util.api.json.GHOrg;
+import io.jandy.util.api.json.GHRepo;
+import io.jandy.util.api.json.GHUser;
 import io.jandy.util.ColorUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -40,7 +39,7 @@ public class ProfileController {
   @Autowired
   private UserService userService;
   @Autowired
-  private GitHubService gitHubService;
+  private GitHubApi gitHubApi;
   @Autowired
   private ProjectRepository projectRepository;
 
@@ -52,17 +51,17 @@ public class ProfileController {
 
     logger.debug("calling page 'index' ");
 
-    GHUser ghUser = gitHubService.getUser();
-    List<GHOrg> organizations = gitHubService.getUserOrgs(ghUser.getLogin()).stream()
-        .map(org -> gitHubService.getOrg((String) org.getLogin()))
+    GHUser ghUser = gitHubApi.getUser();
+    List<GHOrg> organizations = gitHubApi.getUserOrgs(ghUser.getLogin()).stream()
+        .map(org -> gitHubApi.getOrg((String) org.getLogin()))
         .collect(Collectors.toList());
     logger.trace("fetch from github, data: {}", organizations);
 
 
     Map<String, List<GHRepo>> repositories = new LinkedHashMap<>();
-    repositories.put(ghUser.getLogin(), gitHubService.getUserRepos(ghUser.getLogin()));
-    for (GHOrg org : gitHubService.getUserOrgs(ghUser.getLogin())) {
-      repositories.put(org.getLogin(), gitHubService.getOrgRepos(org.getLogin()));
+    repositories.put(ghUser.getLogin(), gitHubApi.getUserRepos(ghUser.getLogin()));
+    for (GHOrg org : gitHubApi.getUserOrgs(ghUser.getLogin())) {
+      repositories.put(org.getLogin(), gitHubApi.getOrgRepos(org.getLogin()));
     }
     logger.trace("get repositories: {}", repositories);
 
@@ -100,7 +99,7 @@ public class ProfileController {
 
     Project project = projectRepository.findByAccountAndName(account, name);
     if (project == null) {
-      GHRepo repository = gitHubService.getRepo(account, name);
+      GHRepo repository = gitHubApi.getRepo(account, name);
       project = new Project();
       project.setAccount(account);
       project.setGitHubId(repository.getId());

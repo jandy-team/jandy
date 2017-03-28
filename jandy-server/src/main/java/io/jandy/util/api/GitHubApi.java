@@ -1,9 +1,9 @@
-package io.jandy.service;
+package io.jandy.util.api;
 
 import io.jandy.domain.cache.HttpCacheEntry;
-import io.jandy.service.data.GHOrg;
-import io.jandy.service.data.GHRepo;
-import io.jandy.service.data.GHUser;
+import io.jandy.util.api.json.GHOrg;
+import io.jandy.util.api.json.GHRepo;
+import io.jandy.util.api.json.GHUser;
 import io.jandy.util.CachedRestTemplate;
 import org.apache.commons.lang3.StringUtils;
 import org.javatuples.KeyValue;
@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.CacheManager;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.*;
 
 import java.net.URI;
@@ -25,9 +25,9 @@ import java.util.regex.Pattern;
  * @author JCooky
  * @since 2015-07-01
  */
-@Service
-public class GitHubService {
-  private Logger logger = LoggerFactory.getLogger(GitHubService.class);
+@Component
+public class GitHubApi {
+  private Logger logger = LoggerFactory.getLogger(GitHubApi.class);
 
   @Autowired
   private OAuth2ClientContext clientContext;
@@ -37,7 +37,7 @@ public class GitHubService {
 
   private CachedRestTemplate restTemplate;
 
-  public GitHubService(RestTemplateBuilder builder) {
+  public GitHubApi(RestTemplateBuilder builder) {
     this.restTemplate = builder
         .build(CachedRestTemplate.class);
 

@@ -1,8 +1,9 @@
-package io.jandy.service.data;
+package io.jandy.util.api.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.Data;
+import lombok.ToString;
 
 import java.io.Serializable;
 
@@ -10,6 +11,7 @@ import java.io.Serializable;
  * @author JCooky
  * @since 2016-04-08
  */
+@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GHRepo implements Serializable {
   @JsonProperty("id")

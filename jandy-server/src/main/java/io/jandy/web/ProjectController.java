@@ -4,14 +4,13 @@ import freemarker.template.TemplateException;
 import io.jandy.domain.*;
 import io.jandy.exception.BadgeUnknownException;
 import io.jandy.exception.ProjectNotRegisteredException;
-import io.jandy.service.GitHubService;
+import io.jandy.util.api.GitHubApi;
 import io.jandy.service.UserService;
-import io.jandy.service.data.GHUser;
+import io.jandy.util.api.json.GHUser;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.querydsl.QPageRequest;
@@ -55,7 +54,7 @@ public class ProjectController {
   @Autowired
   private FreeMarkerConfigurer configurer;
   @Autowired
-  private GitHubService github;
+  private GitHubApi github;
 
   @Autowired
   private UserService userService;

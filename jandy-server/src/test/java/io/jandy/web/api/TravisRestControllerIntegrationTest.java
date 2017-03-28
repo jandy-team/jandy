@@ -5,7 +5,7 @@
 //import io.jandy.domain.ProjectRepository;
 //import io.jandy.domain.User;
 //import io.jandy.domain.UserRepository;
-//import io.jandy.service.TravisClient;
+//import io.jandy.util.TravisApi;
 //import io.jandy.service.TravisRestService;
 //import io.jandy.test.util.WebLog;
 //import org.junit.After;

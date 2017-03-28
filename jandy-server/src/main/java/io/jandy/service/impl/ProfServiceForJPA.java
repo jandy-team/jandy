@@ -63,12 +63,15 @@ public class ProfServiceForJPA extends ProfService {
 
         if (exceptionObjects.size() > 0) {
             for (ExceptionObject eo : exceptionObjects) {
-                ProfClass profClass = profClassRepository.findByNameAndPackageName(eo.getKlass().getName(), eo.getKlass().getPackageName());
-                if (profClass == null) {
-                    profClass = new ProfClass();
-                    profClass.setName(eo.getKlass().getName());
-                    profClass.setPackageName(eo.getKlass().getPackageName());
-                    profClass = profClassRepository.save(profClass);
+                ProfClass profClass = null;
+                if (eo.getKlass() != null) {
+                    profClass = profClassRepository.findByNameAndPackageName(eo.getKlass().getName(), eo.getKlass().getPackageName());
+                    if (profClass == null) {
+                        profClass = new ProfClass();
+                        profClass.setName(eo.getKlass().getName());
+                        profClass.setPackageName(eo.getKlass().getPackageName());
+                        profClass = profClassRepository.save(profClass);
+                    }
                 }
                 ProfException profException = new ProfException();
                 profException.setId(eo.getId());

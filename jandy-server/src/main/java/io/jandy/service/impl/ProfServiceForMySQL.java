@@ -49,7 +49,7 @@ public class ProfServiceForMySQL extends ProfService {
                     .columns("name", "access", "descriptor", "owner_id")
                     .values(methodObjects.stream().map(mo -> new Object[]{
                             mo.getName(), mo.getAccess(), mo.getDescriptor(),
-                            subQuery(
+                            mo.getOwner() == null ? null : subQuery(
                                     select().columns("id").from("prof_class").where(
                                             eq("name", mo.getOwner().getName()).and(eq("package_name", mo.getOwner().getPackageName()))
                                     )
@@ -63,7 +63,7 @@ public class ProfServiceForMySQL extends ProfService {
                     .columns("id", "message", "klass_id")
                     .values(exceptionObjects.stream().map(eo -> new Object[]{
                             eo.getId(), eo.getMessage(),
-                            subQuery(
+                            eo.getKlass() == null ? null : subQuery(
                                     select().columns("id").from("prof_class").where(
                                             eq("name", eo.getKlass().getName()).and(eq("package_name", eo.getKlass().getPackageName()))
                                     )

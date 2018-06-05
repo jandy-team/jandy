@@ -1,11 +1,9 @@
 package io.jandy.service;
 
-import com.google.common.collect.ImmutableMap;
 import io.jandy.domain.Build;
-import io.jandy.domain.ProjectRepository;
 import io.jandy.domain.User;
-import io.jandy.service.data.GHUser;
-import io.jandy.util.SmallTime;
+import io.jandy.util.api.json.GHUser;
+import io.jandy.util.api.GitHubApi;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -32,7 +30,7 @@ public class Reporter {
   private FreeMarkerConfigurer freeMarkerConfigurer;
 
   @Autowired
-  private GitHubService github;
+  private GitHubApi github;
 
   @Async
   public void sendMail(User user, Build current) throws MessagingException {

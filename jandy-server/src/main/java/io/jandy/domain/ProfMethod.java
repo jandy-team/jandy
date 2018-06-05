@@ -1,5 +1,7 @@
 package io.jandy.domain;
 
+import lombok.Data;
+import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
@@ -9,48 +11,21 @@ import javax.persistence.*;
  * @since 2015-07-08
  */
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"name", "descriptor", "access", "owner_id"}))
+@Data
+@Accessors(chain = true)
 public class ProfMethod {
   @Id
-  private String id;
+  @GeneratedValue
+  private Long id;
 
   private String name;
+  @Column(length = 512)
   private String descriptor;
   private int access;
 
   @ManyToOne
   private ProfClass owner;
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getDescriptor() {
-    return descriptor;
-  }
-
-  public void setDescriptor(String descriptor) {
-    this.descriptor = descriptor;
-  }
-
-  public ProfClass getOwner() {
-    return owner;
-  }
-
-  public void setOwner(ProfClass owner) {
-    this.owner = owner;
-  }
 
   @Override
   public String toString() {
@@ -60,13 +35,5 @@ public class ProfMethod {
         .append("descriptor", descriptor)
         .append("owner", owner)
         .toString();
-  }
-
-  public void setAccess(int access) {
-    this.access = access;
-  }
-
-  public int getAccess() {
-    return access;
   }
 }

@@ -4,15 +4,14 @@ import freemarker.template.TemplateException;
 import io.jandy.domain.*;
 import io.jandy.exception.BadgeUnknownException;
 import io.jandy.exception.ProjectNotRegisteredException;
-import io.jandy.service.GitHubService;
+import io.jandy.util.api.GitHubApi;
 import io.jandy.service.UserService;
-import io.jandy.service.data.GHUser;
+import io.jandy.util.api.json.GHUser;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.http.CacheControl;
@@ -40,7 +39,7 @@ import java.util.Locale;
 @Controller
 @RequestMapping("/repos")
 public class ProjectController {
-  private final Logger logger = LoggerFactory.getLogger(ProjectController.class);
+  private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
   @Autowired
   private ProjectRepository projectRepository;
@@ -55,20 +54,24 @@ public class ProjectController {
   @Autowired
   private FreeMarkerConfigurer configurer;
   @Autowired
-  private GitHubService github;
+  private GitHubApi github;
 
   @Autowired
   private UserService userService;
 
   @RequestMapping(method = RequestMethod.GET)
   public ModelAndView index() throws Exception {
-    List<Project> projects = userService.getSelf().getProjects();
-
-    if (projects.isEmpty()) {
-      logger.debug("Send redirect to /profile");
-      return new ModelAndView("redirect:/profile");
+    if (userService.isAnonymous()) {
+      return new ModelAndView("redirect:/");
     } else {
-      return new ModelAndView("redirect:/repos/" + projects.get(0).getAccount() + "/" + projects.get(0).getName());
+      List<Project> projects = userService.getSelf().getProjects();
+
+      if (projects.isEmpty()) {
+        logger.debug("Send redirect to /profile");
+        return new ModelAndView("redirect:/profile");
+      } else {
+        return new ModelAndView("redirect:/repos/" + projects.get(0).getAccount() + "/" + projects.get(0).getName());
+      }
     }
   }
 
@@ -83,14 +86,22 @@ public class ProjectController {
     url = url.substring(0, url.indexOf(request.getServletPath()));
 
     PrettyTime p = new PrettyTime(Locale.ENGLISH);
+    final String[] committerAvatarUrl = new String[1];
     builds.stream().forEach(b -> {
       if (b.getFinishedAt() != null)
         b.setBuildAt(p.format(DatatypeConverter.parseDateTime(b.getFinishedAt())));
       if (b.getCommit() != null) {
         GHUser user = null;
-        user = github.getUser(b.getCommit().getCommitterName());
-        // TODO This code is temporary
-        b.getCommit().setCommitterAvatarUrl(user == null ? null : user.getAvatarUrl());
+        try {
+          user = github.getUser(b.getCommit().getCommitterName());
+          committerAvatarUrl[0] = user.getAvatarUrl();
+        } catch(NullPointerException e){
+          logger.error(e.getMessage(),e);
+          committerAvatarUrl[0] = null;
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
+        b.getCommit().setCommitterAvatarUrl(committerAvatarUrl[0]);
       }
     });
 
@@ -103,7 +114,7 @@ public class ProjectController {
 
   @RequestMapping(value = "/{account}/{projectName}.svg")
   public ResponseEntity<String> getBadge(@PathVariable String account, @PathVariable String projectName) throws Exception {
-    return getBadge(account, projectName, "master");
+    return getBadge(account, projectName, github.getRepo(account, projectName).getDefaultBranch());
   }
 
   @RequestMapping(value = "/{account}/{projectName}/{branchName}.svg")

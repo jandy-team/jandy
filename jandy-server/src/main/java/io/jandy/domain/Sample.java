@@ -1,6 +1,9 @@
 package io.jandy.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -11,6 +14,9 @@ import java.util.List;
  * @since 2016-02-06
  */
 @Entity
+@Data
+@Accessors(chain = true)
+@ToString(exclude = {"project", "builds", "profiles"})
 public class Sample {
   @Id
   @GeneratedValue
@@ -29,48 +35,4 @@ public class Sample {
   @OneToMany(mappedBy = "sample", cascade = CascadeType.REMOVE)
   private List<ProfContextDump> profiles = new ArrayList<>();
 
-  public Long getId() {
-    return id;
-  }
-
-  public Sample setId(Long id) {
-    this.id = id;
-    return this;
-  }
-
-  public List<ProfContextDump> getProfiles() {
-    return profiles;
-  }
-
-  public Sample setProfiles(List<ProfContextDump> profiles) {
-    this.profiles = profiles;
-    return this;
-  }
-
-  public List<Build> getBuilds() {
-    return builds;
-  }
-
-  public Sample setBuilds(List<Build> builds) {
-    this.builds = builds;
-    return this;
-  }
-
-  public Sample setName(String name) {
-    this.name = name;
-    return this;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public Sample setProject(Project project) {
-    this.project = project;
-    return this;
-  }
-
-  public Project getProject() {
-    return project;
-  }
 }

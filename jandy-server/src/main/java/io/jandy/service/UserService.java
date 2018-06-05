@@ -3,7 +3,8 @@ package io.jandy.service;
 import io.jandy.domain.User;
 import io.jandy.domain.UserRepository;
 import io.jandy.exception.UserNotFoundException;
-import io.jandy.service.data.GHUser;
+import io.jandy.util.api.json.GHUser;
+import io.jandy.util.api.GitHubApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,7 @@ public class UserService {
   @Autowired
   private UserRepository userRepository;
   @Autowired
-  private GitHubService gitHubService;
+  private GitHubApi gitHubApi;
 
   @Transactional
   private User getUser(GHUser ghUser) throws IOException {
@@ -37,18 +38,18 @@ public class UserService {
   }
 
   public User getUser(String login) throws IOException, UserNotFoundException {
-    GHUser ghUser = gitHubService.getUser(login);
+    GHUser ghUser = gitHubApi.getUser(login);
     if (ghUser == null)
       throw new UserNotFoundException();
     return getUser(ghUser);
   }
 
   public User getSelf() throws IOException {
-    GHUser self = gitHubService.getUser();
+    GHUser self = gitHubApi.getUser();
     return self != null ? getUser(self) : null;
   }
 
   public boolean isAnonymous() {
-    return gitHubService.isAnonymous();
+    return gitHubApi.isAnonymous();
   }
 }

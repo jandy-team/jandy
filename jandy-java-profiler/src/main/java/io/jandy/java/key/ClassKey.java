@@ -1,16 +1,29 @@
 package io.jandy.java.key;
 
-import com.github.jcooky.jaal.common.profile.ClassType;
-
 /**
  * @author JCooky
  * @since 2015-09-20
  */
 public class ClassKey {
-  private ClassType classType;
+  public String packageName, className;
 
-  public ClassKey(ClassType classType) {
-    this.classType = classType;
+  public ClassKey(String className) {
+    int idx = className.lastIndexOf('.');
+    String packageName;
+    if (idx == -1)
+      packageName = "";
+    else {
+      packageName = className.substring(0, idx);
+      className = className.substring(idx+1);
+    }
+
+    this.packageName = packageName;
+    this.className = className;
+  }
+
+  public ClassKey(String packageName, String className) {
+    this.packageName = packageName;
+    this.className = className;
   }
 
   @Override
@@ -20,12 +33,23 @@ public class ClassKey {
 
     ClassKey classKey = (ClassKey) o;
 
-    return !(classType != null ? !classType.equals(classKey.classType) : classKey.classType != null);
+    if (packageName != null ? !packageName.equals(classKey.packageName) : classKey.packageName != null) return false;
+    return className != null ? className.equals(classKey.className) : classKey.className == null;
 
   }
 
   @Override
   public int hashCode() {
-    return classType != null ? classType.hashCode() : 0;
+    int result = packageName != null ? packageName.hashCode() : 0;
+    result = 31 * result + (className != null ? className.hashCode() : 0);
+    return result;
+  }
+
+  public String getPackageName() {
+    return packageName;
+  }
+
+  public String getClassName() {
+    return className;
   }
 }

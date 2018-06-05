@@ -1,11 +1,17 @@
 spring:
-  jpa.hibernate:
-    ddl-auto: update
+  jpa:
+    properties.hibernate:
+        jdbc.batch_size: 500
+        cache.use_second_level_cache: false
+    hibernate:
+      ddl-auto: update
   datasource:
+#    url: jdbc:mysql://localhost/jandy?useUnicode=true&characterEncoding=utf8
     url: jdbc:mysql://localhost/jandy?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true
     username: root
     password:
     driver-class-name: com.mysql.jdbc.Driver
     continue-on-error: true
-    validation-query: SELECT 1
-    test-on-borrow: true
+    tomcat:
+      validation-query: SELECT 1
+      test-on-borrow: true

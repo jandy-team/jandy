@@ -1,3 +1,6 @@
+spring:
+  redis:
+    type: embedded
+
 logging.level:
   io.jandy: TRACE
-  org.springframework.web: DEBUG

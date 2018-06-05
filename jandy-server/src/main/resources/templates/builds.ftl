@@ -62,7 +62,7 @@
                   <#assign color = (elapsedDuration <= 0)?then("green", "red")>
                   <#assign message = (elapsedDuration <= 0)?then(percent+"% faster than before", percent+"% slower than before")>
                   <dl class="dl-horizontal">
-                    <dt>${prof.sample.name}</dt>
+                    <dt title="${prof.sample.name}">${prof.sample.name}</dt>
                     <dd>
                       <span class="pull-right">
                         <a href="${root}/prof/${prof.id}" class="btn btn-primary btn-sm" role="button">More</a>

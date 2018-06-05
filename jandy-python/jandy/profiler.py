@@ -1,76 +1,92 @@
-import json
-import threading
-import traceback
-
 import math
 import sys
-
-from jandy.factory import treeNode, profilingContext, exceptionObject
+import threading
 import time
 
+from datetime import datetime
 
-class MethodHandler(object):
-    def __init__(self):
+from jandy.context import JandyProfilingContext
+from jandy.data import ThreadObject
+
+class ThreadContext:
+    def __init__(self, threadId, threadName, builder):
         self.nodes = []
-        self.current = {'id': None, 'childrenIds': list()}
-        self.root = None
+        self.context = builder
+        self.root = self.latest = self.context.getRootTreeNode()
+
+        self.threadObject = ThreadObject(threadId=threadId, threadName=threadName, rootId=self.root.id)
+
+        self.context.save(self.latest)
+        self.depth = -1
+
+    def getThreadObject(self):
+        return self.threadObject
 
     def enter(self, frame):
         if '__package__' in frame.f_globals.keys() and frame.f_globals['__package__'] == 'jandy':
-            return
+            return False
 
-        # print('---- ENTER')
-        n = treeNode(frame, self.current['id'])
-        if self.root is None:
-            self.root = n
+        self.nodes.append(self.latest)
 
-        n['acc']['t_startTime'] = time.time()
-        n['acc']['concurThreadName'] = threading.current_thread().name
-        self.current['childrenIds'].append(n['id'])
+        n = self.context.getTreeNode(self.latest.id, frame)
+        n.acc.elapsedTime = 0
+        n.acc.startTime = time.time()
 
-        self.nodes.append(self.current)
-        self.current = n
-        # print('ENTER - '+str(self.current))
+        self.latest = n
+
+        # self.depth += 1
+        # for i in range(self.depth):
+        #     print('  ', end='')
+        #
+        # print('ENTER - %s -- %f' % (str(self.latest), self.latest.acc._start))
+
+        return True
 
     def exit(self, frame, arg, excepted):
         if '__package__' in frame.f_globals.keys() and frame.f_globals['__package__'] == 'jandy':
-            return
+            return False
+
+        if self.latest is self.root:
+            return True
 
         # print('---- EXIT: '+str(frame.f_globals))
-        startTime = self.current['acc']['t_startTime']
-        elapsedTime = time.time() - startTime
+        startTime = self.latest.acc.startTime
+        elapsedTime = self.latest.acc.elapsedTime + time.time() - startTime
 
-        self.current['acc']['startTime'] = math.floor(startTime * 1000.0 * 1000.0 * 1000.0)
-        self.current['acc']['elapsedTime'] = math.floor(elapsedTime * 1000.0 * 1000.0 * 1000.0)
+        self.latest.acc.elapsedTime = int(round(elapsedTime * 1000 * 1000 * 1000))
+        self.latest.acc.startTime = int(round(startTime * 1000 * 1000 * 1000))
         if excepted:
             (exception, value, traceback) = arg
-            self.current['acc']['exceptionId'] = exceptionObject(exception, value, traceback)['id']
+            self.latest.acc.exception = self.context.getExceptionObject(exception, value, traceback)
 
-        # print('EXIT - '+str(self.current))
-        if not excepted:
-            self.current = self.nodes.pop()
+        # for i in range(self.depth):
+        #     print('  ', end='')
+        #
+        # print('EXIT - %s -- %f / %f' % (str(self.latest), self.latest.acc.elapsedTime, self.latest.acc.startTime))
+        # self.depth -= 1
 
+        _time = time.time()
+        self.context.save(self.latest)
+        _time = time.time() - _time
 
-class MethodHandlerContext(object):
-    def __init__(self):
-        self.methodHandlers = []
-        self.local = threading.local()
+        # if not excepted:
+        self.latest = self.nodes.pop()
 
-    def get(self):
-        if hasattr(self.local, 'methodHandler') is not True:
-            self.local.methodHandler = MethodHandler()
-            self.methodHandlers.append(self.local.methodHandler)
-        return self.local.methodHandler
+        if self.latest.acc is not None:
+            self.latest.acc.elapsedTime -= _time
 
-    def roots(self):
-        return [m.root for m in self.methodHandlers]
+        return True
+
 
 class Profiler(object):
-
-    def __init__(self):
-        self.context = MethodHandlerContext()
+    def __init__(self, batchSize, URL, id):
+        self.context = JandyProfilingContext(batchSize, URL, id)
+        self.threadContexts = []
+        self.local = threading.local()
+        self.ignore = False
 
     def start(self):
+        self.context.start()
         sys.settrace(self.trace)
 
     def stop(self):
@@ -78,15 +94,22 @@ class Profiler(object):
 
     def done(self):
         self.stop()
-        context = profilingContext(self.context.roots())
-        with open("python-profiler-result.jandy", "wt") as f:
-            json.dump(context, f)
+        self.context.end(self.threadContexts)
 
     def trace(self, frame, event, arg):
         if event == 'call':
-            self.context.get().enter(frame)
+            return self.trace if self.get().enter(frame) else None
         elif event == 'return':
-            self.context.get().exit(frame, arg, False)
+            return self.trace if self.get().exit(frame, arg, False) else None
         elif event == 'exception':
-            self.context.get().exit(frame, arg, True)
+            return self.trace if self.get().exit(frame, arg, True) else None
         return self.trace
+
+    def get(self):
+        if hasattr(self.local, 'threadContext') is not True:
+            self.local.threadContext = ThreadContext(threading.current_thread().ident,
+                                                     threading.current_thread().getName(),
+                                                     self.context.getBuilder()
+                                                     )
+            self.threadContexts.append(self.local.threadContext)
+        return self.local.threadContext

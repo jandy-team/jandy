@@ -11,19 +11,19 @@ import yaml
 travis = os.getenv('TRAVIS')
 ci = os.getenv('CI')
 
-if os.getenv('DEV') == 'true':
-    URL = "http://dev.jandy.io"
+if os.getenv('JANDY_HOST'):
+    URL = os.getenv("JANDY_HOST")
 elif travis == 'true' and ci == 'true':
-    URL = "http://jandy.io"
+    URL = "jandy.org"
 else:
-    URL = "http://localhost:3000"
-JAVA_PROFILER_URL = URL + "/jandy-java-profiler.jar"
-PYTHON_PROFILER_URL = URL + "/jandy-python-profiler.zip"
+    URL = "localhost:3000"
+JAVA_PROFILER_URL = "http://" + URL + "/jandy-java-profiler.jar"
 
 ownerName, repoName = os.getenv('TRAVIS_REPO_SLUG').split('/')
 branchName = os.getenv('TRAVIS_BRANCH')
 buildId = os.getenv('TRAVIS_BUILD_ID')
 buildNum = os.getenv('TRAVIS_BUILD_NUMBER')
+
 
 def wget(url, filename):
     if travis == 'true' and os.path.exists(filename):
@@ -34,49 +34,57 @@ def wget(url, filename):
         response.close()
 
 
-def do_profile(language, id, argv):
+def do_execute(args):
+    shfile = "_jandy_prof.sh"
+    with open(shfile, "wt") as f:
+        f.writelines(" ".join(args))
+    subprocess.call(["bash", shfile])
+
+
+def do_profile(language, id, batchSize, argv):
     if language == 'java':
         wget(JAVA_PROFILER_URL, 'jandy-java-profiler.jar')
         args = argv[0:]
+        args.insert(1, '-Djandy.batch.size='+batchSize)
+        args.insert(1, '-Djandy.base.url=http://'+URL)
+        args.insert(1, '-Djandy.sample.name='+id)
         args.insert(1, '-javaagent:jandy-java-profiler.jar')
-        subprocess.call(args)
-        # base64.encode('java-profiler-result.jandy', id + '.jandy')
-        shutil.move('java-profiler-result.jandy', id + '.jandy'),
+        do_execute(args)
 
     if language == 'python':
         args = argv[0:]
         args.insert(1, '-m')
         args.insert(2, 'jandy')
-        subprocess.call(args)
-        # with open('python-profiler-result.jandy', 'rb') as input:
-        #     with open(id+'.jandy', 'wb') as output:
-        #         base64.encode(input, output)
-        shutil.move('python-profiler-result.jandy', id + '.jandy'),
+        args.insert(3, str(batchSize))
+        args.insert(4, URL)
+        args.insert(5, id)
+        do_execute(args)
 
 
 if __name__ == '__main__':
     with open('.jandy.yml', 'rb') as conf:
         yml = yaml.load(conf)
-        params = {
+        batchSize = yml['batch-size']
+
+        r = requests.post("http://" + URL + "/rest/travis/begin", data={
             'ownerName': ownerName,
             'repoName': repoName,
             'branchName': branchName,
             'buildId': buildId,
             'buildNum': buildNum,
-            'language': yml['language'].lower()
-        }
-
-        files = []
-        try:
-            for sample in yml['samples']:
-                sampleId = sample['id']
-                argv = sample['script'].split()
-                do_profile(yml['language'].lower(), sampleId, argv)
-
-                files.append(('samples', open(sampleId+'.jandy', "rb")))
-
-            r = requests.post(URL + "/rest/travis", data=params, files=files)
+            'lang': yml['language'].lower(),
+            'numSamples': len(yml['samples'])
+        })
+        if r.status_code is not 200:
             r.raise_for_status()
-        finally:
-            for tuple in files:
-                tuple[1].close()
+
+        for sample in yml['samples']:
+            sampleId = sample['id']
+            argv = sample['script'].split()
+            do_profile(yml['language'].lower(), sampleId, batchSize, argv)
+
+        r = requests.post("http://" + URL + "/rest/travis/finish", data={
+            'buildId': buildId
+        })
+        r.raise_for_status()
+
